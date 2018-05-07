@@ -117,4 +117,20 @@ class PathDiff(
      */
     val differentFiles: Set<FilePath>
         get() = commonFiles - sameFiles
+
+    /**
+     * The paths of files that were modified more recently in the right tree than in the left tree.
+     *
+     * This returns relative paths.
+     */
+    val rightNewer: Set<FSPath>
+        get() = commonFiles.filter { (right + it).toFile().lastModified() > (left + it).toFile().lastModified() }.toSet()
+
+    /**
+     * The paths of files that were modified more recently in the left tree than in the right tree.
+     *
+     * This returns relative paths.
+     */
+    val leftNewer: Set<FSPath>
+        get() = commonFiles - rightNewer
 }

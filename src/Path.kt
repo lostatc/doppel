@@ -260,7 +260,7 @@ fun main(args: Array<String>) {
     val dir2 = DirPath("/", "home", "garrett", "dtest2")
     dir2.findDescendants()
     val dirDiff = dir1 diff dir2
-    println(dirDiff.differentFiles)
+    println(dirDiff.leftNewer)
 
 }
 
