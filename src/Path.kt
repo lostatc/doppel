@@ -35,12 +35,18 @@ abstract class FSPath(protected vararg val segments: String) {
      */
     var parent: FSPath? = null
         set(value) {
-            if (toPath().isAbsolute && value != null) {
+            if (containsRoot && value != null) {
                 throw IsAbsolutePathException("absolute paths cannot have a parent")
             } else {
                 field = value
             }
         }
+
+    /**
+     * This path, excluding parents, is absolute.
+     */
+    protected val containsRoot: Boolean
+        get() = Paths.get("", *segments).isAbsolute
 
     /**
      * Creates a new path from the given [path].
@@ -65,7 +71,7 @@ abstract class FSPath(protected vararg val segments: String) {
     /**
      * Indicates wither the object [other] is equal to this one.
      *
-     * Something is equal to [FSPath] if it is the same type and if their [pathSegments] properties are equal.
+     * This path and [other] are equal if they are the same type and if their [pathSegments] properties are equal.
      */
     override operator fun equals(other: Any?) =
         if (other is FSPath && this::class == other::class) pathSegments == other.pathSegments else false
@@ -99,10 +105,17 @@ abstract class FSPath(protected vararg val segments: String) {
      */
     abstract fun copy(): FSPath
 
+    /**
+     * Return a copy of this path which is relative to [ancestor].
+     *
+     * This method climbs the tree of parents until it finds the path whose parent is [ancestor]. It then sets that
+     * path's parent to null.
+     */
     fun relativeTo(ancestor: FSPath): FSPath {
         val new = copy()
         var current = new
         while (current.parent != ancestor && current.parent != null) {
+            current.parent = current.parent?.copy()
             current = current.parent!!
         }
         current.parent = null
@@ -254,14 +267,6 @@ fun main(args: Array<String>) {
 //    val copy = directory2.copy()
 //    println(directory2.descendants)
 //    println(copy.descendants)
-
-    val dir1 = DirPath("/", "home", "garrett", "dtest1")
-    dir1.findDescendants()
-    val dir2 = DirPath("/", "home", "garrett", "dtest2")
-    dir2.findDescendants()
-    val dirDiff = dir1 diff dir2
-    println(dirDiff.leftNewer)
-
 }
 
 /*
