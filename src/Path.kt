@@ -21,8 +21,7 @@ class NotADirectoryException(message: String) : Exception(message)
  */
 abstract class FSPath(protected vararg val segments: String) {
     /**
-     * A list containing the segments of the path without path separators. This is always absolute if [parent] is not
-     * null.
+     * A list containing the segments of the path without path separators.
      */
     val pathSegments: List<String>
         get() = (parent?.pathSegments ?: listOf<String>()) + segments
@@ -190,9 +189,16 @@ class DirPath : FSPath {
     /**
      * Populate [children] with the given paths and set [parent] to this object for each of them.
      */
-    fun addChildren(vararg children: FSPath) {
+    fun addChildren(children: Iterable<FSPath>) {
         children.forEach { it.parent = this }
         this.children.addAll(children)
+    }
+
+    /**
+     * Populate [children] with the given paths and set [parent] to this object for each of them.
+     */
+    fun addChildren(vararg children: FSPath) {
+        addChildren(children.asIterable())
     }
 
     /**
@@ -208,16 +214,16 @@ class DirPath : FSPath {
         val dirChildren: Array<File>? = toFile().listFiles()
         dirChildren ?: throw NotADirectoryException(
             "cannot access children because the path is not an accessible directory")
-        addChildren(*dirChildren.map {
+        addChildren(dirChildren.map {
             when {
                 it.isDirectory -> DirPath(it.toPath().fileName)
                 else -> FilePath(it.toPath().fileName)
             }
-        }.toTypedArray())
+        })
     }
 
     /**
-     * Populate [children] with paths from the filesystem recursively.
+     * Populate [descendants] with paths from the filesystem.
      *
      * This method calls [findChildren] recursively.
      *
