@@ -68,6 +68,14 @@ abstract class FSPath(protected vararg val segments: String) {
     override fun toString(): String = toPath().toString()
 
     /**
+     * Returns whether the file represented by this path exists in the filesystem.
+     *
+     * @param checkType: Check not only whether the file exists, but also whether the type of file matches the type of
+     * the object.
+     */
+    abstract fun exists(checkType: Boolean = true): Boolean
+
+    /**
      * Indicates wither the object [other] is equal to this one.
      *
      * This path and [other] are equal if they are the same type and if their [pathSegments] properties are equal.
@@ -137,6 +145,13 @@ class FilePath : FSPath {
         new.parent = parent
         return new
     }
+
+    /**
+     * Returns whether the file represented by this path exists in the filesystem.
+     *
+     * @param checkType: Check not only whether the file exists, but also whether it is a normal file.
+     */
+    override fun exists(checkType: Boolean): Boolean = if (checkType) toFile().isFile else toFile().exists()
 }
 
 /**
@@ -234,6 +249,18 @@ class DirPath : FSPath {
         findChildren()
         children.forEach { (it as? DirPath)?.findDescendants() }
     }
+
+    /**
+     * Returns whether the file represented by this path exists in the filesystem.
+     *
+     * @param checkType: Check not only whether the file exists, but also whether it is a directory.
+     */
+    override fun exists(checkType: Boolean): Boolean = if (checkType) toFile().isDirectory else toFile().exists()
+
+    /**
+     * Returns whether every path in the tree exists in the filesystem.
+     */
+    fun treeExists(): Boolean = exists() && descendants.all { it.exists() }
 
     infix fun diff(other: DirPath) = PathDiff(this, other)
 }
