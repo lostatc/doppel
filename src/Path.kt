@@ -183,9 +183,14 @@ class DirPath : FSPath {
         addChildren(firstChild, *children)
     }
 
-    private fun walkChildren(node: DirPath = this): List<FSPath> {
-        return node.children.flatMap {
-            listOf(it) + if (it is DirPath) walkChildren(it) else listOf()
+    /**
+     * Return a sequence of all the descendants of this directory path.
+     *
+     * A top-down, depth-first search is used and directory paths are visited before their contents.
+     */
+    fun walkChildren(node: DirPath = this): Sequence<FSPath> {
+        return node.children.asSequence().flatMap {
+            if (it is DirPath) sequenceOf(it) + walkChildren(it) else sequenceOf(it)
         }
     }
 
@@ -260,7 +265,7 @@ class DirPath : FSPath {
     /**
      * Returns whether every path in the tree exists in the filesystem.
      */
-    fun treeExists(): Boolean = exists() && descendants.all { it.exists() }
+    fun treeExists(checkType: Boolean = true): Boolean = exists(checkType) && walkChildren().all { it.exists(checkType) }
 
     infix fun diff(other: DirPath) = PathDiff(this, other)
 }
@@ -297,9 +302,6 @@ fun main(args: Array<String>) {
 //        )
 //    )
 //
-//    val copy = directory2.copy()
-//    println(directory2.descendants)
-//    println(copy.descendants)
 }
 
 /*
