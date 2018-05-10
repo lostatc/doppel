@@ -188,10 +188,14 @@ class DirPath : FSPath {
      *
      * A top-down, depth-first search is used and directory paths are visited before their contents.
      */
-    fun walkChildren(node: DirPath = this): Sequence<FSPath> {
-        return node.children.asSequence().flatMap {
-            if (it is DirPath) sequenceOf(it) + walkChildren(it) else sequenceOf(it)
+    fun walkChildren(): Sequence<FSPath> {
+        fun walk(node: DirPath): Sequence<FSPath> {
+            return node.children.asSequence().flatMap {
+                if (it is DirPath) sequenceOf(it) + walk(it) else sequenceOf(it)
+            }
         }
+
+        return walk(this)
     }
 
     /**
@@ -301,7 +305,6 @@ fun main(args: Array<String>) {
 //            )
 //        )
 //    )
-//
 }
 
 /*
