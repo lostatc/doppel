@@ -49,8 +49,8 @@ fun compareHash(left: File, right: File): Boolean {
  * @property [fileCompareFunc] The function used to determine if two files are the same.
  */
 class PathDiff(
-    val left: DirPath,
-    val right: DirPath,
+    val left: DirPathBase,
+    val right: DirPathBase,
     val fileCompareFunc: FileCompareFunc = ::compareHash
 ) {
     /**

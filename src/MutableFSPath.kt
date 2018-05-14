@@ -15,24 +15,13 @@ class IsAbsolutePathException(message: String) : Exception(message)
 class NotADirectoryException(message: String) : Exception(message)
 
 /**
- * The path of a file or directory.
+ * A mutable representation of the path of a file or directory.
  *
- * @constructor Accepts the [segments] of a file or directory path without path separators and creates a new path.
+ * @constructor Accepts the [relativeSegments] of a file or directory path without path separators and creates a new
+ * path.
  */
-abstract class FSPath(protected vararg val segments: String) {
-    /**
-     * A list containing the segments of the path without path separators.
-     */
-    val pathSegments: List<String>
-        get() = (parent?.pathSegments ?: listOf<String>()) + segments
-
-    /**
-     * The parent path. Null if there is no parent.
-     *
-     * @throws [IsAbsolutePathException] This exception is thrown if the property is set to a non-null value while
-     * [pathSegments] is absolute.
-     */
-    var parent: FSPath? = null
+abstract class MutableFSPath(override vararg val relativeSegments: String) : FSPath {
+    override var parent: MutableFSPath? = null
         set(value) {
             if (containsRoot && value != null) {
                 throw IsAbsolutePathException("absolute paths cannot have a parent")
@@ -44,81 +33,22 @@ abstract class FSPath(protected vararg val segments: String) {
     /**
      * This path, excluding parents, is absolute.
      */
-    protected val containsRoot: Boolean
-        get() = Paths.get("", *segments).isAbsolute
+    private val containsRoot: Boolean
+        get() = Paths.get("", *relativeSegments).isAbsolute
 
     /**
      * Creates a new path from the given [path].
      */
     constructor(path: Path) : this(*path.map { it.toString() }.toTypedArray())
 
-    /**
-     * Returns a [Path] representing this path.
-     */
-    fun toPath(): Path = Paths.get("", *pathSegments.toTypedArray())
-
-    /**
-     * Returns a [File] representing this path.
-     */
-    fun toFile(): File = toPath().toFile()
-
-    /**
-     * Returns the string representation of this path.
-     */
     override fun toString(): String = toPath().toString()
 
-    /**
-     * Returns whether the file represented by this path exists in the filesystem.
-     *
-     * @param checkType: Check not only whether the file exists, but also whether the type of file matches the type of
-     * the object.
-     */
-    abstract fun exists(checkType: Boolean = true): Boolean
+    override fun equals(other: Any?) =
+            if (other is FSPath && this::class == other::class) pathSegments == other.pathSegments else false
 
-    /**
-     * Indicates wither the object [other] is equal to this one.
-     *
-     * This path and [other] are equal if they are the same type and if their [pathSegments] properties are equal.
-     */
-    override operator fun equals(other: Any?) =
-        if (other is FSPath && this::class == other::class) pathSegments == other.pathSegments else false
-
-    /**
-     * Return a copy of [other] with this as the ancestor.
-     *
-     * This method climbs the tree of parents until it finds a path whose parent is null. It then makes this that path's
-     * parent.
-     *
-     * @throws [IsAbsolutePathException] This exception is thrown if [other] is an absolute path.
-     */
-    operator fun plus(other: FSPath): FSPath {
-        val new = other.copy()
-        var current = new
-        while (current.parent != null) {
-            current.parent = current.parent?.copy()
-            current = current.parent!!
-        }
-        current.parent = this
-        return new
-    }
-
-    /**
-     * Return a hash code value for the object.
-     */
     override fun hashCode(): Int = pathSegments.hashCode()
 
-    /**
-     * Return a copy of this path.
-     */
-    abstract fun copy(): FSPath
-
-    /**
-     * Return a copy of this path which is relative to [ancestor].
-     *
-     * This method climbs the tree of parents until it finds the path whose parent is [ancestor]. It then sets that
-     * path's parent to null.
-     */
-    fun relativeTo(ancestor: FSPath): FSPath {
+    override fun relativeTo(ancestor: DirPathBase): MutableFSPath {
         val new = copy()
         var current = new
         while (current.parent != ancestor && current.parent != null) {
@@ -131,20 +61,13 @@ abstract class FSPath(protected vararg val segments: String) {
 }
 
 /**
- * The path of a file.
+ * A mutable representation of the path of a file.
  */
-class FilePath : FSPath {
-    constructor(vararg segments: String) : super(*segments)
-    constructor(path: Path) : super(path)
+class FilePath : MutableFSPath, FilePathBase {
 
-    /**
-     * Return a copy of this path.
-     */
-    override fun copy(): FilePath {
-        val new = FilePath(*segments)
-        new.parent = parent
-        return new
-    }
+    constructor(vararg relativeSegments: String) : super(*relativeSegments)
+
+    constructor(path: Path) : super(path)
 
     /**
      * Returns whether the file represented by this path exists in the filesystem.
@@ -152,22 +75,24 @@ class FilePath : FSPath {
      * @param checkType: Check not only whether the file exists, but also whether it is a normal file.
      */
     override fun exists(checkType: Boolean): Boolean = if (checkType) toFile().isFile else toFile().exists()
+
+    override fun copy(): FilePath {
+        val new = FilePath(*relativeSegments)
+        new.parent = parent
+        return new
+    }
+
+    /**
+     * Create a read-only view of this file path.
+     */
+    fun toView(): FilePathView = FilePathView(this)
 }
 
 /**
- * The path of a directory.
+ * A mutable representation of the path of a directory.
  */
-class DirPath : FSPath {
-    /**
-     * The paths of the immediate children of the directory.
-     */
-    var children: MutableSet<FSPath> = mutableSetOf()
-
-    /**
-     * The paths of all descendants of the directory.
-     */
-    val descendants: Set<FSPath>
-        get() = walkChildren().toSet()
+class DirPath : MutableFSPath, DirPathBase {
+    override var children: MutableSet<MutableFSPath> = mutableSetOf()
 
     constructor(vararg segments: String) : super(*segments)
 
@@ -178,18 +103,43 @@ class DirPath : FSPath {
      *
      * This constructor can be nested to define a tree of paths.
      */
-    constructor(fileName: String, firstChild: FSPath, vararg children: FSPath) : super(fileName) {
+    constructor(fileName: String, firstChild: MutableFSPath, vararg children: MutableFSPath) : super(fileName) {
         // The purpose of the [firstChild] parameter is to resolve ambiguity with the other constructors.
         addChildren(firstChild, *children)
     }
 
     /**
-     * Return a sequence of all the descendants of this directory path.
+     * Returns whether the file represented by this path exists in the filesystem.
      *
-     * A top-down, depth-first search is used and directory paths are visited before their contents.
+     * @param checkType: Check not only whether the file exists, but also whether it is a directory.
      */
-    fun walkChildren(): Sequence<FSPath> {
-        fun walk(node: DirPath): Sequence<FSPath> {
+    override fun exists(checkType: Boolean): Boolean = if (checkType) toFile().isDirectory else toFile().exists()
+
+    /**
+     * Return a copy of this path.
+     *
+     * Children of this path are copied deeply.
+     */
+    override fun copy(): DirPath {
+        val new = DirPath(*relativeSegments)
+        new.parent = parent
+        new.children = children.map { it.copy() }.toMutableSet()
+        return new
+    }
+
+    override fun plus(other: FSPath): MutableFSPath {
+        val new = other.copy()
+        var current = new
+        while (current.parent != null) {
+            current.parent = current.parent?.copy()
+            current = current.parent!!
+        }
+        current.parent = this
+        return new
+    }
+
+    override fun walkChildren(): Sequence<MutableFSPath> {
+        fun walk(node: DirPath): Sequence<MutableFSPath> {
             return node.children.asSequence().flatMap {
                 if (it is DirPath) sequenceOf(it) + walk(it) else sequenceOf(it)
             }
@@ -199,21 +149,9 @@ class DirPath : FSPath {
     }
 
     /**
-     * Return a copy of this path.
-     *
-     * Children of this path are copied deeply.
-     */
-    override fun copy(): DirPath {
-        val new = DirPath(*segments)
-        new.parent = parent
-        new.children = children.map { it.copy() }.toMutableSet()
-        return new
-    }
-
-    /**
      * Populate [children] with the given paths and set [parent] to this object for each of them.
      */
-    fun addChildren(children: Iterable<FSPath>) {
+    fun addChildren(children: Iterable<MutableFSPath>) {
         children.forEach { it.parent = this }
         this.children.addAll(children)
     }
@@ -221,7 +159,7 @@ class DirPath : FSPath {
     /**
      * Populate [children] with the given paths and set [parent] to this object for each of them.
      */
-    fun addChildren(vararg children: FSPath) {
+    fun addChildren(vararg children: MutableFSPath) {
         addChildren(children.asIterable())
     }
 
@@ -260,19 +198,26 @@ class DirPath : FSPath {
     }
 
     /**
-     * Returns whether the file represented by this path exists in the filesystem.
-     *
-     * @param checkType: Check not only whether the file exists, but also whether it is a directory.
+     * Create a read-only view of this directory path.
      */
-    override fun exists(checkType: Boolean): Boolean = if (checkType) toFile().isDirectory else toFile().exists()
-
-    /**
-     * Returns whether every path in the tree exists in the filesystem.
-     */
-    fun treeExists(checkType: Boolean = true): Boolean = exists(checkType) && walkChildren().all { it.exists(checkType) }
-
-    infix fun diff(other: DirPath) = PathDiff(this, other)
+    fun toView(): DirPathView = DirPathView(this)
 }
+
+/**
+ * A read-only view of a file path.
+ *
+ * Objects of this type present a dynamic view of the file path objects passed in. This means that when the path objects
+ * are updated, this view reflects those changes. View objects cannot modify their corresponding path objects.
+ */
+class FilePathView(inner: FilePathBase) : FilePathBase by inner
+
+/**
+ * A read-only view of a directory path.
+ *
+ * Objects of this type present a dynamic view of the directory path objects passed in. This means that when the path
+ * objects are updated, this view reflects those changes. View objects cannot modify their corresponding path objects.
+ */
+class DirPathView(inner: DirPathBase) : DirPathBase by inner
 
 fun main(args: Array<String>) {
 //    val directory1 = DirPath("/", "home", "garrett")
