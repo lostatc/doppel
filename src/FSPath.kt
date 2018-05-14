@@ -5,13 +5,16 @@ import java.nio.file.Paths
 import java.io.File
 
 /**
- * The path of a file or directory.
+ * A read-only representation of a file or directory path.
+ *
+ * Properties in this interface must be read-only and methods must not modify the state. [FSPath] objects can represent
+ * absolute or relative paths. Unlike [java.nio.file.Path], objects of this type can form a tree to represent a file
+ * hierarchy. Each node in the tree represent a path that is relative to its [parent], and one node in the tree can
+ * represent multiple levels of the file hierarchy.
  */
 interface FSPath {
     /**
-     * The segments of the path relative to [parent].
-     *
-     * These segments exclude path separators.
+     * The segments of the path relative to [parent], excluding path separators.
      */
     val relativeSegments: Array<out String>
 
@@ -24,7 +27,7 @@ interface FSPath {
     val parent: FSPath?
 
     /**
-     * The segments of the path.
+     * The segments of the path, excluding path separators.
      *
      * If [parent] is not null, then this is equal to [parent::pathSegments] + [relativeSegments].
      */
@@ -81,14 +84,14 @@ interface FSPath {
 }
 
 /**
- * The path of a file.
+ * A read-only representation of a file path.
  */
 interface FilePathBase : FSPath {
 
 }
 
 /**
- * The path of a directory.
+ * A read-only representation of a directory path.
  */
 interface DirPathBase : FSPath {
     /**

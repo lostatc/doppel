@@ -15,7 +15,9 @@ class IsAbsolutePathException(message: String) : Exception(message)
 class NotADirectoryException(message: String) : Exception(message)
 
 /**
- * A mutable representation of the path of a file or directory.
+ * A mutable representation of a file or directory path.
+ *
+ * This class contains properties and methods common to all mutable paths.
  *
  * @constructor Accepts the [relativeSegments] of a file or directory path without path separators and creates a new
  * path.
@@ -61,7 +63,7 @@ abstract class MutableFSPath(override vararg val relativeSegments: String) : FSP
 }
 
 /**
- * A mutable representation of the path of a file.
+ * A mutable representation of a file path.
  */
 class FilePath : MutableFSPath, FilePathBase {
 
@@ -89,7 +91,7 @@ class FilePath : MutableFSPath, FilePathBase {
 }
 
 /**
- * A mutable representation of the path of a directory.
+ * A mutable representation of a directory path.
  */
 class DirPath : MutableFSPath, DirPathBase {
     override var children: MutableSet<MutableFSPath> = mutableSetOf()
@@ -167,7 +169,7 @@ class DirPath : MutableFSPath, DirPathBase {
      * Populate [children] with paths from the filesystem.
      *
      * This method reads the filesystem to get the list of files contained in the directory represented by this object.
-     * It then creates [FSPath] objects from those file paths and populates [children] with them.
+     * It then creates path objects from those file paths and populates [children] with them.
      *
      * @throws [NotADirectoryException] This exception is thrown if the path represented by this object is not the path
      * of an accessible directory.
