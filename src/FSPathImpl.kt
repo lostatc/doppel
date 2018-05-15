@@ -19,11 +19,15 @@ class NotADirectoryException(message: String) : Exception(message)
  *
  * This class contains properties and methods common to all mutable paths.
  *
- * @constructor Accepts the [relativeSegments] of a file or directory path without path separators and creates a new
- * path.
+ * @constructor Accepts the segments of a file or directory path without path separators and creates a new path. The
+ * last segment will become this paths [fileName], and rest of them will become this path's parent and ancestors.
  */
-abstract class MutableFSPath(override vararg val relativeSegments: String) : FSPath {
-    override var parent: DirPath? = null
+abstract class MutableFSPath(vararg relativeSegments: String) : FSPath {
+    override val fileName: String = relativeSegments.last()
+
+    override var parent: DirPath? = with(relativeSegments) {
+        if (size > 1) DirPath(*dropLast(1).toTypedArray()) else null
+    }
         set(value) {
             if (containsRoot && value != null) {
                 throw IsAbsolutePathException("absolute paths cannot have a parent")
@@ -36,7 +40,7 @@ abstract class MutableFSPath(override vararg val relativeSegments: String) : FSP
      * This path, excluding parents, is absolute.
      */
     private val containsRoot: Boolean
-        get() = Paths.get("", *relativeSegments).isAbsolute
+        get() = Paths.get(fileName).isAbsolute
 
     /**
      * Creates a new path from the given [path].
@@ -79,7 +83,7 @@ class FilePath : MutableFSPath, FilePathBase {
     override fun exists(checkType: Boolean): Boolean = if (checkType) toFile().isFile else toFile().exists()
 
     override fun copy(): FilePath {
-        val new = FilePath(*relativeSegments)
+        val new = FilePath(fileName)
         new.parent = parent
         return new
     }
@@ -96,7 +100,7 @@ class FilePath : MutableFSPath, FilePathBase {
 class DirPath : MutableFSPath, DirPathBase {
     override var children: MutableSet<MutableFSPath> = mutableSetOf()
 
-    constructor(vararg segments: String) : super(*segments)
+    constructor(vararg relativeSegments: String) : super(*relativeSegments)
 
     constructor(path: Path) : super(path)
 
@@ -123,7 +127,7 @@ class DirPath : MutableFSPath, DirPathBase {
      * Children of this path are copied deeply.
      */
     override fun copy(): DirPath {
-        val new = DirPath(*relativeSegments)
+        val new = DirPath(fileName)
         new.parent = parent
         new.children = children.map { it.copy() }.toMutableSet()
         return new

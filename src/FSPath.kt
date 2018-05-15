@@ -9,14 +9,14 @@ import java.io.File
  *
  * Properties in this interface must be read-only and methods must not modify the state. [FSPath] objects can represent
  * absolute or relative paths. Unlike [java.nio.file.Path], objects of this type can form a tree to represent a file
- * hierarchy. Each node in the tree represent a path that is relative to its [parent], and one node in the tree can
- * represent multiple levels of the file hierarchy.
+ * hierarchy because every path has a [parent] property that points to a separate [FSPath] object. Each [FSPath] object
+ * stores only a file name; the full path is retrieved by joining the paths of all of its ancestors.
  */
 interface FSPath {
     /**
-     * The segments of the path relative to [parent], excluding path separators.
+     * The name of the current file.
      */
-    val relativeSegments: Array<out String>
+    val fileName: String
 
     /**
      * The parent path. Null if there is no parent.
@@ -29,10 +29,11 @@ interface FSPath {
     /**
      * The segments of the path, excluding path separators.
      *
-     * If [parent] is not null, then this is equal to [parent::pathSegments] + [relativeSegments].
+     * If [parent] is null, then this is equal to [fileName]. Otherwise it is equal to [parent::pathSegments] +
+     * [fileName].
      */
     val pathSegments: List<String>
-        get() = (parent?.pathSegments ?: listOf<String>()) + relativeSegments
+        get() = (parent?.pathSegments ?: listOf<String>()) + fileName
 
     /**
      * Returns the string representation of this path.
