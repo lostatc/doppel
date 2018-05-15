@@ -23,7 +23,7 @@ class NotADirectoryException(message: String) : Exception(message)
  * path.
  */
 abstract class MutableFSPath(override vararg val relativeSegments: String) : FSPath {
-    override var parent: MutableFSPath? = null
+    override var parent: DirPath? = null
         set(value) {
             if (containsRoot && value != null) {
                 throw IsAbsolutePathException("absolute paths cannot have a parent")
@@ -222,8 +222,8 @@ class FilePathView(inner: FilePathBase) : FilePathBase by inner
 class DirPathView(inner: DirPathBase) : DirPathBase by inner
 
 fun main(args: Array<String>) {
-//    val directory1 = DirPath("/", "home", "garrett")
-//    directory1.addChildren(
+//    val dir1 = DirPath("/", "home", "garrett")
+//    dir1.addChildren(
 //        DirPath("Documents",
 //            FilePath("Concepts Essay.odt"),
 //            FilePath("Innovation Essay.odt")
@@ -236,8 +236,8 @@ fun main(args: Array<String>) {
 //        )
 //    )
 //
-//    val directory2 = DirPath("/", "home", "garrett")
-//    directory2.addChildren(
+//    val dir2 = DirPath("/", "home", "garrett")
+//    dir2.addChildren(
 //        DirPath("Documents",
 //            FilePath("Rhetoric Essay.odt"),
 //            FilePath("Concepts Essay.odt")

@@ -24,7 +24,7 @@ interface FSPath {
      * @throws [IsAbsolutePathException] This exception is thrown if the property is set to a non-null value while
      * [pathSegments] is absolute.
      */
-    val parent: FSPath?
+    val parent: DirPath?
 
     /**
      * The segments of the path, excluding path separators.
@@ -87,7 +87,7 @@ interface FSPath {
  * A read-only representation of a file path.
  */
 interface FilePathBase : FSPath {
-
+    override fun copy(): FilePath
 }
 
 /**
@@ -103,7 +103,8 @@ interface DirPathBase : FSPath {
      * The paths of all descendants of the directory.
      */
     val descendants: Set<MutableFSPath>
-        get() = walkChildren().toSet()
+
+    override fun copy(): DirPath
 
     /**
      * Return a copy of [other] with this as the ancestor.
