@@ -22,6 +22,7 @@ class NotADirectoryException(message: String) : Exception(message)
  * @constructor Accepts the segments of a file or directory path without path separators and creates a new path. The
  * last segment will become this path's [fileName], and rest of them will become this path's parent and ancestors.
  */
+abstract class MutableFSPath(vararg relativeSegments: String) : FSPath, SimpleObservable {
     final override val fileName: String = relativeSegments.last()
 
     final override var parent: DirPath? =
@@ -30,9 +31,13 @@ class NotADirectoryException(message: String) : Exception(message)
             if (containsRoot && value != null) {
                 throw IsAbsolutePathException("absolute paths cannot have a parent")
             } else {
+                val oldValue = field
                 field = value
+                notify(::parent, oldValue, value)
             }
         }
+
+    override val observers: MutableList<SimpleObserver> = mutableListOf()
 
     /**
      * This path, excluding parents, is absolute.
@@ -109,7 +114,13 @@ class FilePath : MutableFSPath, FilePathBase {
  * A mutable representation of a directory path.
  */
 class DirPath : MutableFSPath, DirPathBase {
-    override var children: MutableSet<MutableFSPath> = mutableSetOf()
+    /**
+     * A mutable representation of the paths of the immediate children of the directory.
+     *
+     * This set is automatically updated whenever one of the paths contained in it changes. It is safe for the contents
+     * of this set to be mutated.
+     */
+    override var children: MutableSet<MutableFSPath> = UpdatableSet<MutableFSPath>()
 
     constructor(vararg relativeSegments: String) : super(*relativeSegments)
 
@@ -139,8 +150,8 @@ class DirPath : MutableFSPath, DirPathBase {
      */
     override fun copy(): DirPath {
         val new = DirPath(fileName)
+        new.children = UpdatableSet(children.map { it.copy() })
         new.parent = parent
-        new.children = children.map { it.copy() }.toMutableSet()
         return new
     }
 
