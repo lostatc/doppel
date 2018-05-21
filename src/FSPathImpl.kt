@@ -20,14 +20,12 @@ class NotADirectoryException(message: String) : Exception(message)
  * This class contains properties and methods common to all mutable paths.
  *
  * @constructor Accepts the segments of a file or directory path without path separators and creates a new path. The
- * last segment will become this paths [fileName], and rest of them will become this path's parent and ancestors.
+ * last segment will become this path's [fileName], and rest of them will become this path's parent and ancestors.
  */
-abstract class MutableFSPath(vararg relativeSegments: String) : FSPath {
-    override val fileName: String = relativeSegments.last()
+    final override val fileName: String = relativeSegments.last()
 
-    override var parent: DirPath? = with(relativeSegments) {
-        if (size > 1) DirPath(*dropLast(1).toTypedArray()) else null
-    }
+    final override var parent: DirPath? =
+        with(relativeSegments) { if (size > 1) DirPath(*dropLast(1).toTypedArray()) else null }
         set(value) {
             if (containsRoot && value != null) {
                 throw IsAbsolutePathException("absolute paths cannot have a parent")
@@ -42,6 +40,11 @@ abstract class MutableFSPath(vararg relativeSegments: String) : FSPath {
     private val containsRoot: Boolean
         get() = Paths.get(fileName).isAbsolute
 
+    init {
+        // Add this path as a child of the parent path.
+        parent?.let(::addParent)
+    }
+
     /**
      * Creates a new path from the given [path].
      */
@@ -49,10 +52,18 @@ abstract class MutableFSPath(vararg relativeSegments: String) : FSPath {
 
     override fun toString(): String = toPath().toString()
 
-    override fun equals(other: Any?) =
-            if (other is FSPath && this::class == other::class) pathSegments == other.pathSegments else false
+    override fun equals(other: Any?): Boolean =
+        if (other is FSPath && this::class == other::class) pathSegments == other.pathSegments else false
 
     override fun hashCode(): Int = pathSegments.hashCode()
+
+    /**
+     * Set the [parent] property to [newParent] and add this path as a child of [newParent].
+     */
+    fun addParent(newParent: DirPath) {
+        newParent.children.add(this)
+        parent = newParent
+    }
 
     override fun relativeTo(ancestor: DirPathBase): MutableFSPath {
         val new = copy()
@@ -155,18 +166,21 @@ class DirPath : MutableFSPath, DirPathBase {
     }
 
     /**
-     * Populate [children] with the given paths and set [parent] to this object for each of them.
+     * Populate [children] with the given paths and set [parent] to this path for each of them.
      */
-    fun addChildren(children: Iterable<MutableFSPath>) {
-        children.forEach { it.parent = this }
-        this.children.addAll(children)
+    fun addChildren(newChildren: Iterable<MutableFSPath>) {
+        newChildren.forEach { it.parent = this }
+        children.addAll(newChildren)
     }
 
     /**
      * Populate [children] with the given paths and set [parent] to this object for each of them.
+     *
+     * Items that are already in [children] are not added again. If [newChildren] contains duplicate items, only one is
+     * added. The order of items is preserved.
      */
-    fun addChildren(vararg children: MutableFSPath) {
-        addChildren(children.asIterable())
+    fun addChildren(vararg newChildren: MutableFSPath) {
+        addChildren(newChildren.asIterable())
     }
 
     /**
