@@ -92,7 +92,7 @@ class FilePath private constructor(segments: List<String>) : MutableFSPath(segme
     /**
      * Create a read-only view of this file path.
      */
-    fun toView(): FilePathView = FilePathView(this)
+    fun asView(): FilePathView = FilePathView(this)
 
     companion object {
         private fun valueOf(segments: List<String>): FilePath {
@@ -230,7 +230,7 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
     /**
      * Create a read-only view of this directory path.
      */
-    fun toView(): DirPathView = DirPathView(this)
+    fun asView(): DirPathView = DirPathView(this)
 
     companion object {
         private fun valueOf(segments: List<String>): DirPath {
