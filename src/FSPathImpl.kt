@@ -22,11 +22,11 @@ class NotADirectoryException(message: String) : Exception(message)
  * @constructor Accepts the segments of a file or directory path without path separators and creates a new path. The
  * last segment will become this path's [fileName], and rest of them will become this path's parent and ancestors.
  */
-abstract class MutableFSPath(vararg relativeSegments: String) : FSPath, SimpleObservable {
-    final override val fileName: String = relativeSegments.last()
+abstract class MutableFSPath protected constructor(segments: List<String>) : FSPath, SimpleObservable {
+    final override val fileName: String = segments.last()
 
     final override var parent: DirPath? =
-        with(relativeSegments) { if (size > 1) DirPath(*dropLast(1).toTypedArray()) else null }
+        with(segments) { if (size > 1) DirPath.of(*dropLast(1).toTypedArray()) else null }
         set(value) {
             if (containsRoot && value != null) {
                 throw IsAbsolutePathException("absolute paths cannot have a parent")
@@ -44,16 +44,6 @@ abstract class MutableFSPath(vararg relativeSegments: String) : FSPath, SimpleOb
      */
     private val containsRoot: Boolean
         get() = Paths.get(fileName).isAbsolute
-
-    init {
-        // Add this path as a child of the parent path.
-        parent?.let(::addParent)
-    }
-
-    /**
-     * Creates a new path from the given [path].
-     */
-    constructor(path: Path) : this(*path.map { it.toString() }.toTypedArray())
 
     override fun toString(): String = toPath().toString()
 
@@ -85,12 +75,7 @@ abstract class MutableFSPath(vararg relativeSegments: String) : FSPath, SimpleOb
 /**
  * A mutable representation of a file path.
  */
-class FilePath : MutableFSPath, FilePathBase {
-
-    constructor(vararg relativeSegments: String) : super(*relativeSegments)
-
-    constructor(path: Path) : super(path)
-
+class FilePath private constructor(segments: List<String>) : MutableFSPath(segments), FilePathBase {
     /**
      * Returns whether the file represented by this path exists in the filesystem.
      *
@@ -99,7 +84,7 @@ class FilePath : MutableFSPath, FilePathBase {
     override fun exists(checkType: Boolean): Boolean = if (checkType) toFile().isFile else toFile().exists()
 
     override fun copy(): FilePath {
-        val new = FilePath(fileName)
+        val new = of(fileName)
         new.parent = parent
         return new
     }
@@ -108,12 +93,36 @@ class FilePath : MutableFSPath, FilePathBase {
      * Create a read-only view of this file path.
      */
     fun toView(): FilePathView = FilePathView(this)
+
+    companion object {
+        private fun valueOf(segments: List<String>): FilePath {
+            val path = FilePath(segments)
+            path.parent?.children?.add(path)
+            return path
+        }
+
+        /**
+         * Construct a new file path from the given path [segments] without path separators.
+         *
+         * This returns a hierarchy of [MutableFSPath] objects where the last segment becomes the new path's [fileName],
+         * and the rest of them become the path's parent and ancestors.
+         */
+        fun of(vararg segments: String): FilePath = valueOf(segments.toList())
+
+        /**
+         * Construct a new file path from the segments of the given [path].
+         *
+         * This returns a hierarchy of [MutableFSPath] objects where the last segment becomes the new path's [fileName],
+         * and the rest of them become the path's parent and ancestors.
+         */
+        fun of(path: Path): FilePath = valueOf(path.map { it.toString() })
+    }
 }
 
 /**
  * A mutable representation of a directory path.
  */
-class DirPath : MutableFSPath, DirPathBase {
+class DirPath private constructor(segments: List<String>) : MutableFSPath(segments), DirPathBase {
     /**
      * A mutable representation of the paths of the immediate children of the directory.
      *
@@ -122,19 +131,9 @@ class DirPath : MutableFSPath, DirPathBase {
      */
     override var children: MutableSet<MutableFSPath> = UpdatableSet<MutableFSPath>()
 
-    constructor(vararg relativeSegments: String) : super(*relativeSegments)
-
-    constructor(path: Path) : super(path)
-
     /**
-     * Accepts the [fileName] of the directory and its immediate [children] and creates a new directory path.
      *
-     * This constructor can be nested to define a tree of paths.
      */
-    constructor(fileName: String, firstChild: MutableFSPath, vararg children: MutableFSPath) : super(fileName) {
-        // The purpose of the [firstChild] parameter is to resolve ambiguity with the other constructors.
-        addChildren(firstChild, *children)
-    }
 
     /**
      * Returns whether the file represented by this path exists in the filesystem.
@@ -149,7 +148,7 @@ class DirPath : MutableFSPath, DirPathBase {
      * Children of this path are copied deeply.
      */
     override fun copy(): DirPath {
-        val new = DirPath(fileName)
+        val new = of(fileName)
         new.children = UpdatableSet(children.map { it.copy() })
         new.parent = parent
         return new
@@ -209,8 +208,8 @@ class DirPath : MutableFSPath, DirPathBase {
             "cannot access children because the path is not an accessible directory")
         addChildren(dirChildren.map {
             when {
-                it.isDirectory -> DirPath(it.toPath().fileName)
-                else -> FilePath(it.toPath().fileName)
+                it.isDirectory -> DirPath.of(it.toPath().fileName)
+                else -> FilePath.of(it.toPath().fileName)
             }
         })
     }
@@ -232,6 +231,44 @@ class DirPath : MutableFSPath, DirPathBase {
      * Create a read-only view of this directory path.
      */
     fun toView(): DirPathView = DirPathView(this)
+
+    companion object {
+        private fun valueOf(segments: List<String>): DirPath {
+            val path = DirPath(segments)
+            path.parent?.children?.add(path)
+            return path
+        }
+
+        /**
+         * Construct a new directory path from the given path [segments] without path separators.
+         *
+         * This returns a hierarchy of [MutableFSPath] objects where the last segment becomes the new path's [fileName],
+         * and the rest of them become the path's parent and ancestors.
+         */
+        fun of(vararg segments: String): DirPath = valueOf(segments.toList())
+
+        /**
+         * Construct a new directory path from the segments of the given [path].
+         *
+         * This returns a hierarchy of [MutableFSPath] objects where the last segment becomes the new path's [fileName],
+         * and the rest of them become the path's parent and ancestors.
+         */
+        fun of(path: Path): DirPath = valueOf(path.map { it.toString() })
+
+        /**
+         * Construct a new directory path from the [fileName] of the directory and a list of immediate [children] to
+         * initialize it with starting with [firstChild].
+         *
+         * This factory method can be nested to define a tree of paths.
+         */
+        fun of(fileName: String, firstChild: MutableFSPath, vararg children: MutableFSPath): DirPath {
+            // The purpose of the [firstChild] parameter is to disambiguate this factory method from the others so that
+            // an instance can be created by passing in a single string.
+            val path = of(fileName)
+            path.addChildren(firstChild, *children)
+            return path
+        }
+    }
 }
 
 /**
@@ -251,55 +288,34 @@ class FilePathView(inner: FilePathBase) : FilePathBase by inner
 class DirPathView(inner: DirPathBase) : DirPathBase by inner
 
 fun main(args: Array<String>) {
-//    val dir1 = DirPath("/", "home", "garrett")
+//    val dir1 = DirPath.of("/", "home", "garrett")
 //    dir1.addChildren(
-//        DirPath("Documents",
-//            FilePath("Concepts Essay.odt"),
-//            FilePath("Innovation Essay.odt")
+//        DirPath.of("Documents",
+//            FilePath.of("Concepts Essay.odt"),
+//            FilePath.of("Innovation Essay.odt")
 //        ),
-//        DirPath("Music",
-//            DirPath("Popular Band",
-//                FilePath("Song 1.mp3"),
-//                FilePath("Song 2.mp3")
+//        DirPath.of("Music",
+//            DirPath.of("Popular Band",
+//                FilePath.of("Song 1.mp3"),
+//                FilePath.of("Song 2.mp3")
 //            )
 //        )
 //    )
 //
-//    val dir2 = DirPath("/", "home", "garrett")
+//    val dir2 = DirPath.of("/", "home", "garrett")
 //    dir2.addChildren(
-//        DirPath("Documents",
-//            FilePath("Rhetoric Essay.odt"),
-//            FilePath("Concepts Essay.odt")
+//        DirPath.of("Documents",
+//            FilePath.of("Rhetoric Essay.odt"),
+//            FilePath.of("Concepts Essay.odt")
 //        ),
-//        DirPath("Music",
-//            DirPath("Popular Band",
-//                FilePath("Song 1.mp3"),
-//                FilePath("Song 3.mp3")
+//        DirPath.of("Music",
+//            DirPath.of("Popular Band",
+//                FilePath.of("Song 1.mp3"),
+//                FilePath.of("Song 3.mp3")
 //            ),
-//            DirPath("Obscure Band",
-//                FilePath("Song 1.mp3")
+//            DirPath.of("Obscure Band",
+//                FilePath.of("Song 1.mp3")
 //            )
 //        )
 //    )
 }
-
-/*
-val directory = DirPath("home", "garrett")
-directory.addChildren(
-    DirPath("Documents",
-        FilePath("Rhetoric Essay.odt"),
-        FilePath("Concepts Essay.odt"),
-        FilePath("Innovation Essay.odt"),
-    ),
-    DirPath("Music",
-        DirPath("Popular Band",
-            FilePath("Song 1.mp3"),
-            FilePath("Song 2.mp3")
-        ),
-        DirPath("Obscure Band",
-            FilePath("Song 1.mp3"),
-            FilePath("Song 2.mp3")
-        )
-    )
-)
-*/
