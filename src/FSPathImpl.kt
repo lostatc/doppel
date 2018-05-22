@@ -54,10 +54,25 @@ abstract class MutableFSPath protected constructor(segments: List<String>) : FSP
 
     /**
      * Set the [parent] property to [newParent] and add this path as a child of [newParent].
+     *
+     * @return `true` if the parent was successfully changed and `false` if it was already equal to [newParent].
      */
-    fun addParent(newParent: DirPath) {
+    fun addParent(newParent: DirPath): Boolean {
+        if (parent == newParent) return false
         newParent.children.add(this)
         parent = newParent
+        return true
+    }
+
+    /**
+     * Set the [parent] property to `null` and remove this path from the children of [parent].
+     *
+     * @return `true` if the parent was successfully changed and `false` if it was already `null`.
+     */
+    fun removeParent(): Boolean {
+        parent?.children?.remove(this) ?: return false
+        parent = null
+        return true
     }
 
     override fun relativeTo(ancestor: DirPathBase): MutableFSPath {
@@ -176,22 +191,40 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
     }
 
     /**
-     * Populate [children] with the given paths and set [parent] to this path for each of them.
+     * Add [newChildren] to [children] and set [parent] to this path for each of them.
+     *
+     * @return `true` if any of the specified paths were added to [children], `false` if [children] was not modified.
      */
-    fun addChildren(newChildren: Iterable<MutableFSPath>) {
+    fun addChildren(newChildren: Collection<MutableFSPath>): Boolean {
         newChildren.forEach { it.parent = this }
-        children.addAll(newChildren)
+        return children.addAll(newChildren)
     }
 
     /**
-     * Populate [children] with the given paths and set [parent] to this object for each of them.
+     * Add [newChildren] to [children] and set [parent] to this path for each of them.
      *
-     * Items that are already in [children] are not added again. If [newChildren] contains duplicate items, only one is
-     * added. The order of items is preserved.
+     * @return `true` if any of the specified paths were added to [children], `false` if [children] was not modified.
      */
-    fun addChildren(vararg newChildren: MutableFSPath) {
-        addChildren(newChildren.asIterable())
+    fun addChildren(vararg newChildren: MutableFSPath): Boolean = addChildren(newChildren.toList())
+
+    /**
+     * Remove [existingChildren] from [children] and set [parent] to `null` for each fo them.
+     *
+     * @return `true` if any of the specified paths were removed from [children], `false` if [children] was not
+     * modified.
+     */
+    fun removeChildren(existingChildren: Collection<MutableFSPath>): Boolean {
+        children.filter { it in existingChildren }.forEach { it.parent = null }
+        return children.removeAll(existingChildren)
     }
+
+    /**
+     * Remove [existingChildren] from [children] and set [parent] to `null` for each fo them.
+     *
+     * @return `true` if any of the specified paths were removed from [children], `false` if [children] was not
+     * modified.
+     */
+    fun removeChildren(vararg existingChildren: MutableFSPath): Boolean = removeChildren(existingChildren.toList())
 
     /**
      * Populate [children] with paths from the filesystem.

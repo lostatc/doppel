@@ -29,7 +29,7 @@ interface FSPath {
     /**
      * The segments of the path, excluding path separators.
      *
-     * If [parent] is null, then this is equal to [fileName]. Otherwise it is equal to [parent::pathSegments] +
+     * If [parent] is `null`, then this is equal to [fileName]. Otherwise it is equal to [parent::pathSegments] +
      * [fileName].
      */
     val pathSegments: List<String>
@@ -69,7 +69,7 @@ interface FSPath {
      * Return a copy of this path which is relative to [ancestor].
      *
      * This method climbs the tree of parents until it finds the path whose parent is [ancestor]. It then sets that
-     * path's parent to null.
+     * path's parent to `null`.
      */
     fun relativeTo(ancestor: DirPathBase): FSPath
 
@@ -110,7 +110,7 @@ interface DirPathBase : FSPath {
     /**
      * Return a copy of [other] with this as the ancestor.
      *
-     * This method climbs the tree of parents until it finds a path whose parent is null. It then makes this that path's
+     * This method climbs the tree of parents until it finds a path whose parent is `null`. It then makes this that path's
      * parent.
      *
      * @throws [IsAbsolutePathException] This exception is thrown if [other] is an absolute path.
