@@ -34,9 +34,9 @@ internal fun getFileChecksum(file: File): ByteArray {
 /**
  * This function compares the files [left] and [right] by size and checksum and returns whether they are the same.
  *
- * Checksums are only created for files which are the same size.
+ * Checksums are only compared when both files are the same size.
  */
-fun compareHash(left: File, right: File): Boolean {
+fun compareByHash(left: File, right: File): Boolean {
     if (left.length() != right.length()) return false
     return getFileChecksum(left) contentEquals getFileChecksum(right)
 }
@@ -51,7 +51,7 @@ fun compareHash(left: File, right: File): Boolean {
 class PathDiff(
     val left: DirPathBase,
     val right: DirPathBase,
-    val fileCompareFunc: FileCompareFunc = ::compareHash
+    val fileCompareFunc: FileCompareFunc = ::compareByHash
 ) {
     /**
      * The descendants of the left directory as relative paths.
@@ -129,7 +129,9 @@ class PathDiff(
      * This returns relative paths.
      */
     val rightNewer: Set<FSPath>
-        get() = commonFiles.filter { (right + it).toFile().lastModified() > (left + it).toFile().lastModified() }.toSet()
+        get() = commonFiles.filter {
+            (right + it).toFile().lastModified() > (left + it).toFile().lastModified()
+        }.toSet()
 
     /**
      * The paths of files that were modified more recently in the left tree than in the right tree.
