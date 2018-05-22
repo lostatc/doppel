@@ -35,22 +35,24 @@ interface SimpleObservable {
 
 /**
  * A set which can contain mutable elements and update itself when they change.
+ *
+ * @constructor Create an instance from a collection of elements.
  */
-internal class UpdatableSet<E : SimpleObservable> private constructor(private val innerSet: MutableSet<E>) :
-    SimpleObserver,
-    MutableSet<E> by innerSet {
+internal class UpdatableSet<E : SimpleObservable>(elements: Collection<E>) : SimpleObserver, MutableSet<E> {
+
+    private val innerSet: MutableSet<E> = hashSetOf()
+
+    init {
+        addAll(elements)
+    }
+
+    override val size: Int
+        get() = innerSet.size
 
     /**
      * Create an empty instance.
      */
-    constructor() : this(hashSetOf())
-
-    /**
-     * Create an instance from a collection of elements.
-     */
-    constructor(elements: Collection<E>) : this(hashSetOf()) {
-        addAll(elements)
-    }
+    constructor() : this(emptyList())
 
     override fun <T> update(observable: SimpleObservable, property: KProperty<*>, oldValue: T, newValue: T) {
         // Clear the set and re-add all items to update the hash codes. Because the hash codes in the hash set aren't
@@ -103,5 +105,15 @@ internal class UpdatableSet<E : SimpleObservable> private constructor(private va
         }
     }
 
+    override fun contains(element: E): Boolean = innerSet.contains(element)
+
+    override fun containsAll(elements: Collection<E>): Boolean = innerSet.containsAll(elements)
+
+    override fun isEmpty(): Boolean = innerSet.isEmpty()
+
     override fun toString(): String = innerSet.toString()
+
+    override fun equals(other: Any?): Boolean = innerSet.equals(other)
+
+    override fun hashCode(): Int = innerSet.hashCode()
 }
