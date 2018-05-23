@@ -1,33 +1,33 @@
 package diffir
 
 fun main(args: Array<String>) {
-//    val dir1 = DirPath.of("/", "home", "garrett")
+//    val dir1 = DirPath("/", "home", "garrett")
 //    dir1.addChildren(
-//        DirPath.of("Documents",
-//            FilePath.of("Concepts Essay.odt"),
-//            FilePath.of("Innovation Essay.odt")
+//        DirPath("Documents",
+//            FilePath("Concepts Essay.odt"),
+//            FilePath("Innovation Essay.odt")
 //        ),
-//        DirPath.of("Music",
-//            DirPath.of("Popular Band",
-//                FilePath.of("Song 1.mp3"),
-//                FilePath.of("Song 2.mp3")
+//        DirPath("Music",
+//            DirPath("Popular Band",
+//                FilePath("Song 1.mp3"),
+//                FilePath("Song 2.mp3")
 //            )
 //        )
 //    )
 //
-//    val dir2 = DirPath.of("/", "home", "garrett")
+//    val dir2 = DirPath("/", "home", "garrett")
 //    dir2.addChildren(
-//        DirPath.of("Documents",
-//            FilePath.of("Rhetoric Essay.odt"),
-//            FilePath.of("Concepts Essay.odt")
+//        DirPath("Documents",
+//            FilePath("Rhetoric Essay.odt"),
+//            FilePath("Concepts Essay.odt")
 //        ),
-//        DirPath.of("Music",
-//            DirPath.of("Popular Band",
-//                FilePath.of("Song 1.mp3"),
-//                FilePath.of("Song 3.mp3")
+//        DirPath("Music",
+//            DirPath("Popular Band",
+//                FilePath("Song 1.mp3"),
+//                FilePath("Song 3.mp3")
 //            ),
-//            DirPath.of("Obscure Band",
-//                FilePath.of("Song 1.mp3")
+//            DirPath("Obscure Band",
+//                FilePath("Song 1.mp3")
 //            )
 //        )
 //    )

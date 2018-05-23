@@ -18,9 +18,6 @@ class NotADirectoryException(message: String) : Exception(message)
  * A mutable representation of a file or directory path.
  *
  * This class contains properties and methods common to all mutable paths.
- *
- * @constructor Accepts the segments of a file or directory path without path separators and creates a new path. The
- * last segment will become this path's [fileName], and rest of them will become this path's parent and ancestors.
  */
 abstract class MutableFSPath protected constructor(segments: List<String>) : FSPath, SimpleObservable {
     // This is final to prevent subclasses from making it var, which could cause problems unless it was also made
@@ -33,7 +30,7 @@ abstract class MutableFSPath protected constructor(segments: List<String>) : FSP
      * This is used to set the parent without affecting the parent's children.
      */
     internal var _parent: DirPath? =
-        with(segments) { if (size > 1) DirPath.of(*dropLast(1).toTypedArray()) else null }
+        with(segments) { if (size > 1) DirPath(*dropLast(1).toTypedArray()) else null }
         set(value) {
             if (containsRoot && value != null) {
                 throw IsAbsolutePathException("absolute paths cannot have a parent")
@@ -89,6 +86,9 @@ abstract class MutableFSPath protected constructor(segments: List<String>) : FSP
 
 /**
  * A mutable representation of a file path.
+ *
+ * To create new instances of this class, see the factory method [invoke]. Creating an instance with this method uses
+ * the same syntax as if using a constructor.
  */
 class FilePath private constructor(segments: List<String>) : MutableFSPath(segments), FilePathBase {
     /**
@@ -99,7 +99,7 @@ class FilePath private constructor(segments: List<String>) : MutableFSPath(segme
     override fun exists(checkType: Boolean): Boolean = if (checkType) toFile().isFile else toFile().exists()
 
     override fun copy(): FilePath {
-        val new = of(fileName)
+        val new = invoke(fileName)
         new._parent = parent
         return new
     }
@@ -122,7 +122,7 @@ class FilePath private constructor(segments: List<String>) : MutableFSPath(segme
          * This returns a hierarchy of [MutableFSPath] objects where the last segment becomes the new path's [fileName],
          * and the rest of them become the path's parent and ancestors.
          */
-        fun of(vararg segments: String): FilePath = valueOf(segments.toList())
+        operator fun invoke(vararg segments: String): FilePath = valueOf(segments.toList())
 
         /**
          * Construct a new file path from the segments of the given [path].
@@ -130,12 +130,15 @@ class FilePath private constructor(segments: List<String>) : MutableFSPath(segme
          * This returns a hierarchy of [MutableFSPath] objects where the last segment becomes the new path's [fileName],
          * and the rest of them become the path's parent and ancestors.
          */
-        fun of(path: Path): FilePath = valueOf(path.map { it.toString() })
+        operator fun invoke(path: Path): FilePath = valueOf(path.map { it.toString() })
     }
 }
 
 /**
  * A mutable representation of a directory path.
+ *
+ * To create new instances of this class, see the factory method [invoke]. Creating an instance with this method uses
+ * the same syntax as if using a constructor.
  */
 class DirPath private constructor(segments: List<String>) : MutableFSPath(segments), DirPathBase {
     /**
@@ -163,7 +166,7 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
      * Children of this path are copied deeply.
      */
     override fun copy(): DirPath {
-        val new = of(fileName)
+        val new = invoke(fileName)
         new.children = UpdatableSet(children.map { it.copy() })
         new._parent = parent
         return new
@@ -241,8 +244,8 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
             "cannot access children because the path is not an accessible directory")
         addChildren(dirChildren.map {
             when {
-                it.isDirectory -> DirPath.of(it.toPath().fileName)
-                else -> FilePath.of(it.toPath().fileName)
+                it.isDirectory -> DirPath(it.toPath().fileName)
+                else -> FilePath(it.toPath().fileName)
             }
         })
     }
@@ -278,7 +281,7 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
          * This returns a hierarchy of [MutableFSPath] objects where the last segment becomes the new path's [fileName],
          * and the rest of them become the path's parent and ancestors.
          */
-        fun of(vararg segments: String): DirPath = valueOf(segments.toList())
+        operator fun invoke(vararg segments: String): DirPath = valueOf(segments.toList())
 
         /**
          * Construct a new directory path from the segments of the given [path].
@@ -286,7 +289,7 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
          * This returns a hierarchy of [MutableFSPath] objects where the last segment becomes the new path's [fileName],
          * and the rest of them become the path's parent and ancestors.
          */
-        fun of(path: Path): DirPath = valueOf(path.map { it.toString() })
+        operator fun invoke(path: Path): DirPath = valueOf(path.map { it.toString() })
 
         /**
          * Construct a new directory path from the [fileName] of the directory and a list of immediate [children] to
@@ -294,10 +297,10 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
          *
          * This factory method can be nested to define a tree of paths.
          */
-        fun of(fileName: String, firstChild: MutableFSPath, vararg children: MutableFSPath): DirPath {
+        operator fun invoke(fileName: String, firstChild: MutableFSPath, vararg children: MutableFSPath): DirPath {
             // The purpose of the [firstChild] parameter is to disambiguate this factory method from the others so that
             // an instance can be created by passing in a single string.
-            val path = of(fileName)
+            val path = valueOf(listOf(fileName))
             path.addChildren(firstChild, *children)
             return path
         }
