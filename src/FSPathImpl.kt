@@ -53,7 +53,7 @@ abstract class MutableFSPath protected constructor(segments: List<String>) : FSP
     override var parent: DirPath?
         get() = _parent
         set(value) {
-            value?.children?.add(this) ?: _parent?.children?.remove(this)
+            value?._children?.add(this) ?: _parent?._children?.remove(this)
             _parent = value
         }
 
@@ -112,7 +112,7 @@ class FilePath private constructor(segments: List<String>) : MutableFSPath(segme
     companion object {
         private fun valueOf(segments: List<String>): FilePath {
             val path = FilePath(segments)
-            path.parent?.children?.add(path)
+            path.parent?._children?.add(path)
             return path
         }
 
@@ -142,12 +142,22 @@ class FilePath private constructor(segments: List<String>) : MutableFSPath(segme
  */
 class DirPath private constructor(segments: List<String>) : MutableFSPath(segments), DirPathBase {
     /**
+     * The backing property of [children].
+     *
+     * This is used to modify the children of the directory without affecting their parents.
+     */
+    internal var _children: MutableSet<MutableFSPath> = UpdatableSet<MutableFSPath>()
+
+    /**
      * A mutable representation of the paths of the immediate children of the directory.
      *
-     * This set is automatically updated whenever one of the paths contained in it changes. It is safe for the contents
-     * of this set to be mutated.
+     * This set is automatically updated whenever one of the paths contained in it changes. It is safe for the paths
+     * contained in this set to be modified.
+     *
+     * Whenever children are added to this set, the [parent] property of each of them is set to this directory. Whenever
+     * children are removed from this set, the [parent] property of each of them is set to `null`.
      */
-    override var children: MutableSet<MutableFSPath> = UpdatableSet<MutableFSPath>()
+    override val children: MutableSet<MutableFSPath> = PathChildren(this)
 
     /**
      *
@@ -167,7 +177,7 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
      */
     override fun copy(): DirPath {
         val new = invoke(fileName)
-        new.children = UpdatableSet(children.map { it.copy() })
+        new._children = UpdatableSet(children.map { it.copy() })
         new._parent = parent
         return new
     }
@@ -194,40 +204,13 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
     }
 
     /**
-     * Add [newChildren] to [children] and set [parent] to this path for each of them.
+     * Add [newChildren] to [children].
+     *
+     * This is just a shortcut for [children::addAll] that uses a vararg.
      *
      * @return `true` if any of the specified paths were added to [children], `false` if [children] was not modified.
      */
-    fun addChildren(newChildren: Collection<MutableFSPath>): Boolean {
-        newChildren.forEach { it._parent = this }
-        return children.addAll(newChildren)
-    }
-
-    /**
-     * Add [newChildren] to [children] and set [parent] to this path for each of them.
-     *
-     * @return `true` if any of the specified paths were added to [children], `false` if [children] was not modified.
-     */
-    fun addChildren(vararg newChildren: MutableFSPath): Boolean = addChildren(newChildren.toList())
-
-    /**
-     * Remove [existingChildren] from [children] and set [parent] to `null` for each fo them.
-     *
-     * @return `true` if any of the specified paths were removed from [children], `false` if [children] was not
-     * modified.
-     */
-    fun removeChildren(existingChildren: Collection<MutableFSPath>): Boolean {
-        children.filter { it in existingChildren }.forEach { it._parent = null }
-        return children.removeAll(existingChildren)
-    }
-
-    /**
-     * Remove [existingChildren] from [children] and set [parent] to `null` for each fo them.
-     *
-     * @return `true` if any of the specified paths were removed from [children], `false` if [children] was not
-     * modified.
-     */
-    fun removeChildren(vararg existingChildren: MutableFSPath): Boolean = removeChildren(existingChildren.toList())
+    fun addChildren(vararg newChildren: MutableFSPath): Boolean = children.addAll(newChildren.toList())
 
     /**
      * Populate [children] with paths from the filesystem.
@@ -242,7 +225,7 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
         val dirChildren: Array<File>? = toFile().listFiles()
         dirChildren ?: throw NotADirectoryException(
             "cannot access children because the path is not an accessible directory")
-        addChildren(dirChildren.map {
+        children.addAll(dirChildren.map {
             when {
                 it.isDirectory -> DirPath(it.toPath().fileName)
                 else -> FilePath(it.toPath().fileName)
@@ -271,7 +254,7 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
     companion object {
         private fun valueOf(segments: List<String>): DirPath {
             val path = DirPath(segments)
-            path.parent?.children?.add(path)
+            path.parent?._children?.add(path)
             return path
         }
 
@@ -301,7 +284,7 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
             // The purpose of the [firstChild] parameter is to disambiguate this factory method from the others so that
             // an instance can be created by passing in a single string.
             val path = valueOf(listOf(fileName))
-            path.addChildren(firstChild, *children)
+            path.children.addAll(listOf(firstChild, *children))
             return path
         }
     }
