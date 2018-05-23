@@ -23,9 +23,16 @@ class NotADirectoryException(message: String) : Exception(message)
  * last segment will become this path's [fileName], and rest of them will become this path's parent and ancestors.
  */
 abstract class MutableFSPath protected constructor(segments: List<String>) : FSPath, SimpleObservable {
+    // This is final to prevent subclasses from making it var, which could cause problems unless it was also made
+    // observable since it is used in [equals] and [hashCode].
     final override val fileName: String = segments.last()
 
-    final override var parent: DirPath? =
+    /**
+     * The backing property of [parent].
+     *
+     * This is used to set the parent without affecting the parent's children.
+     */
+    internal var _parent: DirPath? =
         with(segments) { if (size > 1) DirPath.of(*dropLast(1).toTypedArray()) else null }
         set(value) {
             if (containsRoot && value != null) {
@@ -35,6 +42,22 @@ abstract class MutableFSPath protected constructor(segments: List<String>) : FSP
                 field = value
                 notify(::parent, oldValue, value)
             }
+        }
+
+    /**
+     * The parent path. Null if there is no parent.
+     *
+     * If set to a non-null value, this path is added to the children of the new parent. If set to `null`, this path is
+     * removed from the children of the old parent.
+     *
+     * @throws [IsAbsolutePathException] This exception is thrown if the property is set to a non-null value while
+     * [fileName] is a filesystem root.
+     */
+    override var parent: DirPath?
+        get() = _parent
+        set(value) {
+            value?.children?.add(this) ?: _parent?.children?.remove(this)
+            _parent = value
         }
 
     override val observers: MutableList<SimpleObserver> = mutableListOf()
@@ -52,37 +75,14 @@ abstract class MutableFSPath protected constructor(segments: List<String>) : FSP
 
     override fun hashCode(): Int = pathSegments.hashCode()
 
-    /**
-     * Set the [parent] property to [newParent] and add this path as a child of [newParent].
-     *
-     * @return `true` if the parent was successfully changed and `false` if it was already equal to [newParent].
-     */
-    fun addParent(newParent: DirPath): Boolean {
-        if (parent == newParent) return false
-        newParent.children.add(this)
-        parent = newParent
-        return true
-    }
-
-    /**
-     * Set the [parent] property to `null` and remove this path from the children of [parent].
-     *
-     * @return `true` if the parent was successfully changed and `false` if it was already `null`.
-     */
-    fun removeParent(): Boolean {
-        parent?.children?.remove(this) ?: return false
-        parent = null
-        return true
-    }
-
     override fun relativeTo(ancestor: DirPathBase): MutableFSPath {
         val new = copy()
         var current = new
         while (current.parent != ancestor && current.parent != null) {
-            current.parent = current.parent?.copy()
+            current._parent = current.parent?.copy()
             current = current.parent!!
         }
-        current.parent = null
+        current._parent = null
         return new
     }
 }
@@ -100,7 +100,7 @@ class FilePath private constructor(segments: List<String>) : MutableFSPath(segme
 
     override fun copy(): FilePath {
         val new = of(fileName)
-        new.parent = parent
+        new._parent = parent
         return new
     }
 
@@ -165,7 +165,7 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
     override fun copy(): DirPath {
         val new = of(fileName)
         new.children = UpdatableSet(children.map { it.copy() })
-        new.parent = parent
+        new._parent = parent
         return new
     }
 
@@ -173,10 +173,10 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
         val new = other.copy()
         var current = new
         while (current.parent != null) {
-            current.parent = current.parent?.copy()
+            current._parent = current.parent?.copy()
             current = current.parent!!
         }
-        current.parent = this
+        current._parent = this
         return new
     }
 
@@ -196,7 +196,7 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
      * @return `true` if any of the specified paths were added to [children], `false` if [children] was not modified.
      */
     fun addChildren(newChildren: Collection<MutableFSPath>): Boolean {
-        newChildren.forEach { it.parent = this }
+        newChildren.forEach { it._parent = this }
         return children.addAll(newChildren)
     }
 
@@ -214,7 +214,7 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
      * modified.
      */
     fun removeChildren(existingChildren: Collection<MutableFSPath>): Boolean {
-        children.filter { it in existingChildren }.forEach { it.parent = null }
+        children.filter { it in existingChildren }.forEach { it._parent = null }
         return children.removeAll(existingChildren)
     }
 

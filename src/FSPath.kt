@@ -22,7 +22,7 @@ interface FSPath {
      * The parent path. Null if there is no parent.
      *
      * @throws [IsAbsolutePathException] This exception is thrown if the property is set to a non-null value while
-     * [pathSegments] is absolute.
+     * [fileName] is a filesystem root.
      */
     val parent: DirPath?
 
