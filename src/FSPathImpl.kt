@@ -161,8 +161,12 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
     override val children: MutableSet<MutableFSPath> = PathChildren(this)
 
     /**
+     * A mutable representation of the paths of all descendants of the directory.
      *
+     * Changes to any paths in the tree are reflected in this set. Items added to the set are inserted into their proper
+     * location in the tree, and items removed from the set are removed from the tree.
      */
+    override val descendants: MutableSet<MutableFSPath> = PathDescendants(this)
 
     /**
      * Notify each of the [observers] that this object has changed.
