@@ -55,13 +55,10 @@ internal class UpdatableSet<E : SimpleObservable>(elements: Collection<E>) : Sim
     constructor() : this(emptyList())
 
     override fun <T> update(observable: SimpleObservable, property: KProperty<*>, oldValue: T, newValue: T) {
-        // Clear the set and re-add all items to update the hash codes. Because the hash codes in the hash set aren't
-        // updated when the contents are mutated, items which have been mutated cannot be accessed. This is why the
-        // affected items cannot be removed individually.
+        // Clear the set and re-add all items to update the hash codes.
         val copy = innerSet.toList()
         innerSet.clear()
         innerSet.addAll(copy)
-        innerSet.add(observable as E)
     }
 
     override fun add(element: E): Boolean {

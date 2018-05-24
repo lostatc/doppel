@@ -10,21 +10,25 @@ internal class PathChildren(private val innerPath: DirPath) : MutableSet<Mutable
     private val innerSet: MutableSet<MutableFSPath> = innerPath._children
 
     override fun add(element: MutableFSPath): Boolean {
+        // The element must be inserted into the set before setting its parent so that the set is registered as an
+        // observer for the element.
+        val successful = innerSet.add(element)
         element._parent = innerPath
-        return innerSet.add(element)
+        return successful
     }
 
     override fun addAll(elements: Collection<MutableFSPath>): Boolean = elements.filter { add(it) }.any()
 
     override fun remove(element: MutableFSPath): Boolean {
-        innerSet.find { it == element }?._parent = null
-        return innerSet.remove(element)
+        // The element must be removed from the set before setting its parent to `null`, otherwise it won't be found in
+        // the set and won't be removed.
+        val elementInSet = innerSet.find { it == element }
+        val successful = innerSet.remove(element)
+        elementInSet?._parent = null
+        return successful
     }
 
-    override fun removeAll(elements: Collection<MutableFSPath>): Boolean {
-        innerSet.filter { it in elements }.forEach { it._parent = null }
-        return innerSet.removeAll(elements)
-    }
+    override fun removeAll(elements: Collection<MutableFSPath>): Boolean = elements.filter { remove(it) }.any()
 
     override fun retainAll(elements: Collection<MutableFSPath>): Boolean =
         removeAll(innerSet.filter { it !in elements })

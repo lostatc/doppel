@@ -3,6 +3,7 @@ package diffir
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.io.File
+import kotlin.reflect.KProperty
 
 /**
  * This exception is thrown when there is a problem caused by a path being absolute.
@@ -162,6 +163,18 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
     /**
      *
      */
+
+    /**
+     * Notify each of the [observers] that this object has changed.
+     *
+     * This method is also calls itself on each path in [children]. Observers are notified in the order in which they
+     * appear in [observers].
+     */
+    override fun <T> notify(property: KProperty<*>, oldValue: T, newValue: T) {
+        // Create a copy to avoid a ConcurrentModificationException.
+        children.toList().forEach { it.notify(property, oldValue, newValue) }
+        super.notify(property, oldValue, newValue)
+    }
 
     /**
      * Returns whether the file represented by this path exists in the filesystem.
