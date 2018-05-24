@@ -40,25 +40,8 @@ internal class PathChildren(private val innerPath: DirPath) : MutableSet<Mutable
         innerSet.clear()
     }
 
-    override fun iterator(): MutableIterator<MutableFSPath> = object : MutableIterator<MutableFSPath> {
-        /**
-         * The last item returned by this iterator. This property is used to implement [remove].
-         */
-        private lateinit var previousItem: MutableFSPath
-
-        private val innerIterator = innerSet.iterator()
-
-        override fun hasNext(): Boolean = innerIterator.hasNext()
-
-        override fun next(): MutableFSPath {
-            previousItem = innerIterator.next()
-            return previousItem
-        }
-
-        override fun remove() {
-            remove(previousItem)
-        }
-    }
+    override fun iterator(): MutableIterator<MutableFSPath> =
+        MutableCollectionIterator<MutableFSPath>(this, innerSet.iterator())
 
     override fun toString(): String = innerSet.toString()
 

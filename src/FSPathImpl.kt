@@ -160,6 +160,7 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
      */
     override val children: MutableSet<MutableFSPath> = PathChildren(this)
 
+
     /**
      * A mutable representation of the paths of all descendants of the directory.
      *
@@ -171,8 +172,8 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
     /**
      * Notify each of the [observers] that this object has changed.
      *
-     * This method is also calls itself on each path in [children]. Observers are notified in the order in which they
-     * appear in [observers].
+     * This method also notifies the observers of all of its [descendants]. Observers are notified in the order in which
+     * they appear in [observers].
      */
     override fun <T> notify(property: KProperty<*>, oldValue: T, newValue: T) {
         // Create a copy to avoid a ConcurrentModificationException.

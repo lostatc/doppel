@@ -82,25 +82,7 @@ internal class UpdatableSet<E : SimpleObservable>(elements: Collection<E>) : Sim
         innerSet.clear()
     }
 
-    override fun iterator(): MutableIterator<E> = object : MutableIterator<E> {
-        /**
-         * The last item returned by this iterator. This property is used to implement [remove].
-         */
-        private lateinit var previousItem: E
-
-        private val innerIterator = innerSet.iterator()
-
-        override fun hasNext(): Boolean = innerIterator.hasNext()
-
-        override fun next(): E {
-            previousItem = innerIterator.next()
-            return previousItem
-        }
-
-        override fun remove() {
-            remove(previousItem)
-        }
-    }
+    override fun iterator(): MutableIterator<E> = MutableCollectionIterator<E>(this, innerSet.iterator())
 
     override fun contains(element: E): Boolean = innerSet.contains(element)
 
