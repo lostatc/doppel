@@ -48,7 +48,7 @@ interface FSPath {
     override operator fun equals(other: Any?): Boolean
 
     /**
-     * Return a hash code value for the object.
+     * Returns a hash code value for the object.
      */
     override fun hashCode(): Int
 
@@ -61,12 +61,12 @@ interface FSPath {
     fun exists(checkType: Boolean = true): Boolean
 
     /**
-     * Return a copy of this path.
+     * Returns a copy of this path.
      */
     fun copy(): MutableFSPath
 
     /**
-     * Return a copy of this path which is relative to [ancestor].
+     * Returns a copy of this path which is relative to [ancestor].
      *
      * This method climbs the tree of parents until it finds the path whose parent is [ancestor]. It then sets that
      * path's parent to `null`.
@@ -108,7 +108,7 @@ interface DirPathBase : FSPath {
     override fun copy(): DirPath
 
     /**
-     * Return a copy of [other] with this as the ancestor.
+     * Returns a copy of [other] with this as the ancestor.
      *
      * This method climbs the tree of parents until it finds a path whose parent is `null`. It then makes this that path's
      * parent.
@@ -118,7 +118,7 @@ interface DirPathBase : FSPath {
     operator fun plus(other: FSPath): MutableFSPath
 
     /**
-     * Return a sequence of all the descendants of this directory path.
+     * Returns a sequence of all the descendants of this directory path.
      *
      * A top-down, depth-first search is used and directory paths are visited before their contents.
      */
@@ -130,7 +130,7 @@ interface DirPathBase : FSPath {
     fun treeExists(checkType: Boolean = true): Boolean = exists(checkType) && walkChildren().all { it.exists(checkType) }
 
     /**
-     * Return a representation of the difference between two directories.
+     * Returns a representation of the difference between two directories.
      */
     infix fun diff(other: DirPathBase) = PathDiff(this, other)
 }
