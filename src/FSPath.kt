@@ -71,7 +71,10 @@ interface FSPath {
      * Returns a copy of this path which is relative to [ancestor].
      *
      * This method climbs the tree of parents until it finds the path whose parent is [ancestor]. It then sets that
-     * path's parent to `null`.
+     * path's parent to `null`. If this is an absolute path, then [ancestor] must be an an absolute path. Similarly, if
+     * this is a relative path, then [ancestor] must also be a relative path.
+     *
+     * @throws [IllegalArgumentException] This exception is thrown if [ancestor] is not an ancestor of this path.
      */
     fun relativeTo(ancestor: DirPathBase): MutableFSPath
 

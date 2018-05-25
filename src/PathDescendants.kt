@@ -29,10 +29,19 @@ internal class PathDescendants(private val innerPath: DirPath) : MutableSet<Muta
     /**
      * Inserts [element] into its proper location in the tree.
      *
+     * If [element] is a relative path, then it is considered to be relative to [innerPath].
+     *
+     * @throws [IllegalArgumentException] This exception is thrown if [element] is absolute and [innerPath] is not an
+     * ancestor of it.
+     *
      * @return `true` if the element has been added, `false` if the element is already contained in the collection.
      */
     override fun add(element: MutableFSPath): Boolean {
-        val new = element.relativeTo(innerPath)
+        val new = try {
+            if (element.toPath().isAbsolute) element.relativeTo(innerPath) else element.copy()
+        } catch (e: IllegalArgumentException) {
+            throw IllegalArgumentException("the given path must either be relative or have this path as an ancestor", e)
+        }
         var successful = false
 
         // Get a list of all the ancestors in the hierarchy going back to the root.

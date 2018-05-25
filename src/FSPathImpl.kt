@@ -73,6 +73,8 @@ abstract class MutableFSPath protected constructor(segments: List<String>) : FSP
     override fun hashCode(): Int = pathSegments.hashCode()
 
     override fun relativeTo(ancestor: DirPathBase): MutableFSPath {
+        if (!toPath().startsWith(ancestor.toPath()))
+            throw IllegalArgumentException("the given path must be an ancestor of this path")
         val new = copy()
         var current = new
         while (current.parent != ancestor && current.parent != null) {
@@ -171,10 +173,11 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
      * A mutable representation of the paths of all descendants of the directory.
      *
      * This set is automatically updated whenever one of the paths contained in it changes. It is safe for the paths
-     * contained in this set to be modified.
+     * contained in this set to be modified. Changes to any paths in the tree are reflected in this set.
      *
-     * Changes to any paths in the tree are reflected in this set. Items added to the set are inserted into their proper
-     * location in the tree, and items removed from the set are removed from the tree.
+     * Items added to the set are inserted into their proper location in the tree. Both relative and absolute paths can
+     * be added to the set. Relative paths are considered to be relative to this directory, and absolute paths must
+     * start with this directory. Items which are removed from the set are removed from their location in the tree.
      */
     override val descendants: MutableSet<MutableFSPath> = PathDescendants(this)
 
