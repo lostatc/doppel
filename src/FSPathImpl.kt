@@ -78,7 +78,7 @@ abstract class MutableFSPath protected constructor(segments: List<String>) : FSP
         var current = new
         while (current.parent != ancestor && current.parent != null) {
             current._parent = current.parent?.copy()
-            current = current.parent!!
+            current = current.parent ?: break
         }
         current._parent = null
         return new
@@ -205,7 +205,7 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
         var current = new
         while (current.parent != null) {
             current._parent = current.parent?.copy()
-            current = current.parent!!
+            current = current.parent ?: break
         }
         current._parent = this
         return new
