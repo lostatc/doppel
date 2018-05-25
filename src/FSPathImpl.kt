@@ -170,6 +170,9 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
     /**
      * A mutable representation of the paths of all descendants of the directory.
      *
+     * This set is automatically updated whenever one of the paths contained in it changes. It is safe for the paths
+     * contained in this set to be modified.
+     *
      * Changes to any paths in the tree are reflected in this set. Items added to the set are inserted into their proper
      * location in the tree, and items removed from the set are removed from the tree.
      */
@@ -230,7 +233,7 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
     /**
      * Adds [newChildren] to [children].
      *
-     * This is a vararg shortcut that calls [MutableSet.addAll] on [children].
+     * This is a vararg shortcut that calls [children.addAll][MutableSet.addAll].
      *
      * @return `true` if any of the specified paths were added to [children], `false` if [children] was not modified.
      */

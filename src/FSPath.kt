@@ -8,9 +8,9 @@ import java.io.File
  * A read-only representation of a file or directory path.
  *
  * Properties in this interface must be read-only and methods must not modify the state. [FSPath] objects can represent
- * absolute or relative paths. Unlike [java.nio.file.Path], objects of this type can form a tree to represent a file
- * hierarchy because every path has a [parent] property that points to a separate [FSPath] object. Each [FSPath] object
- * stores only a file name; the full path is retrieved by joining the paths of all of its ancestors.
+ * absolute or relative paths. Unlike [java.nio.file.Path], objects of this type form a tree to represent a file
+ * hierarchy; every path has a [parent] property that points to a separate [FSPath] object. Each [FSPath] object stores
+ * only a file name; the full path is retrieved by joining the paths of all of its ancestors.
  */
 interface FSPath {
     /**
@@ -49,14 +49,16 @@ interface FSPath {
 
     /**
      * Returns a hash code value for the object.
+     *
+     * The hash code value is based on the [pathSegments] property.
      */
     override fun hashCode(): Int
 
     /**
      * Returns whether the file represented by this path exists in the filesystem.
      *
-     * @param checkType: Check not only whether the file exists, but also whether the type of file matches the type of
-     * the object.
+     * @param [checkType] Check not only whether the file exists, but also whether the type of file matches the type of
+     * the the object.
      */
     fun exists(checkType: Boolean = true): Boolean
 
@@ -71,7 +73,7 @@ interface FSPath {
      * This method climbs the tree of parents until it finds the path whose parent is [ancestor]. It then sets that
      * path's parent to `null`.
      */
-    fun relativeTo(ancestor: DirPathBase): FSPath
+    fun relativeTo(ancestor: DirPathBase): MutableFSPath
 
     /**
      * Returns a [Path] representing this path.
@@ -126,6 +128,9 @@ interface DirPathBase : FSPath {
 
     /**
      * Returns whether every path in the tree exists in the filesystem.
+     *
+     * @param [checkType] Check not only whether each file exists, but also whether the type of file matches the type of
+     * the object.
      */
     fun treeExists(checkType: Boolean = true): Boolean = exists(checkType) && walkChildren().all { it.exists(checkType) }
 
