@@ -29,8 +29,8 @@ interface FSPath {
     /**
      * The segments of the path, excluding path separators.
      *
-     * If [parent] is `null`, then this is equal to [fileName]. Otherwise it is equal to [parent::pathSegments] +
-     * [fileName].
+     * If [parent] is `null`, then this is equal to [fileName]. Otherwise it is equal to
+     * [parent.pathSegments][DirPath.pathSegments] + [fileName].
      */
     val pathSegments: List<String>
         get() = (parent?.pathSegments ?: listOf<String>()) + fileName

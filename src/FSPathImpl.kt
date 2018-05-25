@@ -230,7 +230,7 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
     /**
      * Add [newChildren] to [children].
      *
-     * This is just a shortcut for [children::addAll] that uses a vararg.
+     * This is a vararg shortcut that calls [MutableSet.addAll] on [children].
      *
      * @return `true` if any of the specified paths were added to [children], `false` if [children] was not modified.
      */
