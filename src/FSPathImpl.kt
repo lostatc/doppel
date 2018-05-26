@@ -3,17 +3,8 @@ package diffir
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.io.File
+import java.io.IOException
 import kotlin.reflect.KProperty
-
-/**
- * This exception is thrown when there is a problem caused by a path being absolute.
- */
-class IsAbsolutePathException(message: String) : Exception(message)
-
-/**
- * This exception is thrown when there is a problem caused by a path not being an accessible directory.
- */
-class NotADirectoryException(message: String) : Exception(message)
 
 /**
  * A mutable representation of a file or directory path.
@@ -33,7 +24,7 @@ abstract class MutableFSPath protected constructor(segments: List<String>) : FSP
     internal var _parent: DirPath? = with(segments) { if (size > 1) DirPath(dropLast(1)) else null }
         set(value) {
             if (containsRoot && value != null) {
-                throw IsAbsolutePathException("absolute paths cannot have a parent")
+                throw IllegalArgumentException("parent cannot be non-null if this path is a filesystem root")
             } else {
                 val oldValue = field
                 field = value
@@ -47,7 +38,7 @@ abstract class MutableFSPath protected constructor(segments: List<String>) : FSP
      * If set to a non-null value, this path is added to the children of the new parent. If set to `null`, this path is
      * removed from the children of the old parent.
      *
-     * @throws [IsAbsolutePathException] This exception is thrown if the property is set to a non-null value while
+     * @throws [IllegalArgumentException] This exception is thrown if the property is set to a non-null value while
      * [fileName] is a filesystem root.
      */
     override var parent: DirPath?
@@ -248,13 +239,13 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
      * This method reads the filesystem to get the list of files contained in the directory represented by this object.
      * It then creates path objects from those file paths and populates [children] with them.
      *
-     * @throws [NotADirectoryException] This exception is thrown if the path represented by this object is not the path
-     * of an accessible directory.
+     * @throws [IOException] This exception is thrown if the path represented by this object is not the path of an
+     * accessible directory or if there is an IO error.
      */
     fun findChildren() {
         val dirChildren: Array<File>? = toFile().listFiles()
-        dirChildren ?: throw NotADirectoryException(
-            "cannot access children because the path is not an accessible directory")
+        dirChildren ?: throw IOException(
+            "cannot access children because the path is not an accessible directory or because of an IO error")
         children.addAll(dirChildren.map {
             when {
                 it.isDirectory -> DirPath(it.toPath().fileName)
@@ -268,8 +259,8 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
      *
      * This method calls [findChildren] recursively.
      *
-     * @throws [NotADirectoryException] This exception is thrown if the path represented by this object is not the path
-     * of an accessible directory.
+     * @throws [IOException] This exception is thrown if the path represented by this object is not the path of an
+     * accessible directory or if there is an IO error.
      */
     fun findDescendants() {
         findChildren()
