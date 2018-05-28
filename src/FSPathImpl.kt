@@ -7,6 +7,30 @@ import java.io.IOException
 import kotlin.reflect.KProperty
 
 /**
+ * Return a list of paths of the immediate children of [directory] in the filesystem.
+ */
+private fun scanChildren(directory: DirPathBase): List<MutableFSPath> {
+    val dirChildren = directory.toFile().listFiles()
+    dirChildren ?: throw IOException(
+        "cannot access children because the path is not an accessible directory or because of an IO error")
+    return dirChildren.map {
+        when {
+            it.isDirectory -> DirPath(it.toPath().fileName)
+            else -> FilePath(it.toPath().fileName)
+        }
+    }
+}
+
+/**
+ * Return a list of paths of the descendants of [directory] in the filesystem.
+ */
+private fun scanDescendants(directory: DirPathBase): List<MutableFSPath> =
+    scanChildren(directory)
+    .map { directory + it }
+    .map { if (it is DirPath) scanDescendants(it) else listOf(it) }
+    .flatten()
+
+/**
  * A mutable representation of a file or directory path.
  *
  * This class contains properties and methods common to all mutable paths.
@@ -236,35 +260,27 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
     /**
      * Populates [children] with paths from the filesystem.
      *
-     * This method reads the filesystem to get the list of files contained in the directory represented by this object.
-     * It then creates path objects from those file paths and populates [children] with them.
+     * This method reads the filesystem to get the list of immediate children of the directory represented by this
+     * object. It then creates path objects from those file paths and populates [children] with them.
      *
      * @throws [IOException] This exception is thrown if the path represented by this object is not the path of an
      * accessible directory or if there is an IO error.
      */
     fun findChildren() {
-        val dirChildren: Array<File>? = toFile().listFiles()
-        dirChildren ?: throw IOException(
-            "cannot access children because the path is not an accessible directory or because of an IO error")
-        children.addAll(dirChildren.map {
-            when {
-                it.isDirectory -> DirPath(it.toPath().fileName)
-                else -> FilePath(it.toPath().fileName)
-            }
-        })
+        children.addAll(scanChildren(this))
     }
 
     /**
      * Populates [descendants] with paths from the filesystem.
      *
-     * This method calls [findChildren] recursively.
+     * This method reads the filesystem to get the list of descendants of the directory represented by this object. It
+     * then creates path objects from those file paths and populates [descendants] with them.
      *
      * @throws [IOException] This exception is thrown if the path represented by this object is not the path of an
      * accessible directory or if there is an IO error.
      */
     fun findDescendants() {
-        findChildren()
-        children.forEach { (it as? DirPath)?.findDescendants() }
+        descendants.addAll(scanDescendants(this))
     }
 
     /**
