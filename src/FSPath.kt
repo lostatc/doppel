@@ -24,7 +24,7 @@ interface FSPath {
      * @throws [IllegalArgumentException] This exception is thrown if the property is set to a non-null value while
      * [fileName] is a filesystem root.
      */
-    val parent: DirPath?
+    val parent: DirPathBase?
 
     /**
      * The segments of the path, excluding path separators.
@@ -103,12 +103,12 @@ interface DirPathBase : FSPath {
     /**
      * The paths of the immediate children of the directory.
      */
-    val children: Set<MutableFSPath>
+    val children: Set<FSPath>
 
     /**
      * The paths of all descendants of the directory.
      */
-    val descendants: Set<MutableFSPath>
+    val descendants: Set<FSPath>
 
     override fun copy(): DirPath
 
@@ -125,7 +125,7 @@ interface DirPathBase : FSPath {
      *
      * A top-down, depth-first search is used and directory paths are visited before their contents.
      */
-    fun walkChildren(): Sequence<MutableFSPath>
+    fun walkChildren(): Sequence<FSPath>
 
     /**
      * Returns whether every path in the tree exists in the filesystem.
