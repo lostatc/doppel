@@ -87,6 +87,20 @@ interface FSPath {
      * Returns a [File] representing this path.
      */
     fun toFile(): File = toPath().toFile()
+
+    /**
+     * Returns whether this path starts with the path [other].
+     *
+     * @see [Path.startsWith]
+     */
+    fun startsWith(other: FSPath): Boolean = toPath().startsWith(other.toPath())
+
+    /**
+     * Returns whether this path ends with the path [other].
+     *
+     * @see [Path.endsWith]
+     */
+    fun endsWith(other: FSPath): Boolean = toPath().endsWith(other.toPath())
 }
 
 /**
@@ -106,7 +120,7 @@ interface DirPathBase : FSPath {
     val children: Set<FSPath>
 
     /**
-     * The paths of all descendants of the directory.
+     * The paths of all the descendants of the directory.
      */
     val descendants: Set<FSPath>
 

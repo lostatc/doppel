@@ -88,8 +88,9 @@ abstract class MutableFSPath protected constructor(segments: List<String>) : FSP
     override fun hashCode(): Int = pathSegments.hashCode()
 
     override fun relativeTo(ancestor: DirPathBase): MutableFSPath {
-        if (!toPath().startsWith(ancestor.toPath()))
+        if (startsWith(ancestor))
             throw IllegalArgumentException("the given path must be an ancestor of this path")
+
         val new = copy()
         var current = new
         while (current.parent != ancestor && current.parent != null) {
