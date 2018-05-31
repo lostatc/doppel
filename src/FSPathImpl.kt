@@ -27,7 +27,7 @@ private fun scanChildren(directory: DirPathBase): List<MutableFSPath> {
 private fun scanDescendants(directory: DirPathBase): List<MutableFSPath> =
     scanChildren(directory)
     .map { directory + it }
-    .map { if (it is DirPath) scanDescendants(it) else listOf(it) }
+    .map { if (it is DirPath) scanDescendants(it) + it else listOf(it) }
     .flatten()
 
 /**
