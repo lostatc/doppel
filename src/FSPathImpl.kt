@@ -124,8 +124,10 @@ class FilePath private constructor(segments: List<String>) : MutableFSPath(segme
 
     /**
      * Creates a read-only view of this file path.
+     *
+     * The returned object updates with this object. It and all its ancestors are read-only.
      */
-    fun asView(): FilePathView = FilePathView(this)
+    fun asView(): FilePathBase = this as FilePathBase
 
     companion object {
         /**
@@ -286,8 +288,10 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
 
     /**
      * Creates a read-only view of this directory path.
+     *
+     * The returned object updates with this object. It, all its ancestors and all its descendants are read-only.
      */
-    fun asView(): DirPathView = DirPathView(this)
+    fun asView(): DirPathBase = this as DirPathBase
 
     companion object {
         /**
@@ -336,19 +340,3 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
         }
     }
 }
-
-/**
- * A read-only view of a file path.
- *
- * Objects of this type present a dynamic view of the file path objects passed in. This means that when the path objects
- * are updated, this view reflects those changes. View objects cannot modify their corresponding path objects.
- */
-class FilePathView(inner: FilePathBase) : FilePathBase by inner
-
-/**
- * A read-only view of a directory path.
- *
- * Objects of this type present a dynamic view of the directory path objects passed in. This means that when the path
- * objects are updated, this view reflects those changes. View objects cannot modify their corresponding path objects.
- */
-class DirPathView(inner: DirPathBase) : DirPathBase by inner
