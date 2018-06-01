@@ -125,9 +125,9 @@ class MutableFilePath private constructor(segments: List<String>) : MutableFSPat
     /**
      * Creates a read-only view of this file path.
      *
-     * The returned object updates with this object. It and all its ancestors are read-only.
+     * @return A new object which updates with this object. It and all its ancestors are read-only.
      */
-    fun asView(): FilePath = this as FilePath
+    fun asView(): FilePath = this
 
     companion object {
         /**
@@ -289,9 +289,9 @@ class MutableDirPath private constructor(segments: List<String>) : MutableFSPath
     /**
      * Creates a read-only view of this directory path.
      *
-     * The returned object updates with this object. It, all its ancestors and all its descendants are read-only.
+     * @return A new object which updates with this object. It, all its ancestors and all its descendants are read-only.
      */
-    fun asView(): DirPath = this as DirPath
+    fun asView(): DirPath = this
 
     companion object {
         /**
