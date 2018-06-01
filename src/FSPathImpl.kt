@@ -9,14 +9,14 @@ import kotlin.reflect.KProperty
 /**
  * Return a list of paths of the immediate children of [directory] in the filesystem.
  */
-private fun scanChildren(directory: DirPathBase): List<MutableFSPath> {
+internal fun scanChildren(directory: DirPath): List<MutableFSPath> {
     val dirChildren = directory.toFile().listFiles()
     dirChildren ?: throw IOException(
         "cannot access children because the path is not an accessible directory or because of an IO error")
     return dirChildren.map {
         when {
-            it.isDirectory -> DirPath(it.toPath().fileName)
-            else -> FilePath(it.toPath().fileName)
+            it.isDirectory -> MutableDirPath(it.toPath().fileName)
+            else -> MutableFilePath(it.toPath().fileName)
         }
     }
 }
@@ -24,10 +24,10 @@ private fun scanChildren(directory: DirPathBase): List<MutableFSPath> {
 /**
  * Return a list of paths of the descendants of [directory] in the filesystem.
  */
-private fun scanDescendants(directory: DirPathBase): List<MutableFSPath> =
+private fun scanDescendants(directory: DirPath): List<MutableFSPath> =
     scanChildren(directory)
     .map { directory + it }
-    .map { if (it is DirPath) scanDescendants(it) + it else listOf(it) }
+    .map { if (it is MutableDirPath) scanDescendants(it) + it else listOf(it) }
     .flatten()
 
 /**
@@ -45,7 +45,7 @@ abstract class MutableFSPath protected constructor(segments: List<String>) : FSP
      *
      * This is used to set the parent without affecting the parent's children.
      */
-    internal var _parent: DirPath? = with(segments) { if (size > 1) DirPath(dropLast(1)) else null }
+    internal var _parent: MutableDirPath? = with(segments) { if (size > 1) MutableDirPath(dropLast(1)) else null }
         set(value) {
             if (containsRoot && value != null) {
                 throw IllegalArgumentException("parent cannot be non-null if this path is a filesystem root")
@@ -65,7 +65,7 @@ abstract class MutableFSPath protected constructor(segments: List<String>) : FSP
      * @throws [IllegalArgumentException] This exception is thrown if the property is set to a non-null value while
      * [fileName] is a filesystem root.
      */
-    override var parent: DirPath?
+    override var parent: MutableDirPath?
         get() = _parent
         set(value) {
             value?._children?.add(this) ?: _parent?._children?.remove(this)
@@ -87,7 +87,7 @@ abstract class MutableFSPath protected constructor(segments: List<String>) : FSP
 
     override fun hashCode(): Int = pathSegments.hashCode()
 
-    override fun relativeTo(ancestor: DirPathBase): MutableFSPath {
+    override fun relativeTo(ancestor: DirPath): MutableFSPath {
         if (startsWith(ancestor))
             throw IllegalArgumentException("the given path must be an ancestor of this path")
 
@@ -108,15 +108,15 @@ abstract class MutableFSPath protected constructor(segments: List<String>) : FSP
  * To create new instances of this class, see the factory method [invoke]. Creating an instance with this method uses
  * the same syntax as using a constructor.
  */
-class FilePath private constructor(segments: List<String>) : MutableFSPath(segments), FilePathBase {
+class MutableFilePath private constructor(segments: List<String>) : MutableFSPath(segments), FilePath {
     /**
      * Returns whether the file represented by this path exists in the filesystem.
      *
-     * @param checkType: Check not only whether the file exists, but also whether it is a normal file.
+     * @param [checkType] Check not only whether the file exists, but also whether it is a normal file.
      */
     override fun exists(checkType: Boolean): Boolean = if (checkType) toFile().isFile else toFile().exists()
 
-    override fun copy(): FilePath {
+    override fun copy(): MutableFilePath {
         val new = invoke(fileName)
         new._parent = parent
         return new
@@ -127,7 +127,7 @@ class FilePath private constructor(segments: List<String>) : MutableFSPath(segme
      *
      * The returned object updates with this object. It and all its ancestors are read-only.
      */
-    fun asView(): FilePathBase = this as FilePathBase
+    fun asView(): FilePath = this as FilePath
 
     companion object {
         /**
@@ -136,8 +136,8 @@ class FilePath private constructor(segments: List<String>) : MutableFSPath(segme
          * @return A hierarchy of [MutableFSPath] objects where the last segment becomes the new path's [fileName], and
          * the rest of them become the new path's parent and ancestors.
          */
-        operator fun invoke(segments: List<String>): FilePath {
-            val path = FilePath(segments)
+        operator fun invoke(segments: List<String>): MutableFilePath {
+            val path = MutableFilePath(segments)
             path.parent?._children?.add(path)
             return path
         }
@@ -148,7 +148,7 @@ class FilePath private constructor(segments: List<String>) : MutableFSPath(segme
          * @return A hierarchy of [MutableFSPath] objects where the last segment becomes the new path's [fileName], and
          * the rest of them become the new path's parent and ancestors.
          */
-        operator fun invoke(firstSegment: String, vararg segments: String): FilePath =
+        operator fun invoke(firstSegment: String, vararg segments: String): MutableFilePath =
             invoke(listOf(firstSegment, *segments))
 
         /**
@@ -157,7 +157,7 @@ class FilePath private constructor(segments: List<String>) : MutableFSPath(segme
          * @return A hierarchy of [MutableFSPath] objects where the last segment becomes the new path's [fileName], and
          * the rest of them become the new path's parent and ancestors.
          */
-        operator fun invoke(path: Path): FilePath = invoke(path.map { it.toString() })
+        operator fun invoke(path: Path): MutableFilePath = invoke(path.map { it.toString() })
     }
 }
 
@@ -167,7 +167,7 @@ class FilePath private constructor(segments: List<String>) : MutableFSPath(segme
  * To create new instances of this class, see the factory method [invoke]. Creating an instance with this method uses
  * the same syntax as using a constructor.
  */
-class DirPath private constructor(segments: List<String>) : MutableFSPath(segments), DirPathBase {
+class MutableDirPath private constructor(segments: List<String>) : MutableFSPath(segments), DirPath {
     /**
      * The backing property of [children].
      *
@@ -214,7 +214,7 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
     /**
      * Returns whether the file represented by this path exists in the filesystem.
      *
-     * @param checkType: Check not only whether the file exists, but also whether it is a directory.
+     * @param [checkType] Check not only whether the file exists, but also whether it is a directory.
      */
     override fun exists(checkType: Boolean): Boolean = if (checkType) toFile().isDirectory else toFile().exists()
 
@@ -223,7 +223,7 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
      *
      * Children of this path are copied deeply.
      */
-    override fun copy(): DirPath {
+    override fun copy(): MutableDirPath {
         val new = invoke(fileName)
         new._children = UpdatableSet(children.map { it.copy() })
         new._parent = parent
@@ -242,9 +242,9 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
     }
 
     override fun walkChildren(): Sequence<MutableFSPath> {
-        fun walk(node: DirPath): Sequence<MutableFSPath> {
+        fun walk(node: MutableDirPath): Sequence<MutableFSPath> {
             return node.children.asSequence().flatMap {
-                if (it is DirPath) sequenceOf(it) + walk(it) else sequenceOf(it)
+                if (it is MutableDirPath) sequenceOf(it) + walk(it) else sequenceOf(it)
             }
         }
 
@@ -291,7 +291,7 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
      *
      * The returned object updates with this object. It, all its ancestors and all its descendants are read-only.
      */
-    fun asView(): DirPathBase = this as DirPathBase
+    fun asView(): DirPath = this as DirPath
 
     companion object {
         /**
@@ -300,8 +300,8 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
          * @return A hierarchy of [MutableFSPath] objects where the last segment becomes the new path's [fileName], and
          * the rest of them become the new path's parent and ancestors.
          */
-        operator fun invoke(segments: List<String>): DirPath {
-            val path = DirPath(segments)
+        operator fun invoke(segments: List<String>): MutableDirPath {
+            val path = MutableDirPath(segments)
             path.parent?._children?.add(path)
             return path
         }
@@ -312,7 +312,7 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
          * @return A hierarchy of [MutableFSPath] objects where the last segment becomes the new path's [fileName], and
          * the rest of them become the new path's parent and ancestors.
          */
-        operator fun invoke(firstSegment: String, vararg segments: String): DirPath =
+        operator fun invoke(firstSegment: String, vararg segments: String): MutableDirPath =
             invoke(listOf(firstSegment, *segments))
 
         /**
@@ -321,7 +321,7 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
          * @return A hierarchy of [MutableFSPath] objects where the last segment becomes the new path's [fileName], and
          * the rest of them become the new path's parent and ancestors.
          */
-        operator fun invoke(path: Path): DirPath = invoke(path.map { it.toString() })
+        operator fun invoke(path: Path): MutableDirPath = invoke(path.map { it.toString() })
 
         /**
          * Constructs a new directory path from the [fileName] of the directory and a list of immediate [children] to
@@ -331,7 +331,7 @@ class DirPath private constructor(segments: List<String>) : MutableFSPath(segmen
          *
          * @return A new directory path containing the given children.
          */
-        operator fun invoke(fileName: String, firstChild: MutableFSPath, vararg children: MutableFSPath): DirPath {
+        operator fun invoke(fileName: String, firstChild: MutableFSPath, vararg children: MutableFSPath): MutableDirPath {
             // The purpose of the [firstChild] parameter is to disambiguate this factory method from the others so that
             // an instance can be created by passing in a single string.
             val path = invoke(listOf(fileName))

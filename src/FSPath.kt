@@ -24,7 +24,7 @@ interface FSPath {
      * @throws [IllegalArgumentException] This exception is thrown if the property is set to a non-null value while
      * [fileName] is a filesystem root.
      */
-    val parent: DirPathBase?
+    val parent: DirPath?
 
     /**
      * The segments of the path, excluding path separators.
@@ -76,7 +76,7 @@ interface FSPath {
      *
      * @throws [IllegalArgumentException] This exception is thrown if [ancestor] is not an ancestor of this path.
      */
-    fun relativeTo(ancestor: DirPathBase): MutableFSPath
+    fun relativeTo(ancestor: DirPath): MutableFSPath
 
     /**
      * Returns a [Path] representing this path.
@@ -106,14 +106,14 @@ interface FSPath {
 /**
  * A read-only representation of a file path.
  */
-interface FilePathBase : FSPath {
-    override fun copy(): FilePath
+interface FilePath : FSPath {
+    override fun copy(): MutableFilePath
 }
 
 /**
  * A read-only representation of a directory path.
  */
-interface DirPathBase : FSPath {
+interface DirPath : FSPath {
     /**
      * The paths of the immediate children of the directory.
      */
@@ -124,7 +124,7 @@ interface DirPathBase : FSPath {
      */
     val descendants: Set<FSPath>
 
-    override fun copy(): DirPath
+    override fun copy(): MutableDirPath
 
     /**
      * Returns a copy of [other] with this as the ancestor.
@@ -152,5 +152,5 @@ interface DirPathBase : FSPath {
     /**
      * Returns a representation of the difference between two directories.
      */
-    infix fun diff(other: DirPathBase) = PathDiff(this, other)
+    infix fun diff(other: DirPath) = PathDiff(this, other)
 }

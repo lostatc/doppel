@@ -10,7 +10,7 @@ import java.util.LinkedList
  *
  * @param [innerPath] The directory path to modify.
  */
-internal class PathDescendants(private val innerPath: DirPath) : MutableSet<MutableFSPath> {
+internal class PathDescendants(private val innerPath: MutableDirPath) : MutableSet<MutableFSPath> {
     /**
      * A read-only set containing all the descendants of the directory.
      */
@@ -20,8 +20,8 @@ internal class PathDescendants(private val innerPath: DirPath) : MutableSet<Muta
     /**
      * A read-only list containing all the directories in the tree.
      */
-    private val allDirectories: List<DirPath>
-        get() = descendants.filterIsInstance<DirPath>() + innerPath
+    private val allDirectories: List<MutableDirPath>
+        get() = descendants.filterIsInstance<MutableDirPath>() + innerPath
 
     override val size: Int
         get() = descendants.size
@@ -40,7 +40,7 @@ internal class PathDescendants(private val innerPath: DirPath) : MutableSet<Muta
         val new = try {
             if (element.toPath().isAbsolute) element.relativeTo(innerPath) else element.copy()
         } catch (e: IllegalArgumentException) {
-            throw IllegalArgumentException("the given path must either be relative or have this path as an ancestor", e)
+            throw IllegalArgumentException("the given path must either be relative or be a descendant of this path", e)
         }
         var successful = false
 
@@ -100,7 +100,7 @@ internal class PathDescendants(private val innerPath: DirPath) : MutableSet<Muta
      * @return `true` if any element was removed from the collection, `false` if the collection was not modified.
      */
     override fun retainAll(elements: Collection<MutableFSPath>): Boolean =
-            removeAll(descendants.filter { it !in elements })
+        removeAll(descendants.filter { it !in elements })
 
     /**
      * Removes all the paths in the tree.
