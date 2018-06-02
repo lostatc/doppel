@@ -122,13 +122,6 @@ class MutableFilePath private constructor(segments: List<String>) : MutableFSPat
         return new
     }
 
-    /**
-     * Creates a read-only view of this file path.
-     *
-     * @return A new object which updates with this object. It and all its ancestors are read-only.
-     */
-    fun asView(): FilePath = this
-
     companion object {
         /**
          * Constructs a new file path from the given path [segments] without path separators.
@@ -285,13 +278,6 @@ class MutableDirPath private constructor(segments: List<String>) : MutableFSPath
     fun findDescendants() {
         descendants.addAll(scanDescendants(this))
     }
-
-    /**
-     * Creates a read-only view of this directory path.
-     *
-     * @return A new object which updates with this object. It, all its ancestors and all its descendants are read-only.
-     */
-    fun asView(): DirPath = this
 
     companion object {
         /**
