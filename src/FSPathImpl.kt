@@ -234,16 +234,6 @@ class MutableDirPath private constructor(segments: List<String>) : MutableFSPath
         return new
     }
 
-    override fun walkChildren(): Sequence<MutableFSPath> {
-        fun walk(node: MutableDirPath): Sequence<MutableFSPath> {
-            return node.children.asSequence().flatMap {
-                if (it is MutableDirPath) sequenceOf(it) + walk(it) else sequenceOf(it)
-            }
-        }
-
-        return walk(this)
-    }
-
     /**
      * Adds [newChildren] to [children].
      *
