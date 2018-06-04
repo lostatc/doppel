@@ -1,5 +1,6 @@
 package diffir
 
+import org.jetbrains.annotations.Mutable
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.io.File
@@ -65,7 +66,7 @@ interface FSPath {
     /**
      * Returns a copy of this path.
      */
-    fun copy(): MutableFSPath
+    fun copy(): FSPath
 
     /**
      * Returns a copy of this path which is relative to [ancestor].
@@ -76,7 +77,7 @@ interface FSPath {
      *
      * @throws [IllegalArgumentException] This exception is thrown if [ancestor] is not an ancestor of this path.
      */
-    fun relativeTo(ancestor: DirPath): MutableFSPath
+    fun relativeTo(ancestor: DirPath): FSPath
 
     /**
      * Returns a [Path] representing this path.
@@ -107,7 +108,14 @@ interface FSPath {
  * A read-only representation of a file path.
  */
 interface FilePath : FSPath {
-    override fun copy(): MutableFilePath
+    override fun copy(): FilePath
+
+    override fun relativeTo(ancestor: DirPath): FilePath
+
+    /**
+     * Return a copy of this path as a mutable file path.
+     */
+    fun toMutableFilePath(): MutableFilePath = copy() as MutableFilePath
 }
 
 /**
@@ -124,7 +132,9 @@ interface DirPath : FSPath {
      */
     val descendants: Set<FSPath>
 
-    override fun copy(): MutableDirPath
+    override fun copy(): DirPath
+
+    override fun relativeTo(ancestor: DirPath): DirPath
 
     /**
      * Returns a copy of [other] with this as the ancestor.
@@ -162,4 +172,9 @@ interface DirPath : FSPath {
      * Returns a representation of the difference between two directories.
      */
     infix fun diff(other: DirPath) = PathDiff(this, other)
+
+    /**
+     * Return a copy of this path as a mutable directory path.
+     */
+    fun toMutableDirPath(): MutableDirPath = copy() as MutableDirPath
 }

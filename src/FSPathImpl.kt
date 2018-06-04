@@ -27,6 +27,7 @@ internal fun scanChildren(directory: DirPath): List<MutableFSPath> {
 private fun scanDescendants(directory: DirPath): List<MutableFSPath> =
     scanChildren(directory)
     .map { directory + it }
+    .map { it as MutableFSPath }
     .map { if (it is MutableDirPath) scanDescendants(it) + it else listOf(it) }
     .flatten()
 
@@ -87,8 +88,10 @@ abstract class MutableFSPath protected constructor(segments: List<String>) : FSP
 
     override fun hashCode(): Int = pathSegments.hashCode()
 
+    abstract override fun copy(): MutableFSPath
+
     override fun relativeTo(ancestor: DirPath): MutableFSPath {
-        if (startsWith(ancestor))
+        if (!startsWith(ancestor))
             throw IllegalArgumentException("the given path must be an ancestor of this path")
 
         val new = copy()
@@ -121,6 +124,8 @@ class MutableFilePath private constructor(segments: List<String>) : MutableFSPat
         new._parent = parent
         return new
     }
+
+    override fun relativeTo(ancestor: DirPath): MutableFilePath = super.relativeTo(ancestor) as MutableFilePath
 
     companion object {
         /**
@@ -223,9 +228,11 @@ class MutableDirPath private constructor(segments: List<String>) : MutableFSPath
         return new
     }
 
+    override fun relativeTo(ancestor: DirPath): MutableDirPath = super.relativeTo(ancestor) as MutableDirPath
+
     override fun plus(other: FSPath): MutableFSPath {
-        val new = other.copy()
-        var current = new
+        val new = other.copy() //as MutableFSPath
+        var current = new as MutableFSPath
         while (current.parent != null) {
             current._parent = current.parent?.copy()
             current = current.parent ?: break
@@ -233,6 +240,8 @@ class MutableDirPath private constructor(segments: List<String>) : MutableFSPath
         current._parent = this
         return new
     }
+
+    override fun walkChildren(): Sequence<MutableFSPath> = super.walkChildren().map { it as MutableFSPath }
 
     /**
      * Adds [newChildren] to [children].
