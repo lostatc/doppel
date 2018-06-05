@@ -26,8 +26,7 @@ internal fun scanChildren(directory: DirPath): List<MutableFSPath> {
  */
 private fun scanDescendants(directory: DirPath): List<MutableFSPath> =
     scanChildren(directory)
-    .map { directory + it }
-    .map { it as MutableFSPath }
+    .map { it.withAncestor(directory) }
     .map { if (it is MutableDirPath) scanDescendants(it) + it else listOf(it) }
     .flatten()
 
@@ -103,6 +102,17 @@ abstract class MutableFSPath protected constructor(segments: List<String>) : FSP
         current._parent = null
         return new
     }
+
+    override fun withAncestor(ancestor: DirPath): MutableFSPath {
+        val new = copy()
+        var current = new
+        while (current.parent != null) {
+            current._parent = current.parent?.copy()
+            current = current.parent ?: break
+        }
+        current._parent = ancestor as MutableDirPath
+        return new
+    }
 }
 
 /**
@@ -126,6 +136,8 @@ class MutableFilePath private constructor(segments: List<String>) : MutableFSPat
     }
 
     override fun relativeTo(ancestor: DirPath): MutableFilePath = super.relativeTo(ancestor) as MutableFilePath
+
+    override fun withAncestor(ancestor: DirPath): MutableFilePath = super.withAncestor(ancestor) as MutableFilePath
 
     companion object {
         /**
@@ -230,16 +242,7 @@ class MutableDirPath private constructor(segments: List<String>) : MutableFSPath
 
     override fun relativeTo(ancestor: DirPath): MutableDirPath = super.relativeTo(ancestor) as MutableDirPath
 
-    override fun plus(other: FSPath): MutableFSPath {
-        val new = other.copy() //as MutableFSPath
-        var current = new as MutableFSPath
-        while (current.parent != null) {
-            current._parent = current.parent?.copy()
-            current = current.parent ?: break
-        }
-        current._parent = this
-        return new
-    }
+    override fun withAncestor(ancestor: DirPath): MutableDirPath = super.withAncestor(ancestor) as MutableDirPath
 
     override fun walkChildren(): Sequence<MutableFSPath> = super.walkChildren().map { it as MutableFSPath }
 

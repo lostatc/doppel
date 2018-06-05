@@ -48,7 +48,7 @@ internal class PathDescendants(private val innerPath: MutableDirPath) : MutableS
         val ancestors = LinkedList<MutableFSPath>()
         var current: MutableFSPath? = new
         while (current != null) {
-            ancestors.addFirst(innerPath + current)
+            ancestors.addFirst(current.withAncestor(innerPath))
             current = current.parent
         }
 

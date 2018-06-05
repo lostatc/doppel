@@ -80,6 +80,14 @@ interface FSPath {
     fun relativeTo(ancestor: DirPath): FSPath
 
     /**
+     * Returns a copy of this with [ancestor] as its ancestor.
+     *
+     * This method climbs the tree of parents until it finds a path whose parent is `null`. It then makes [ancestor]
+     * that path's parent.
+     */
+    fun withAncestor(ancestor: DirPath): FSPath
+
+    /**
      * Returns a [Path] representing this path.
      */
     fun toPath(): Path = Paths.get("", *pathSegments.toTypedArray())
@@ -112,6 +120,8 @@ interface FilePath : FSPath {
 
     override fun relativeTo(ancestor: DirPath): FilePath
 
+    override fun withAncestor(ancestor: DirPath): FilePath
+
     /**
      * Return a copy of this path as a mutable file path.
      */
@@ -136,13 +146,7 @@ interface DirPath : FSPath {
 
     override fun relativeTo(ancestor: DirPath): DirPath
 
-    /**
-     * Returns a copy of [other] with this as the ancestor.
-     *
-     * This method climbs the tree of parents until it finds a path whose parent is `null`. It then makes this that path's
-     * parent.
-     */
-    operator fun plus(other: FSPath): MutableFSPath
+    override fun withAncestor(ancestor: DirPath): DirPath
 
     /**
      * Returns a sequence of all the descendants of this directory path.

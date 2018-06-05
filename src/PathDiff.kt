@@ -112,7 +112,9 @@ class PathDiff(
      * [fileCompareFunc]. This returns relative paths.
      */
     val sameFiles: Set<FilePath>
-        get() = commonFiles.filter { fileCompareFunc((left + it).toFile(), (right + it).toFile()) }.toSet()
+        get() = commonFiles.filter {
+            fileCompareFunc(it.withAncestor(left).toFile(), it.withAncestor(right).toFile())
+        }.toSet()
 
     /**
      * The paths of files that are different in both directory trees.
@@ -130,7 +132,7 @@ class PathDiff(
      */
     val rightNewer: Set<FSPath>
         get() = commonFiles.filter {
-            (right + it).toFile().lastModified() > (left + it).toFile().lastModified()
+            it.withAncestor(right).toFile().lastModified() > it.withAncestor(left).toFile().lastModified()
         }.toSet()
 
     /**
