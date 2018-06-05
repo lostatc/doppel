@@ -194,7 +194,7 @@ class MutableDirPath private constructor(segments: List<String>) : MutableFSPath
      * Whenever children are added to this set, the [parent] property of each of them is set to this directory. Whenever
      * children are removed from this set, the [parent] property of each of them is set to `null`.
      */
-    override val children: MutableSet<MutableFSPath> = PathChildren(this)
+    override val children: MutableSet<MutableFSPath> = PathChildren(this, _children)
 
 
     /**

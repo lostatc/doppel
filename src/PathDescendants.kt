@@ -8,7 +8,7 @@ import java.util.LinkedList
  * This class allows for modifying a tree of [MutableFSPath] objects like a set. Items added to the set are inserted
  * into their proper location in the tree, and items removed from the set are removed from the tree.
  *
- * @param [innerPath] The directory path to modify.
+ * @param [innerPath] The directory path that this object represents the descendants of.
  */
 internal class PathDescendants(private val innerPath: MutableDirPath) : MutableSet<MutableFSPath> {
     /**

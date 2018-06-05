@@ -5,10 +5,14 @@ package diffir
  *
  * This class modifies the [MutableFSPath.parent] property of its elements to ensure that if B is a child of A, then A
  * is the parent of B.
+ *
+ * @param [innerPath] The directory path that this object represents the children of.
+ * @param [innerSet] The backing set that contains the children of the directory.
  */
-internal class PathChildren(private val innerPath: MutableDirPath) : MutableSet<MutableFSPath> by innerPath._children {
-    private val innerSet: MutableSet<MutableFSPath> = innerPath._children
-
+internal class PathChildren(
+    private val innerPath: MutableDirPath,
+    private val innerSet: MutableSet<MutableFSPath>
+) : MutableSet<MutableFSPath> by innerSet {
     /**
      * Makes [innerPath] the parent of [element] and adds it to this collection.
      *
