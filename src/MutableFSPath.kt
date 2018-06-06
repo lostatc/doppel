@@ -183,7 +183,7 @@ class MutableDirPath private constructor(segments: List<String>) : MutableFSPath
      *
      * This is used to modify the children of the directory without affecting their parents.
      */
-    internal var _children: MutableSet<MutableFSPath> = UpdatableSet<MutableFSPath>()
+    internal val _children: MutableSet<MutableFSPath> = UpdatableSet<MutableFSPath>()
 
     /**
      * A mutable representation of the paths of the immediate children of the directory.
@@ -235,7 +235,7 @@ class MutableDirPath private constructor(segments: List<String>) : MutableFSPath
      */
     override fun copy(): MutableDirPath {
         val new = invoke(fileName)
-        new._children = UpdatableSet(children.map { it.copy() })
+        new.children.addAll(children.map { it.copy() })
         new._parent = parent
         return new
     }
