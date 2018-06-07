@@ -110,7 +110,7 @@ abstract class MutableFSPath protected constructor(segments: List<String>) : FSP
             current._parent = current.parent?.copy()
             current = current.parent ?: break
         }
-        current._parent = ancestor as MutableDirPath
+        current._parent = ancestor.toMutableDirPath()
         return new
     }
 }

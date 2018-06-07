@@ -80,10 +80,10 @@ interface FSPath {
     fun relativeTo(ancestor: DirPath): FSPath
 
     /**
-     * Returns a copy of this with [ancestor] as its ancestor.
+     * Returns a copy of this path with [ancestor] as its ancestor.
      *
-     * This method climbs the tree of parents until it finds a path whose parent is `null`. It then makes [ancestor]
-     * that path's parent.
+     * This method climbs the tree of parents until it finds a path whose parent is `null`. It then makes that path's
+     * parent a copy of [ancestor].
      */
     fun withAncestor(ancestor: DirPath): FSPath
 
