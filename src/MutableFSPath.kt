@@ -15,8 +15,8 @@ internal fun scanChildren(directory: DirPath): List<MutableFSPath> {
         "cannot access children because the path is not an accessible directory or because of an IO error")
     return dirChildren.map {
         when {
-            it.isDirectory -> MutableDirPath(it.toPath().fileName)
-            else -> MutableFilePath(it.toPath().fileName)
+            it.isDirectory -> MutableDirPath.of(it.toPath().fileName)
+            else -> MutableFilePath.of(it.toPath().fileName)
         }
     }
 }
@@ -45,7 +45,7 @@ abstract class MutableFSPath protected constructor(segments: List<String>) : FSP
      *
      * This is used to set the parent without affecting the parent's children.
      */
-    internal var _parent: MutableDirPath? = with(segments) { if (size > 1) MutableDirPath(dropLast(1)) else null }
+    internal var _parent: MutableDirPath? = with(segments) { if (size > 1) MutableDirPath.of(dropLast(1)) else null }
         set(value) {
             if (containsRoot && value != null) {
                 throw IllegalArgumentException("parent cannot be non-null if this path is a filesystem root")
@@ -118,8 +118,7 @@ abstract class MutableFSPath protected constructor(segments: List<String>) : FSP
 /**
  * A mutable representation of a file path.
  *
- * To create new instances of this class, see the factory method [invoke]. Creating an instance with this method uses
- * the same syntax as using a constructor.
+ * To create new instances of this class, see the factory method [of].
  */
 class MutableFilePath private constructor(segments: List<String>) : MutableFSPath(segments), FilePath {
     /**
@@ -130,7 +129,7 @@ class MutableFilePath private constructor(segments: List<String>) : MutableFSPat
     override fun exists(checkType: Boolean): Boolean = if (checkType) toFile().isFile else toFile().exists()
 
     override fun copy(): MutableFilePath {
-        val new = invoke(fileName)
+        val new = of(fileName)
         new._parent = parent
         return new
     }
@@ -146,7 +145,7 @@ class MutableFilePath private constructor(segments: List<String>) : MutableFSPat
          * @return A hierarchy of [MutableFSPath] objects where the last segment becomes the new path's [fileName], and
          * the rest of them become the new path's parent and ancestors.
          */
-        operator fun invoke(segments: List<String>): MutableFilePath {
+        fun of(segments: List<String>): MutableFilePath {
             val path = MutableFilePath(segments)
             path.parent?._children?.add(path)
             return path
@@ -158,8 +157,8 @@ class MutableFilePath private constructor(segments: List<String>) : MutableFSPat
          * @return A hierarchy of [MutableFSPath] objects where the last segment becomes the new path's [fileName], and
          * the rest of them become the new path's parent and ancestors.
          */
-        operator fun invoke(firstSegment: String, vararg segments: String): MutableFilePath =
-            invoke(listOf(firstSegment, *segments))
+        fun of(firstSegment: String, vararg segments: String): MutableFilePath =
+            of(listOf(firstSegment, *segments))
 
         /**
          * Constructs a new file path from the segments of the given [path].
@@ -167,15 +166,14 @@ class MutableFilePath private constructor(segments: List<String>) : MutableFSPat
          * @return A hierarchy of [MutableFSPath] objects where the last segment becomes the new path's [fileName], and
          * the rest of them become the new path's parent and ancestors.
          */
-        operator fun invoke(path: Path): MutableFilePath = invoke(path.map { it.toString() })
+        fun of(path: Path): MutableFilePath = of(path.map { it.toString() })
     }
 }
 
 /**
  * A mutable representation of a directory path.
  *
- * To create new instances of this class, see the factory method [invoke]. Creating an instance with this method uses
- * the same syntax as using a constructor.
+ * To create new instances of this class, see the factory method [of].
  */
 class MutableDirPath private constructor(segments: List<String>) : MutableFSPath(segments), DirPath {
     /**
@@ -234,7 +232,7 @@ class MutableDirPath private constructor(segments: List<String>) : MutableFSPath
      * Children of this path are copied deeply.
      */
     override fun copy(): MutableDirPath {
-        val new = invoke(fileName)
+        val new = of(fileName)
         new.children.addAll(children.map { it.copy() })
         new._parent = parent
         return new
@@ -288,7 +286,7 @@ class MutableDirPath private constructor(segments: List<String>) : MutableFSPath
          * @return A hierarchy of [MutableFSPath] objects where the last segment becomes the new path's [fileName], and
          * the rest of them become the new path's parent and ancestors.
          */
-        operator fun invoke(segments: List<String>): MutableDirPath {
+        fun of(segments: List<String>): MutableDirPath {
             val path = MutableDirPath(segments)
             path.parent?._children?.add(path)
             return path
@@ -300,8 +298,8 @@ class MutableDirPath private constructor(segments: List<String>) : MutableFSPath
          * @return A hierarchy of [MutableFSPath] objects where the last segment becomes the new path's [fileName], and
          * the rest of them become the new path's parent and ancestors.
          */
-        operator fun invoke(firstSegment: String, vararg segments: String): MutableDirPath =
-            invoke(listOf(firstSegment, *segments))
+        fun of(firstSegment: String, vararg segments: String): MutableDirPath =
+            of(listOf(firstSegment, *segments))
 
         /**
          * Constructs a new directory path from the segments of the given [path].
@@ -309,7 +307,7 @@ class MutableDirPath private constructor(segments: List<String>) : MutableFSPath
          * @return A hierarchy of [MutableFSPath] objects where the last segment becomes the new path's [fileName], and
          * the rest of them become the new path's parent and ancestors.
          */
-        operator fun invoke(path: Path): MutableDirPath = invoke(path.map { it.toString() })
+        fun of(path: Path): MutableDirPath = of(path.map { it.toString() })
 
         /**
          * Constructs a new directory path from the [fileName] of the directory and a list of immediate [children] to
@@ -319,10 +317,10 @@ class MutableDirPath private constructor(segments: List<String>) : MutableFSPath
          *
          * @return A new directory path containing the given children.
          */
-        operator fun invoke(fileName: String, firstChild: MutableFSPath, vararg children: MutableFSPath): MutableDirPath {
+        fun of(fileName: String, firstChild: MutableFSPath, vararg children: MutableFSPath): MutableDirPath {
             // The purpose of the [firstChild] parameter is to disambiguate this factory method from the others so that
             // an instance can be created by passing in a single string.
-            val path = invoke(listOf(fileName))
+            val path = of(listOf(fileName))
             path.children.addAll(listOf(firstChild, *children))
             return path
         }
