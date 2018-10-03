@@ -17,7 +17,7 @@ const val CHECKSUM_BUFFER_SIZE = 4096
 /**
  * This function computes and returns a SHA-256 checksum of the given [file].
  */
-internal fun getFileChecksum(file: File): ByteArray {
+private fun getFileChecksum(file: File): ByteArray {
     val messageDigest = MessageDigest.getInstance("SHA-256")
     val inputStream = file.inputStream()
     val buffer = ByteArray(CHECKSUM_BUFFER_SIZE)

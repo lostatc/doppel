@@ -1,6 +1,5 @@
 package diffir
 
-import org.jetbrains.annotations.Mutable
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.io.File
@@ -34,7 +33,7 @@ interface FSPath {
      * [parent.pathSegments][DirPath.pathSegments] + [fileName].
      */
     val pathSegments: List<String>
-        get() = (parent?.pathSegments ?: listOf<String>()) + fileName
+        get() = (parent?.pathSegments ?: listOf()) + fileName
 
     /**
      * Returns the string representation of this path.
@@ -66,7 +65,7 @@ interface FSPath {
     /**
      * Returns a copy of this path.
      */
-    fun copy(): FSPath
+    fun copy(fileName: String = this.fileName, parent: DirPath? = this.parent): FSPath
 
     /**
      * Returns a copy of this path which is relative to [ancestor].
@@ -116,7 +115,7 @@ interface FSPath {
  * A read-only representation of a file path.
  */
 interface FilePath : FSPath {
-    override fun copy(): FilePath
+    override fun copy(fileName: String, parent: DirPath?): FilePath
 
     override fun relativeTo(ancestor: DirPath): FilePath
 
@@ -142,7 +141,7 @@ interface DirPath : FSPath {
      */
     val descendants: Set<FSPath>
 
-    override fun copy(): DirPath
+    override fun copy(fileName: String, parent: DirPath?): DirPath
 
     override fun relativeTo(ancestor: DirPath): DirPath
 
@@ -160,7 +159,6 @@ interface DirPath : FSPath {
                 if (it is DirPath) sequenceOf(it) + walk(it) else sequenceOf(it)
             }
         }
-
         return walk(this)
     }
 

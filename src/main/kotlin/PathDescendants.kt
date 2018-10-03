@@ -110,7 +110,7 @@ internal class PathDescendants(private val innerPath: MutableDirPath) : MutableS
     }
 
     override fun iterator(): MutableIterator<MutableFSPath> =
-        MutableCollectionIterator<MutableFSPath>(this, descendants.iterator())
+        MutableCollectionIterator(this, descendants.iterator())
 
     override fun contains(element: MutableFSPath): Boolean = descendants.contains(element)
 
@@ -120,7 +120,7 @@ internal class PathDescendants(private val innerPath: MutableDirPath) : MutableS
 
     override fun toString(): String = descendants.toString()
 
-    override fun equals(other: Any?): Boolean = descendants.equals(other)
+    override fun equals(other: Any?): Boolean = descendants == other
 
     override fun hashCode(): Int = descendants.hashCode()
 }
