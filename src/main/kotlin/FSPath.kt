@@ -168,7 +168,8 @@ interface DirPath : FSPath {
      * @param [checkType] Check not only whether each file exists, but also whether the type of file matches the type of
      * the object.
      */
-    fun treeExists(checkType: Boolean = true): Boolean = exists(checkType) && walkChildren().all { it.exists(checkType) }
+    fun treeExists(checkType: Boolean = true): Boolean =
+        exists(checkType) && walkChildren().all { it.exists(checkType) }
 
     /**
      * Returns a representation of the difference between two directories.

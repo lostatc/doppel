@@ -231,6 +231,18 @@ class MutableDirPath(fileName: String, parent: MutableDirPath?) : MutableFSPath(
             val parent = if (remaining.isEmpty()) null else MutableDirPath.of(remaining)
             return MutableDirPath(fileName, parent)
         }
+    /**
+     * A type-safe builder for creating a new file path from the given path segments.
+     *
+     * This is meant to be used with [of] and [dir] to construct trees of file and directory paths.
+     *
+     * @see [of]
+     */
+    fun file(firstSegment: String, vararg segments: String): MutableFilePath {
+        val filePath = MutableFilePath(firstSegment, *segments)
+        children.add(filePath.getRoot())
+        return filePath
+    }
 
         /**
          * Constructs a new directory path from the given path segments without path separators.
@@ -240,28 +252,49 @@ class MutableDirPath(fileName: String, parent: MutableDirPath?) : MutableFSPath(
          */
         fun of(firstSegment: String, vararg segments: String): MutableDirPath =
             of(listOf(firstSegment, *segments))
+    /**
+     * A type-safe builder for creating a new directory path from the given path segments and its children.
+     *
+     * This is meant to be used with [of] and [file] to construct trees of file and directory paths.
+     *
+     * @see [of]
+     */
+    fun dir(firstSegment: String, vararg segments: String, init: MutableDirPath.() -> Unit = {}): MutableDirPath {
+        val dirPath = MutableDirPath(firstSegment, *segments)
+        dirPath.init()
+        children.add(dirPath.getRoot())
+        return dirPath
+    }
 
+    companion object {
         /**
-         * Constructs a new directory path from the segments of the given [path].
+         * Constructs a new directory path from the given path segments and its children.
          *
-         * @return A hierarchy of [MutableFSPath] objects where the last segment becomes the new path's [fileName], and
-         * the rest of them become the new path's parent and ancestors.
-         */
-        fun of(path: Path): MutableDirPath = of(path.map { it.toString() })
-
-        /**
-         * Constructs a new directory path from the [fileName] of the directory and a list of immediate [children] to
-         * initialize it with starting with [firstChild].
+         * This method is a type-safe builder. It allows you to create a tree of file and directory paths. The [init]
+         * parameter accepts a lambda in which you can call [file] and [dir] to create new file and directory paths as
+         * children of this path.
          *
-         * This factory method can be nested to define a tree of paths.
+         * @param [firstSegment] The first segment of the new path.
+         * @param [segments] The remaining segments of the new path.
+         * @param [init] A function literal with receiver in which you can call [file] and [dir] to construct children.
+         *
+         * Example:
+         * ```
+         * MutableDirPath.of("/", "home", "user") {
+         *     file("Photo.png")
+         *     dir("Documents", "Reports") {
+         *         file("Quarterly.odt")
+         *         file("Monthly.odt")
+         *     }
+         * }
+         * ```
          *
          * @return A new directory path containing the given children.
          */
-        fun of(fileName: String, firstChild: MutableFSPath, vararg children: MutableFSPath): MutableDirPath {
-            // The purpose of the [firstChild] parameter is to disambiguate this factory method from the others.
-            val path = of(listOf(fileName))
-            path.children.addAll(listOf(firstChild, *children))
-            return path
+        fun of(firstSegment: String, vararg segments: String, init: MutableDirPath.() -> Unit): MutableDirPath {
+            val dirPath = MutableDirPath(firstSegment, *segments)
+            dirPath.init()
+            return dirPath
         }
     }
 }
