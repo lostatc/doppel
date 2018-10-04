@@ -1,6 +1,9 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.2.71'
+    id 'application'
 }
+
+mainClassName = 'diffir.MainKt'
 
 version '0.1'
 
