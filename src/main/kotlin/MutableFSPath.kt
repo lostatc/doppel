@@ -5,7 +5,7 @@ import java.io.IOException
 import java.util.Objects
 
 /**
- * Return a list of paths of the immediate children of [directory] in the filesystem.
+ * Returns a list of paths representing the immediate children of [directory] in the filesystem.
  */
 internal fun scanChildren(directory: DirPath): List<MutableFSPath> {
     val dirChildren = directory.toFile().listFiles()
@@ -20,7 +20,7 @@ internal fun scanChildren(directory: DirPath): List<MutableFSPath> {
 }
 
 /**
- * Return a list of paths of the descendants of [directory] in the filesystem.
+ * Returns a list of paths of the descendants of [directory] in the filesystem.
  */
 private fun scanDescendants(directory: DirPath): List<MutableFSPath> =
     scanChildren(directory)
@@ -31,27 +31,25 @@ private fun scanDescendants(directory: DirPath): List<MutableFSPath> =
     .toList()
 
 /**
- * Return a hierarchy of paths from a list of path segments.
+ * Returns a directory created from the given path [segments] or `null` if [segments] is empty.
  */
-private fun getTreeFromSegments(segments: List<String>): MutableDirPath? =
+private fun getDirFromSegments(segments: List<String>): MutableDirPath? =
     if (segments.isEmpty()) null else MutableDirPath(segments)
 
 /**
  * A mutable representation of a file or directory path.
- *
- * This class contains properties and methods common to all mutable paths.
  */
 abstract class MutableFSPath(override val fileName: String, override val parent: MutableDirPath?) : FSPath {
     /**
-     * Constructs a new directory path from the given path [segments] without path separators.
+     * Constructs a new path from the given path [segments] without path separators.
      *
      * @return A hierarchy of [MutableFSPath] objects where the last segment becomes the new path's [fileName], and
      * the rest of them become the new path's parent and ancestors.
      */
-    constructor(segments: List<String>) : this(segments.last(), getTreeFromSegments(segments.dropLast(1)))
+    constructor(segments: List<String>) : this(segments.last(), getDirFromSegments(segments.dropLast(1)))
 
     /**
-     * Constructs a new directory path from the given path segments without path separators.
+     * Constructs a new path from the given path segments without path separators.
      *
      * @param [firstSegment] The first segment of the new path.
      * @param [segments] The remaining segments of the new path.
@@ -62,7 +60,7 @@ abstract class MutableFSPath(override val fileName: String, override val parent:
     constructor(firstSegment: String, vararg segments: String) : this(listOf(firstSegment, *segments))
 
     /**
-     * Constructs a new directory path from the segments of the given [path].
+     * Constructs a new path from the segments of the given [path].
      *
      * @return A hierarchy of [MutableFSPath] objects where the last segment becomes the new path's [fileName], and
      * the rest of them become the new path's parent and ancestors.
@@ -79,6 +77,7 @@ abstract class MutableFSPath(override val fileName: String, override val parent:
         }
         return current
     }
+
     override fun toString(): String = toPath().toString()
 
     override fun equals(other: Any?): Boolean {
@@ -141,8 +140,6 @@ class MutableFilePath : MutableFSPath, FilePath {
 
 /**
  * A mutable representation of a directory path.
- *
- * To create new instances of this class, see the factory method [of].
  */
 class MutableDirPath : MutableFSPath, DirPath {
     init {
@@ -173,9 +170,10 @@ class MutableDirPath : MutableFSPath, DirPath {
     /**
      * A mutable representation of the paths of all descendants of the directory.
      *
-     * Items added to the set are inserted into their proper location in the tree. Both relative and absolute paths can
-     * be added to the set. Relative paths are considered to be relative to this directory, and absolute paths must
-     * start with this directory. Items which are removed from the set are removed from their location in the tree.
+     * When items are added to this set, a copy is inserted into the proper location in the tree. Both relative and
+     * absolute paths can be added to the set. Relative paths are considered to be relative to this directory, and
+     * absolute paths must start with this directory. Items which are removed from the set are removed from their
+     * location in the tree.
      */
     override val descendants: MutableSet<MutableFSPath> = PathDescendants(this)
 
@@ -273,7 +271,7 @@ class MutableDirPath : MutableFSPath, DirPath {
          *
          * @param [firstSegment] The first segment of the new path.
          * @param [segments] The remaining segments of the new path.
-         * @param [init] A function literal with receiver in which you can call [file] and [dir] to construct children.
+         * @param [init] A function with receiver in which you can call [file] and [dir] to construct children.
          *
          * Example:
          * ```

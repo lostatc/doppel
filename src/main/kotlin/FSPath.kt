@@ -20,9 +20,6 @@ interface FSPath {
 
     /**
      * The parent path. Null if there is no parent.
-     *
-     * @throws [IllegalArgumentException] This exception is thrown if the property is set to a non-null value while
-     * [fileName] is a filesystem root.
      */
     val parent: DirPath?
 
@@ -43,14 +40,14 @@ interface FSPath {
     /**
      * Indicates wither the object [other] is equal to this one.
      *
-     * This path and [other] are equal if they are the same type and if their [pathSegments] properties are equal.
+     * This path and [other] are equal if they are the same type and their [fileName] and [parent] properties are equal.
      */
     override operator fun equals(other: Any?): Boolean
 
     /**
      * Returns a hash code value for the object.
      *
-     * The hash code value is based on the [pathSegments] property.
+     * The hash code value is based on the [fileName] and [parent] properties.
      */
     override fun hashCode(): Int
 
@@ -64,15 +61,18 @@ interface FSPath {
 
     /**
      * Returns a copy of this path.
+     *
+     * @param [fileName] The new file name to assign to the copy.
+     * @param [parent] The new parent to assign to the copy.
      */
     fun copy(fileName: String = this.fileName, parent: DirPath? = this.parent): FSPath
 
     /**
      * Returns a copy of this path which is relative to [ancestor].
      *
-     * This method climbs the tree of parents until it finds the path whose parent is [ancestor]. It then sets that
-     * path's parent to `null`. If this is an absolute path, then [ancestor] must be an an absolute path. Similarly, if
-     * this is a relative path, then [ancestor] must also be a relative path.
+     * This method climbs the tree of parents until it finds the path whose parent is [ancestor]. It then returns a copy
+     * of that path with the parent set to `null`. If this is an absolute path, then [ancestor] must be an an absolute
+     * path. Similarly, if this is a relative path, then [ancestor] must also be a relative path.
      *
      * @throws [IllegalArgumentException] This exception is thrown if [ancestor] is not an ancestor of this path.
      */
@@ -174,7 +174,7 @@ interface DirPath : FSPath {
     /**
      * Returns a representation of the difference between two directories.
      */
-    infix fun diff(other: DirPath) = PathDiff(this, other)
+    infix fun diff(other: DirPath): PathDiff = PathDiff(this, other)
 
     /**
      * Return a copy of this path as a mutable directory path.
