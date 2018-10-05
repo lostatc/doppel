@@ -204,15 +204,6 @@ class MutableDirPath : MutableFSPath, DirPath {
     override fun walkChildren(): Sequence<MutableFSPath> = super.walkChildren().map { it as MutableFSPath }
 
     /**
-     * Adds [newChildren] to [children].
-     *
-     * This is a vararg shortcut that calls [children.addAll][MutableSet.addAll].
-     *
-     * @return `true` if any of the specified paths were added to [children], `false` if [children] was not modified.
-     */
-    fun addChildren(vararg newChildren: MutableFSPath): Boolean = children.addAll(newChildren.toList())
-
-    /**
      * Populates [children] with paths from the filesystem.
      *
      * This method reads the filesystem to get the list of immediate children of the directory represented by this
