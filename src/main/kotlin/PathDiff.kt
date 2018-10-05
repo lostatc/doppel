@@ -36,7 +36,7 @@ private fun getFileChecksum(file: File): ByteArray {
  *
  * Checksums are only compared when both files are the same size.
  */
-fun compareByHash(left: File, right: File): Boolean {
+private fun compareByHash(left: File, right: File): Boolean {
     if (left.length() != right.length()) return false
     return getFileChecksum(left) contentEquals getFileChecksum(right)
 }
@@ -46,7 +46,8 @@ fun compareByHash(left: File, right: File): Boolean {
  *
  * @property [left] The first directory to compare.
  * @property [right] The second directory to compare.
- * @property [fileCompareFunc] The function used to determine if two files are the same.
+ * @property [fileCompareFunc] The function used to determine if two files are the same. The default function compares
+ * files by size and checksum.
  */
 class PathDiff(
     val left: DirPath,
@@ -74,22 +75,6 @@ class PathDiff(
         get() = leftRelativeDescendants intersect rightRelativeDescendants
 
     /**
-     * The paths of files that exist in both directory trees.
-     *
-     * This returns relative paths.
-     */
-    val commonFiles: Set<FilePath>
-        get() = common.asSequence().filterIsInstance<FilePath>().toSet()
-
-    /**
-     * The paths of directories that exist in both directory trees.
-     *
-     * This returns relative paths.
-     */
-    val commonDirs: Set<DirPath>
-        get() = common.asSequence().filterIsInstance<DirPath>().toSet()
-
-    /**
      * The paths that exist in the left tree but not the right tree.
      *
      * This returns relative paths.
@@ -106,40 +91,49 @@ class PathDiff(
         get() = rightRelativeDescendants - leftRelativeDescendants
 
     /**
-     * The paths of files that are the same in both directory trees.
+     * The paths of files and directories that are the same in both directory trees.
      *
-     * These are files that have the same relative path in both directory trees and the same contents according to
-     * [fileCompareFunc]. This returns relative paths.
+     * Files are the same if they have the same relative path and the same contents according to [fileCompareFunc].
+     *
+     * Directories are the same if they have the same relative path and the same [children][DirPath.children].
+     *
+     * This returns relative paths.
      */
-    val sameFiles: Set<FilePath>
-        get() = commonFiles.asSequence().filter {
-            fileCompareFunc(it.withAncestor(left).toFile(), it.withAncestor(right).toFile())
+    val same: Set<FSPath>
+        get() = common.asSequence().filter {
+            when (it) {
+                is DirPath -> it.withAncestor(left).children == it.withAncestor(right).children
+                else -> fileCompareFunc(it.withAncestor(left).toFile(), it.withAncestor(right).toFile())
+            }
         }.toSet()
 
     /**
-     * The paths of files that are different in both directory trees.
+     * The paths of files and directories that are different in both directory trees.
      *
-     * These are files that have the same relative path in both directory trees and different contents according to
-     * [fileCompareFunc]. This returns relative paths.
+     * Files are different if they have the same relative path and different contents according to [fileCompareFunc].
+     *
+     * Directories are different if they have the same relative path and different [children][DirPath.children].
+     *
+     * This returns relative paths.
      */
-    val differentFiles: Set<FilePath>
-        get() = commonFiles - sameFiles
+    val different: Set<FSPath>
+        get() = common - same
 
     /**
-     * The paths of files that were modified more recently in the right tree than in the left tree.
+     * The paths of files and directories that were modified more recently in the right tree than in the left tree.
      *
      * This returns relative paths.
      */
     val rightNewer: Set<FSPath>
-        get() = commonFiles.asSequence().filter {
+        get() = common.asSequence().filter {
             it.withAncestor(right).toFile().lastModified() > it.withAncestor(left).toFile().lastModified()
         }.toSet()
 
     /**
-     * The paths of files that were modified more recently in the left tree than in the right tree.
+     * The paths of files and directories that were modified more recently in the left tree than in the right tree.
      *
      * This returns relative paths.
      */
     val leftNewer: Set<FSPath>
-        get() = commonFiles - rightNewer
+        get() = common - rightNewer
 }
