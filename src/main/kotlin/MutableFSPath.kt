@@ -146,14 +146,6 @@ class MutableDirPath : MutableFSPath, DirPath {
         parent?._children?.add(this)
     }
 
-    constructor(fileName: String, parent: MutableDirPath?) : super(fileName, parent)
-
-    constructor(segments: List<String>) : super(segments)
-
-    constructor(firstSegment: String, vararg segments: String) : super(firstSegment, *segments)
-
-    constructor(path: Path) : super(path)
-
     /**
      * The backing property of [children]. This is used to add new children to the set without changing their parent.
      */
@@ -176,6 +168,14 @@ class MutableDirPath : MutableFSPath, DirPath {
      * location in the tree.
      */
     override val descendants: MutableSet<MutableFSPath> = PathDescendants(this)
+
+    constructor(fileName: String, parent: MutableDirPath?) : super(fileName, parent)
+
+    constructor(segments: List<String>) : super(segments)
+
+    constructor(firstSegment: String, vararg segments: String) : super(firstSegment, *segments)
+
+    constructor(path: Path) : super(path)
 
     /**
      * Returns whether the file represented by this path exists in the filesystem.
