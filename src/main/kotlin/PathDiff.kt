@@ -57,13 +57,13 @@ class PathDiff(
      * The descendants of the left directory as relative paths.
      */
     private val leftRelativeDescendants
-        get() = left.descendants.map { it.relativeTo(left) }.toSet()
+        get() = left.descendants.asSequence().map { it.relativeTo(left) }.toSet()
 
     /**
      * The descendants of the right directory as relative paths.
      */
     private val rightRelativeDescendants
-        get() = right.descendants.map { it.relativeTo(right) }.toSet()
+        get() = right.descendants.asSequence().map { it.relativeTo(right) }.toSet()
 
     /**
      * The paths that exist in both directory trees.
@@ -79,7 +79,7 @@ class PathDiff(
      * This returns relative paths.
      */
     val commonFiles: Set<FilePath>
-        get() = common.filterIsInstance<FilePath>().toSet()
+        get() = common.asSequence().filterIsInstance<FilePath>().toSet()
 
     /**
      * The paths of directories that exist in both directory trees.
@@ -87,7 +87,7 @@ class PathDiff(
      * This returns relative paths.
      */
     val commonDirs: Set<DirPath>
-        get() = common.filterIsInstance<DirPath>().toSet()
+        get() = common.asSequence().filterIsInstance<DirPath>().toSet()
 
     /**
      * The paths that exist in the left tree but not the right tree.
@@ -112,7 +112,7 @@ class PathDiff(
      * [fileCompareFunc]. This returns relative paths.
      */
     val sameFiles: Set<FilePath>
-        get() = commonFiles.filter {
+        get() = commonFiles.asSequence().filter {
             fileCompareFunc(it.withAncestor(left).toFile(), it.withAncestor(right).toFile())
         }.toSet()
 
@@ -131,7 +131,7 @@ class PathDiff(
      * This returns relative paths.
      */
     val rightNewer: Set<FSPath>
-        get() = commonFiles.filter {
+        get() = commonFiles.asSequence().filter {
             it.withAncestor(right).toFile().lastModified() > it.withAncestor(left).toFile().lastModified()
         }.toSet()
 
