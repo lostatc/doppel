@@ -12,7 +12,7 @@ typealias FileCompareFunc = (File, File) -> Boolean
 /**
  * This is the size of the buffer used when computing the checksum of a file.
  */
-const val CHECKSUM_BUFFER_SIZE = 4096
+const val CHECKSUM_BUFFER_SIZE: Int = 4096
 
 /**
  * This function computes and returns a SHA-256 checksum of the given [file].
