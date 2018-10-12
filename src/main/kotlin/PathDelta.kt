@@ -10,21 +10,36 @@ import java.nio.file.StandardCopyOption
 import java.util.*
 
 /**
- * A function that modifies a directory path.
- */
-private typealias ViewAction = (MutableDirPath) -> Unit
-
-/**
- * A function that modifies the filesystem.
- */
-private typealias FilesystemAction = () -> Boolean
-
-/**
  * A function that is called for each error that occurs during a filesystem operation. Functions of this type are passed
  * the file that caused the error and the exception that was thrown. They return a value which determines how that error
  * is handled.
  */
 typealias ErrorHandler = (File, IOException) -> OnErrorAction
+
+/**
+ * Handle filesystem errors by always skipping the file that caused the error.
+ */
+@Suppress("UNUSED_PARAMETER")
+fun skipOnError(file: File, exception: IOException): OnErrorAction = OnErrorAction.SKIP
+
+/**
+ * Handle filesystem errors by always terminating the operation when there is an error.
+ */
+@Suppress("UNUSED_PARAMETER")
+fun terminateOnError(file: File, exception: IOException): OnErrorAction = OnErrorAction.TERMINATE
+
+/**
+ * Handle filesystem errors by always throwing the exception.
+ */
+@Suppress("UNUSED_PARAMETER")
+fun throwOnError(file: File, exception: IOException): Nothing {
+    throw exception
+}
+
+/**
+ * The default error handler used by functions and classes which accept one.
+ */
+val DEFAULT_ERROR_HANDLER: ErrorHandler = ::skipOnError
 
 /**
  * An exception used to terminate a move operation.
@@ -54,265 +69,245 @@ private fun walkWithErrorHandler(walk: FileTreeWalk, onError: ErrorHandler, acti
 }
 
 /**
- * Moves a file in the filesystem from [source] to [target].
- *
- * @return `true` if the file was moved successfully and `false` otherwise.
+ * A change to apply to the filesystem.
  */
-private fun moveRecursively(
-        source: File, target: File,
-        overwrite: Boolean, onError: ErrorHandler
-): Boolean {
-    fun moveFile(sourceFile: File): Boolean {
-        // Get the corresponding file in the target directory.
-        val relativePath = sourceFile.toRelativeString(source)
-        val destFile = File(target, relativePath)
+interface Action {
+    /**
+     * Applies the change to [dirPath].
+     *
+     * After this is called, [dirPath] should match what the filesystem would look like with the change applied assuming
+     * there are no errors.
+     */
+    fun applyView(dirPath: MutableDirPath)
 
-        // Call the [onError] function if the source file does not exist.
-        if (!sourceFile.exists()) {
-            val action = onError(
+    /**
+     * Applies the change to the filesystem.
+     *
+     * @return `true` if the action completed successfully or `false` if there were errors.
+     */
+    fun applyFilesystem(): Boolean
+}
+
+/**
+ * An action that recursively moves a file or directory.
+ *
+ * @property [source] The file or directory to move.
+ * @property [target] The file or directory to move [source] to.
+ * @property [overwrite] If a file already exists at [target], replace it.
+ * @property [onError] The function used to handle errors.
+ *
+ * [onError] can be passed the following exceptions:
+ * - [NoSuchFileException]: There was an attempt to move a nonexistent file.
+ * - [FileAlreadyExistsException]: The destination file already exists.
+ * - [AccessDeniedException]: There was an attempt to open a directory that didn't succeed.
+ * - [IOException]: Some other problem occurred while moving.
+ */
+class MoveAction(
+    val source: FSPath, val target: FSPath,
+    val overwrite: Boolean = false,
+    val onError: ErrorHandler = DEFAULT_ERROR_HANDLER
+) : Action {
+    override fun applyView(dirPath: MutableDirPath) {
+        if (source.startsWith(dirPath)) dirPath.descendants.remove(source)
+        if (target.startsWith(dirPath)) dirPath.descendants.add(target as MutableFSPath)
+    }
+
+    override fun applyFilesystem(): Boolean {
+        fun moveFile(sourceFile: File): Boolean {
+            // Get the corresponding file in the target directory.
+            val relativePath = sourceFile.toRelativeString(sourceFile)
+            val destFile = File(target.toFile(), relativePath)
+
+            // Call the [onError] function if the source file does not exist.
+            if (!sourceFile.exists()) {
+                val action = onError(
                     sourceFile,
                     NoSuchFileException(file = sourceFile, reason = "The source file doesn't exist.")
+                )
+                if (action == OnErrorAction.TERMINATE) return false
+            }
+
+            try {
+                // Attempt to move the file.
+                if (overwrite) {
+                    Files.move(sourceFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
+                } else {
+                    Files.move(sourceFile.toPath(), destFile.toPath())
+                }
+            } catch (e: IOException) {
+                // Handle the exceptions thrown by [Files.move] or pass them to the [onError] function.
+                val action = when (e) {
+                    is DirectoryNotEmptyException -> return true
+                    else -> onError(destFile, e)
+                }
+
+                if (action == OnErrorAction.TERMINATE) return false
+            }
+
+            return true
+        }
+
+        // Execute [moveFile] for each file in the source directory tree.
+        return walkWithErrorHandler(source.toFile().walkTopDown(), onError, ::moveFile)
+    }
+}
+
+/**
+ * An action that recursively copies a file or directory.
+ *
+ * @property [source] The file or directory to copy.
+ * @property [target] The file or directory to copy [source] to.
+ * @property [overwrite] If a file already exists at [target], replace it.
+ * @property [onError] The function used to handle errors.
+ *
+ * [onError] can be passed the following exceptions:
+ * - [NoSuchFileException]: There was an attempt to copy a nonexistent file.
+ * - [FileAlreadyExistsException]: The destination file already exists.
+ * - [AccessDeniedException]: There was an attempt to open a directory that didn't succeed.
+ * - [IOException]: Some other problem occurred while copying.
+ */
+class CopyAction(
+    val source: FSPath, val target: FSPath,
+    val overwrite: Boolean = false,
+    val onError: ErrorHandler = DEFAULT_ERROR_HANDLER
+) : Action {
+    override fun applyView(dirPath: MutableDirPath) {
+        if (target.startsWith(dirPath)) dirPath.descendants.add(target as MutableFSPath)
+    }
+
+    override fun applyFilesystem(): Boolean =
+        source.toFile().copyRecursively(target.toFile(), overwrite, onError)
+}
+
+/**
+ * An action that creates a new file.
+ *
+ * @property [path] The path of the new file.
+ * @property [contents] A stream containing the data to fill the file with.
+ * @property [onError] The function used to handle errors.
+ *
+ * [onError] can be passed the following exceptions:
+ * - [FileAlreadyExistsException]: The file already exists.
+ * - [IOException]: Some other problem occurred while creating the file.
+ */
+class CreateFileAction(
+    val path: FilePath,
+    val contents: InputStream = ByteArrayInputStream(ByteArray(0)),
+    val onError: ErrorHandler = DEFAULT_ERROR_HANDLER
+) : Action {
+    override fun applyView(dirPath: MutableDirPath) {
+        dirPath.descendants.add(path as MutableFSPath)
+    }
+
+    override fun applyFilesystem(): Boolean {
+        if (path.exists()) {
+            val action = onError(
+                path.toFile(),
+                FileAlreadyExistsException(file = path.toFile(), reason = "The file already exists.")
             )
+
             if (action == OnErrorAction.TERMINATE) return false
         }
 
-        try {
-            // Attempt to move the file.
-            if (overwrite) {
-                Files.move(sourceFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
-            } else {
-                Files.move(sourceFile.toPath(), destFile.toPath())
-            }
-        } catch (e: IOException) {
-            // Handle the exceptions thrown by [Files.move] or pass them to the [onError] function.
-            val action = when (e) {
-                is DirectoryNotEmptyException -> return true
-                else -> onError(destFile, e)
-            }
-
-            if (action == OnErrorAction.TERMINATE) return false
+        contents.use { input ->
+            path.toFile().outputStream().use { output -> input.copyTo(output) }
         }
 
         return true
     }
-
-    // Execute [moveSingleFile] for each file in the source directory tree.
-    return walkWithErrorHandler(source.walkTopDown(), onError, ::moveFile)
 }
 
 /**
- * Copies a file in the filesystem from [source] to [target].
+ * An action that creates a new directory and any necessary parent directories.
  *
- * @return `true` if the file was copied successfully and `false` otherwise.
- */
-private fun copyRecursively(
-        source: File, target: File,
-        overwrite: Boolean, onError: ErrorHandler
-): Boolean {
-    return source.copyRecursively(target, overwrite, onError)
-}
-
-/**
- * Creates a file in the filesystem at [path] with the given [contents].
+ * @property [path] The path of the new directory.
+ * @property [onError] The function used to handle errors.
  *
- * @return `true` if the file was created successfully and `false` otherwise.
+ * [onError] can be passed the following exceptions:
+ * - [FileAlreadyExistsException]: The file already exists.
+ * - [IOException]: Some other problem occurred while creating the directory.
  */
-private fun createFileFromStream(
-        path: File, contents: InputStream = ByteArrayInputStream(ByteArray(0)),
-        onError: ErrorHandler
-): Boolean {
-    if (path.exists()) {
-        val action = onError(path, FileAlreadyExistsException(file = path, reason = "The file already exists."))
-
-        if (action == OnErrorAction.TERMINATE) return false
+class CreateDirAction(val path: DirPath, val onError: ErrorHandler = DEFAULT_ERROR_HANDLER) : Action {
+    override fun applyView(dirPath: MutableDirPath) {
+        dirPath.descendants.add(path as MutableFSPath)
     }
 
-    contents.use { input ->
-        path.outputStream().use { output -> input.copyTo(output) }
-    }
+    override fun applyFilesystem(): Boolean {
+        if (path.exists()) {
+            val action = onError(
+                path.toFile(),
+                FileAlreadyExistsException(file = path.toFile(), reason = "The file already exists.")
+            )
 
-    return true
-}
-
-/**
- * Creates an empty directory in the filesystem at [path].
- *
- * @return `true` if the directory was created successfully and `false` otherwise.
- */
-private fun createEmptyDir(path: File, onError: ErrorHandler): Boolean {
-    if (path.exists()) {
-        val action = onError(path, FileAlreadyExistsException(file = path, reason = "The file already exists."))
-
-        if (action == OnErrorAction.TERMINATE) return false
-    }
-
-    return path.mkdirs()
-}
-
-/**
- * Deletes the file or directory at [path] from the filesystem.
- *
- * @return `true` if the file was deleted successfully and `false` otherwise.
- */
-private fun deleteRecursively(path: File, onError: ErrorHandler): Boolean {
-    fun deleteFile(deletePath: File): Boolean {
-        try {
-            Files.delete(deletePath.toPath())
-        } catch (e: IOException) {
-            val action = onError(deletePath, e)
             if (action == OnErrorAction.TERMINATE) return false
         }
 
-        return true
+        return path.toFile().mkdirs()
     }
-
-    // Execute [deleteSingleFile] for each file in the directory tree.
-    return walkWithErrorHandler(path.walkBottomUp(), onError, ::deleteFile)
 }
 
 /**
- * Handle filesystem errors by always skipping the file that caused the error.
+ * An action that recursively deletes a file or directory.
+ *
+ * @property [path] The path of the file or directory to delete.
+ * @property [onError] The function used to handle errors.
+ *
+ * [onError] can be passed the following exceptions:
+ * - [NoSuchFileException]: There was an attempt to delete a nonexistent file.
+ * - [AccessDeniedException]: There was an attempt to open a directory that didn't succeed.
+ * - [IOException]: Some other problem occurred while deleting.
  */
-@Suppress("UNUSED_PARAMETER")
-fun skipOnError(file: File, exception: IOException): OnErrorAction = OnErrorAction.SKIP
+class DeleteAction(val path: FSPath, val onError: ErrorHandler = DEFAULT_ERROR_HANDLER) : Action {
+    override fun applyView(dirPath: MutableDirPath) {
+        dirPath.descendants.remove(path)
+    }
 
-/**
- * Handle filesystem errors by always terminating the operation when there is an error.
- */
-@Suppress("UNUSED_PARAMETER")
-fun terminateOnError(file: File, exception: IOException): OnErrorAction = OnErrorAction.TERMINATE
+    override fun applyFilesystem(): Boolean {
+        fun deleteFile(deletePath: File): Boolean {
+            try {
+                Files.delete(deletePath.toPath())
+            } catch (e: IOException) {
+                val action = onError(deletePath, e)
+                if (action == OnErrorAction.TERMINATE) return false
+            }
 
-/**
- * Handle filesystem errors by always throwing the exception.
- */
-@Suppress("UNUSED_PARAMETER")
-fun throwOnError(file: File, exception: IOException): Nothing {
-    throw exception
+            return true
+        }
+
+        // Execute [deleteFile] for each file in the directory tree.
+        return walkWithErrorHandler(path.toFile().walkBottomUp(), onError, ::deleteFile)
+    }
 }
 
 /**
  * A set of changes to apply to the filesystem.
  *
- * This class allows for creating a set of changes that can be applied to multiple directories. The [move], [copy],
- * [createFile], [createDir] and [delete] methods are used to queue up new changes which can be applied to the
- * filesystem all at once with [apply].
+ * This class allows for creating a set of changes that can be applied to multiple directories. Changes are stored in a
+ * queue and can be applied to the filesystem all at once. New changes can be queued up by passing an instance of
+ * [Action] to the [add] method, but the filesystem is not modified until [apply] is called. There are actions for
+ * moving, copying, creating and deleting files and directories. Custom actions can be created by subclassing [Action].
  *
- * @param [defaultErrorHandler] The default error handler to use for each method that accepts one.
+ * The [getExpected] method can be used to see what a directory will look like after all changes are applied.
  */
-class PathDelta(var defaultErrorHandler: ErrorHandler = ::skipOnError) {
-    /**
-     * A change to apply to the filesystem.
-     *
-     * @property [viewFunc] A function that modifies a [MutableDirPath].
-     * @property [filesystemFunc] A function that modifies the filesystem.
-     */
-    private data class Action(val viewFunc: ViewAction, val filesystemFunc: FilesystemAction)
-
+class PathDelta {
     /**
      * A list of actions to apply to the filesystem.
      */
     private val actions: Deque<Action> = LinkedList()
 
     /**
-     * Moves the file or directory at [source] to [target].
+     * Adds a change to the queue.
      *
-     * @param [overwrite] If a file already exists at [target], replace it.
-     * @param [onError] The function used to handle errors.
-     *
-     * [onError] can be passed the following exceptions:
-     * - [NoSuchFileException]: There was an attempt to move a nonexistent file.
-     * - [FileAlreadyExistsException]: The destination file already exists.
-     * - [AccessDeniedException]: There was an attempt to open a directory that didn't succeed.
-     * - [IOException]: Some other problem occurred while moving.
+     * This change is not applied to the filesystem until the [apply] method is called.
      */
-    fun move(source: FSPath, target: FSPath, overwrite: Boolean = false, onError: ErrorHandler = defaultErrorHandler) {
-        val viewAction: ViewAction = {
-            if (source.startsWith(it)) it.descendants.remove(source)
-            if (target.startsWith(it)) it.descendants.add(target as MutableFSPath)
-        }
-        val filesystemAction = {
-            moveRecursively(source.toFile(), target.toFile(), overwrite, onError)
-        }
-
-        actions.addLast(Action(viewAction, filesystemAction))
+    fun add(change: Action) {
+        actions.addLast(change)
     }
 
     /**
-     * Copies the file or directory at [source] to [target].
+     * Undoes the given number of [changes] that have been queued up and returns how many were undone.
      *
-     * @param [overwrite] If a file already exists at [target], replace it.
-     * @param [onError] The function used to handle errors.
-     *
-     * [onError] can be passed the following exceptions:
-     * - [NoSuchFileException]: There was an attempt to copy a nonexistent file.
-     * - [FileAlreadyExistsException]: The destination file already exists.
-     * - [AccessDeniedException]: There was an attempt to open a directory that didn't succeed.
-     * - [IOException]: Some other problem occurred while copying.
-     */
-    fun copy(source: FSPath, target: FSPath, overwrite: Boolean = false, onError: ErrorHandler = defaultErrorHandler) {
-        val viewAction: ViewAction = {
-            if (target.startsWith(it)) it.descendants.add(target as MutableFSPath)
-        }
-        val filesystemAction = {
-            copyRecursively(source.toFile(), target.toFile(), overwrite, onError)
-        }
-
-        actions.addLast(Action(viewAction, filesystemAction))
-    }
-
-    /**
-     * Creates a new file at [path] containing data from [contents].
-     *
-     * @param [onError] The function used to handle errors.
-     *
-     * [onError] can be passed the following exceptions:
-     * - [FileAlreadyExistsException]: The file already exists.
-     * - [IOException]: Some other problem occurred while creating the file.
-     */
-    fun createFile(path: FilePath, contents: InputStream, onError: ErrorHandler = defaultErrorHandler) {
-        val viewAction: ViewAction = { it.descendants.add(path as MutableFSPath) }
-        val filesystemAction = { createFileFromStream(path.toFile(), contents, onError) }
-
-        actions.addLast(Action(viewAction, filesystemAction))
-    }
-
-    /**
-     * Creates a new empty directory at [path].
-     *
-     * @param [onError] The function used to handle errors.
-     *
-     * [onError] can be passed the following exceptions:
-     * - [FileAlreadyExistsException]: The file already exists.
-     * - [IOException]: Some other problem occurred while creating the directory.
-     */
-    fun createDir(path: DirPath, onError: ErrorHandler = defaultErrorHandler) {
-        val viewAction: ViewAction = { it.descendants.add(path as MutableFSPath) }
-        val filesystemAction = { createEmptyDir(path.toFile(), onError) }
-
-        actions.addLast(Action(viewAction, filesystemAction))
-    }
-
-    /**
-     * Deletes the file or directory at [path].
-     *
-     * @param [onError] The function used to handle errors.
-     *
-     * [onError] can be passed the following exceptions:
-     * - [NoSuchFileException]: There was an attempt to delete a nonexistent file.
-     * - [AccessDeniedException]: There was an attempt to open a directory that didn't succeed.
-     * - [IOException]: Some other problem occurred while deleting.
-     */
-    fun delete(path: FSPath, onError: ErrorHandler = defaultErrorHandler) {
-        val viewAction: ViewAction = { it.descendants.remove(path) }
-        val filesystemAction = { deleteRecursively(path.toFile(), onError) }
-
-        actions.addLast(Action(viewAction, filesystemAction))
-    }
-
-    /**
-     * Undoes the given number of [changes] and returns how many were undone.
-     *
-     * @throws [IllegalArgumentException] This is thrown if the given number of changes is negative.
+     * @throws [IllegalArgumentException] The given number of changes is negative.
      */
     fun undo(changes: Int): Int {
         require(changes < 0) { "the given number of changes must be positive" }
@@ -323,12 +318,21 @@ class PathDelta(var defaultErrorHandler: ErrorHandler = ::skipOnError) {
     }
 
     /**
-     * Returns what [dirPath] will look like with all changes applied assuming there are no errors.
+     * Clears all changes that have been queued up and returns how many were cleared.
+     */
+    fun clear(): Int {
+        val numActions = actions.size
+        actions.clear()
+        return numActions
+    }
+
+    /**
+     * Returns what [dirPath] will look like after the [apply] method is called assuming there are no errors.
      */
     fun getExpected(dirPath: DirPath): DirPath {
         val outputPath = dirPath.toMutableDirPath()
         for (action in actions) {
-            action.viewFunc(outputPath)
+            action.applyView(outputPath)
         }
         return outputPath
     }
@@ -336,12 +340,11 @@ class PathDelta(var defaultErrorHandler: ErrorHandler = ::skipOnError) {
     /**
      * Applies the changes in this delta to the filesystem in the order they were made.
      *
-     * Any relative paths that were passed in are resolved against [dirPath]. Applying the changes does not consume
-     * them. If any [ErrorHandler] throws an exception, it will be thrown here.
+     * Applying the changes does not consume them. If any [ErrorHandler] throws an exception, it will be thrown here.
      */
-    fun apply(dirPath: DirPath) {
+    fun apply() {
         for (action in actions) {
-            action.filesystemFunc()
+            action.applyFilesystem()
         }
     }
 }
