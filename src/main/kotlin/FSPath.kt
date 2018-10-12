@@ -1,8 +1,8 @@
 package diffir
 
+import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.io.File
 
 /**
  * A read-only representation of a file or directory path.

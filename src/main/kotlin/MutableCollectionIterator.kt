@@ -9,7 +9,7 @@ package diffir
 class MutableCollectionIterator<E : Any>(
     private val outerClass: MutableCollection<E>,
     private val iterator: Iterator<E>
-): MutableIterator<E> {
+) : MutableIterator<E> {
     /**
      * The last item returned by this iterator. This property is used to implement [remove].
      */

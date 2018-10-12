@@ -1,8 +1,8 @@
 package diffir
 
-import java.nio.file.Path
 import java.io.IOException
-import java.util.Objects
+import java.nio.file.Path
+import java.util.*
 
 /**
  * Returns a list of paths representing the immediate children of [directory] in the filesystem.
@@ -10,7 +10,8 @@ import java.util.Objects
 internal fun scanChildren(directory: DirPath): List<MutableFSPath> {
     val dirChildren = directory.toFile().listFiles()
     dirChildren ?: throw IOException(
-        "cannot access children because the path is not an accessible directory or because of an IO error")
+        "cannot access children because the path is not an accessible directory or because of an IO error"
+    )
     return dirChildren.map {
         when {
             it.isDirectory -> MutableDirPath(it.toPath().fileName)
@@ -24,11 +25,11 @@ internal fun scanChildren(directory: DirPath): List<MutableFSPath> {
  */
 private fun scanDescendants(directory: DirPath): List<MutableFSPath> =
     scanChildren(directory)
-    .asSequence()
-    .map { it.withAncestor(directory) }
-    .map { if (it is MutableDirPath) scanDescendants(it) + it else listOf(it) }
-    .flatten()
-    .toList()
+        .asSequence()
+        .map { it.withAncestor(directory) }
+        .map { if (it is MutableDirPath) scanDescendants(it) + it else listOf(it) }
+        .flatten()
+        .toList()
 
 /**
  * Returns a directory created from the given path [segments] or `null` if [segments] is empty.
@@ -93,7 +94,7 @@ abstract class MutableFSPath(override val fileName: String, override val parent:
 
     override fun relativeTo(ancestor: DirPath): MutableFSPath {
         if (!startsWith(ancestor))
-        throw IllegalArgumentException("the given path must be an ancestor of this path")
+            throw IllegalArgumentException("the given path must be an ancestor of this path")
 
         var current = this
         while (current.parent != ancestor) {

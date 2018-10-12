@@ -1,6 +1,6 @@
 package diffir
 
-import java.util.LinkedList
+import java.util.*
 
 /**
  * A wrapper for modifying the descendants of a directory path like a set.

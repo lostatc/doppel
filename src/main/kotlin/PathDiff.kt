@@ -1,8 +1,8 @@
 package diffir
 
 import java.io.File
-import java.security.MessageDigest
 import java.security.DigestInputStream
+import java.security.MessageDigest
 
 /**
  * This function returns true if the two files are the same and false otherwise.
