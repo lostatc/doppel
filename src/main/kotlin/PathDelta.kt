@@ -42,6 +42,22 @@ fun throwOnError(file: File, exception: IOException): Nothing {
 val DEFAULT_ERROR_HANDLER: ErrorHandler = ::skipOnError
 
 /**
+ * Adds [path] to [viewDir] if [path] is relative or a descendant of [viewDir].
+ */
+fun addPathToView(viewDir: MutableDirPath, path: FSPath) {
+    val absolutePath = path.withAncestor(viewDir)
+    if (absolutePath.startsWith(viewDir)) viewDir.descendants.add(path as MutableFSPath)
+}
+
+/**
+ * Removes [path] from [viewDir] if [path] is relative or a descendant of [viewDir].
+ */
+fun removePathFromView(viewDir: MutableDirPath, path: FSPath) {
+    val absolutePath = path.withAncestor(viewDir)
+    if (absolutePath.startsWith(viewDir)) viewDir.descendants.remove(path)
+}
+
+/**
  * An exception used to terminate a move operation.
  */
 private class TerminateException(file: File) : FileSystemException(file)
@@ -69,64 +85,18 @@ private fun walkWithErrorHandler(walk: FileTreeWalk, onError: ErrorHandler, acti
 }
 
 /**
- * A change to apply to a directory path that reflects a change in the filesystem.
- *
- * Instances of this class are used in implementations of [Action].
- */
-sealed class ViewModifier {
-    /**
-     * The path to add or remove from a directory path.
-     */
-    abstract val path: FSPath
-
-    /**
-     * Adds or removes [path] from [viewDir] if [path] is relative or a descendant of [viewDir].
-     */
-    abstract fun apply(viewDir: MutableDirPath)
-
-    /**
-     * A change that adds [path] to a directory.
-     */
-    data class Add(override val path: FSPath) : ViewModifier() {
-        override fun apply(viewDir: MutableDirPath) {
-            val absolutePath = path.withAncestor(viewDir)
-            if (absolutePath.startsWith(viewDir)) viewDir.descendants.add(path as MutableFSPath)
-        }
-    }
-
-    /**
-     * A change that removes [path] from a directory.
-     */
-    data class Remove(override val path: FSPath) : ViewModifier() {
-        override fun apply(viewDir: MutableDirPath) {
-            val absolutePath = path.withAncestor(viewDir)
-            if (absolutePath.startsWith(viewDir)) viewDir.descendants.remove(path as MutableFSPath)
-        }
-    }
-}
-
-/**
  * A change to apply to the filesystem.
  */
 interface Action {
     /**
-     * A list of changes to apply to a directory path to provide a view of what the filesystem will look like.
+     * Modifies [viewDir] to provide a view of what the filesystem will look like after [applyView] is called.
      *
-     * These changes are applied to a directory by [applyView].
-     */
-    val viewModifiers: List<ViewModifier>
-
-    /**
-     * Modifies [dirPath] to provide a view of what the filesystem will look like after [applyView] is called.
+     * After this is called, [viewDir] should match what the filesystem would look like if [applyFilesystem] were called
+     * assuming there are no errors. Relative paths passed to [Action] instances are resolved against [viewDir].
      *
-     * After this is called, [dirPath] should match what the filesystem would look like if [applyFilesystem] were called
-     * assuming there are no errors. Relative paths passed to [Action] instances are resolved against [dirPath].
+     * The functions [addPathToView] and [removePathFromView] can be useful in implementing this method.
      */
-    fun applyView(dirPath: MutableDirPath) {
-        for (modifier in viewModifiers) {
-            modifier.apply(dirPath)
-        }
-    }
+    fun applyView(viewDir: MutableDirPath)
 
     /**
      * Applies the change to the filesystem.
@@ -157,10 +127,10 @@ data class MoveAction(
     val overwrite: Boolean = false,
     val onError: ErrorHandler = DEFAULT_ERROR_HANDLER
 ) : Action {
-    override val viewModifiers: List<ViewModifier> = listOf(
-        ViewModifier.Remove(source),
-        ViewModifier.Add(target)
-    )
+    override fun applyView(viewDir: MutableDirPath) {
+        removePathFromView(viewDir, source)
+        addPathToView(viewDir, target)
+    }
 
     override fun applyFilesystem(dirPath: DirPath): Boolean {
         val absoluteSource = source.withAncestor(dirPath).toFile()
@@ -224,9 +194,9 @@ data class CopyAction(
     val overwrite: Boolean = false,
     val onError: ErrorHandler = DEFAULT_ERROR_HANDLER
 ) : Action {
-    override val viewModifiers: List<ViewModifier> = listOf(
-        ViewModifier.Add(target)
-    )
+    override fun applyView(viewDir: MutableDirPath) {
+        addPathToView(viewDir, target)
+    }
 
     override fun applyFilesystem(dirPath: DirPath): Boolean {
         val absoluteSource = source.withAncestor(dirPath).toFile()
@@ -251,9 +221,9 @@ data class CreateFileAction(
     val contents: InputStream = ByteArrayInputStream(ByteArray(0)),
     val onError: ErrorHandler = DEFAULT_ERROR_HANDLER
 ) : Action {
-    override val viewModifiers: List<ViewModifier> = listOf(
-        ViewModifier.Add(path)
-    )
+    override fun applyView(viewDir: MutableDirPath) {
+        addPathToView(viewDir, path)
+    }
 
     override fun applyFilesystem(dirPath: DirPath): Boolean {
         val absolutePath = path.withAncestor(dirPath).toFile()
@@ -286,9 +256,9 @@ data class CreateFileAction(
  * - [IOException]: Some other problem occurred while creating the directory.
  */
 data class CreateDirAction(val path: DirPath, val onError: ErrorHandler = DEFAULT_ERROR_HANDLER) : Action {
-    override val viewModifiers: List<ViewModifier> = listOf(
-        ViewModifier.Add(path)
-    )
+    override fun applyView(viewDir: MutableDirPath) {
+        addPathToView(viewDir, path)
+    }
 
     override fun applyFilesystem(dirPath: DirPath): Boolean {
         val absolutePath = path.withAncestor(dirPath).toFile()
@@ -318,9 +288,9 @@ data class CreateDirAction(val path: DirPath, val onError: ErrorHandler = DEFAUL
  * - [IOException]: Some other problem occurred while deleting.
  */
 data class DeleteAction(val path: FSPath, val onError: ErrorHandler = DEFAULT_ERROR_HANDLER) : Action {
-    override val viewModifiers: List<ViewModifier> = listOf(
-        ViewModifier.Remove(path)
-    )
+    override fun applyView(viewDir: MutableDirPath) {
+        removePathFromView(viewDir, path)
+    }
 
     override fun applyFilesystem(dirPath: DirPath): Boolean {
         val absolutePath = path.withAncestor(dirPath).toFile()
