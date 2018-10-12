@@ -33,6 +33,12 @@ interface FSPath {
         get() = (parent?.pathSegments ?: listOf()) + fileName
 
     /**
+     * Whether the path is an absolute path.
+     */
+    val isAbsolute: Boolean
+        get() = toPath().isAbsolute
+
+    /**
      * Returns the string representation of this path.
      */
     override fun toString(): String
@@ -82,7 +88,7 @@ interface FSPath {
      * Returns a copy of this path with [ancestor] as its ancestor.
      *
      * This method climbs the tree of parents until it finds a path whose parent is `null`. It then makes that path's
-     * parent a copy of [ancestor].
+     * parent a copy of [ancestor]. If this path is absolute, then this method returns a copy of this path.
      */
     fun withAncestor(ancestor: DirPath): FSPath
 

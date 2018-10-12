@@ -73,19 +73,21 @@ private fun walkWithErrorHandler(walk: FileTreeWalk, onError: ErrorHandler, acti
  */
 interface Action {
     /**
-     * Applies the change to [dirPath].
+     * Applies the change to [dirPath] by modifying it. This does not modify the filesystem.
      *
      * After this is called, [dirPath] should match what the filesystem would look like with the change applied assuming
-     * there are no errors.
+     * there are no errors. Relative paths passed to [Action] instances are resolved against [dirPath].
      */
     fun applyView(dirPath: MutableDirPath)
 
     /**
      * Applies the change to the filesystem.
      *
+     * Relative paths passed to [Action] instances are resolved against [dirPath].
+     *
      * @return `true` if the action completed successfully or `false` if there were errors.
      */
-    fun applyFilesystem(): Boolean
+    fun applyFilesystem(dirPath: DirPath): Boolean
 }
 
 /**
@@ -112,11 +114,14 @@ class MoveAction(
         if (target.startsWith(dirPath)) dirPath.descendants.add(target as MutableFSPath)
     }
 
-    override fun applyFilesystem(): Boolean {
+    override fun applyFilesystem(dirPath: DirPath): Boolean {
+        val absoluteSource = source.withAncestor(dirPath).toFile()
+        val absoluteTarget = target.withAncestor(dirPath).toFile()
+
         fun moveFile(sourceFile: File): Boolean {
             // Get the corresponding file in the target directory.
             val relativePath = sourceFile.toRelativeString(sourceFile)
-            val destFile = File(target.toFile(), relativePath)
+            val destFile = File(absoluteTarget, relativePath)
 
             // Call the [onError] function if the source file does not exist.
             if (!sourceFile.exists()) {
@@ -148,7 +153,7 @@ class MoveAction(
         }
 
         // Execute [moveFile] for each file in the source directory tree.
-        return walkWithErrorHandler(source.toFile().walkTopDown(), onError, ::moveFile)
+        return walkWithErrorHandler(absoluteSource.walkTopDown(), onError, ::moveFile)
     }
 }
 
@@ -175,8 +180,11 @@ class CopyAction(
         if (target.startsWith(dirPath)) dirPath.descendants.add(target as MutableFSPath)
     }
 
-    override fun applyFilesystem(): Boolean =
-        source.toFile().copyRecursively(target.toFile(), overwrite, onError)
+    override fun applyFilesystem(dirPath: DirPath): Boolean {
+        val absoluteSource = source.withAncestor(dirPath).toFile()
+        val absoluteTarget = target.withAncestor(dirPath).toFile()
+        return absoluteSource.copyRecursively(absoluteTarget, overwrite, onError)
+    }
 }
 
 /**
@@ -199,18 +207,20 @@ class CreateFileAction(
         dirPath.descendants.add(path as MutableFSPath)
     }
 
-    override fun applyFilesystem(): Boolean {
-        if (path.exists()) {
+    override fun applyFilesystem(dirPath: DirPath): Boolean {
+        val absolutePath = path.withAncestor(dirPath).toFile()
+
+        if (absolutePath.exists()) {
             val action = onError(
-                path.toFile(),
-                FileAlreadyExistsException(file = path.toFile(), reason = "The file already exists.")
+                absolutePath,
+                FileAlreadyExistsException(file = absolutePath, reason = "The file already exists.")
             )
 
             if (action == OnErrorAction.TERMINATE) return false
         }
 
         contents.use { input ->
-            path.toFile().outputStream().use { output -> input.copyTo(output) }
+            absolutePath.outputStream().use { output -> input.copyTo(output) }
         }
 
         return true
@@ -232,17 +242,19 @@ class CreateDirAction(val path: DirPath, val onError: ErrorHandler = DEFAULT_ERR
         dirPath.descendants.add(path as MutableFSPath)
     }
 
-    override fun applyFilesystem(): Boolean {
-        if (path.exists()) {
+    override fun applyFilesystem(dirPath: DirPath): Boolean {
+        val absolutePath = path.withAncestor(dirPath).toFile()
+
+        if (absolutePath.exists()) {
             val action = onError(
-                path.toFile(),
-                FileAlreadyExistsException(file = path.toFile(), reason = "The file already exists.")
+                absolutePath,
+                FileAlreadyExistsException(file = absolutePath, reason = "The file already exists.")
             )
 
             if (action == OnErrorAction.TERMINATE) return false
         }
 
-        return path.toFile().mkdirs()
+        return absolutePath.mkdirs()
     }
 }
 
@@ -262,7 +274,9 @@ class DeleteAction(val path: FSPath, val onError: ErrorHandler = DEFAULT_ERROR_H
         dirPath.descendants.remove(path)
     }
 
-    override fun applyFilesystem(): Boolean {
+    override fun applyFilesystem(dirPath: DirPath): Boolean {
+        val absolutePath = path.withAncestor(dirPath).toFile()
+
         fun deleteFile(deletePath: File): Boolean {
             try {
                 Files.delete(deletePath.toPath())
@@ -275,7 +289,7 @@ class DeleteAction(val path: FSPath, val onError: ErrorHandler = DEFAULT_ERROR_H
         }
 
         // Execute [deleteFile] for each file in the directory tree.
-        return walkWithErrorHandler(path.toFile().walkBottomUp(), onError, ::deleteFile)
+        return walkWithErrorHandler(absolutePath.walkBottomUp(), onError, ::deleteFile)
     }
 }
 
@@ -287,7 +301,9 @@ class DeleteAction(val path: FSPath, val onError: ErrorHandler = DEFAULT_ERROR_H
  * [Action] to the [add] method, but the filesystem is not modified until [apply] is called. There are actions for
  * moving, copying, creating and deleting files and directories. Custom actions can be created by subclassing [Action].
  *
- * The [getExpected] method can be used to see what a directory will look like after all changes are applied.
+ * [Action] classes accept both absolute paths and relative paths. If the paths are relative, they are resolved against
+ * the path provided to [apply]. The [view] method can be used to see what a directory will look like after all changes
+ * are applied. The [clear] and [undo] methods can be used to undo changes before they're applied.
  */
 class PathDelta {
     /**
@@ -305,20 +321,20 @@ class PathDelta {
     }
 
     /**
-     * Undoes the given number of [changes] that have been queued up and returns how many were undone.
+     * Removes the last [numChanges] changes from the queue and returns how many were removed.
      *
-     * @throws [IllegalArgumentException] The given number of changes is negative.
+     * @throws [IllegalArgumentException] The given number of numChanges is negative.
      */
-    fun undo(changes: Int): Int {
-        require(changes < 0) { "the given number of changes must be positive" }
+    fun undo(numChanges: Int): Int {
+        require(numChanges < 0) { "the given number of changes must be positive" }
 
         val startSize = actions.size
-        repeat(changes) { actions.pollLast() }
+        repeat(numChanges) { actions.pollLast() }
         return startSize - actions.size
     }
 
     /**
-     * Clears all changes that have been queued up and returns how many were cleared.
+     * Removes all changes from the queue and returns how many were removed.
      */
     fun clear(): Int {
         val numActions = actions.size
@@ -328,8 +344,11 @@ class PathDelta {
 
     /**
      * Returns what [dirPath] will look like after the [apply] method is called assuming there are no errors.
+     *
+     * Any relative paths that were passed to [Action] classes are resolved against [dirPath]. This does not modify the
+     * filesystem.
      */
-    fun getExpected(dirPath: DirPath): DirPath {
+    fun view(dirPath: DirPath): DirPath {
         val outputPath = dirPath.toMutableDirPath()
         for (action in actions) {
             action.applyView(outputPath)
@@ -340,11 +359,13 @@ class PathDelta {
     /**
      * Applies the changes in this delta to the filesystem in the order they were made.
      *
-     * Applying the changes does not consume them. If any [ErrorHandler] throws an exception, it will be thrown here.
+     * Any relative paths that were passed to [Action] classes are resolved against [dirPath]. Applying the changes does
+     * not consume them. If an [ErrorHandler] that was passed to an [Action] class throws an exception, it will be
+     * thrown here.
      */
-    fun apply() {
+    fun apply(dirPath: DirPath) {
         for (action in actions) {
-            action.applyFilesystem()
+            action.applyFilesystem(dirPath)
         }
     }
 }
