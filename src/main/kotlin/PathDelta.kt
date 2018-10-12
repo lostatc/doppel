@@ -17,19 +17,19 @@ import java.util.*
 typealias ErrorHandler = (File, IOException) -> OnErrorAction
 
 /**
- * Handle filesystem errors by always skipping the file that caused the error.
+ * Handles filesystem errors by always skipping the file that caused the error.
  */
 @Suppress("UNUSED_PARAMETER")
 fun skipOnError(file: File, exception: IOException): OnErrorAction = OnErrorAction.SKIP
 
 /**
- * Handle filesystem errors by always terminating the operation when there is an error.
+ * Handles filesystem errors by always terminating the operation when there is an error.
  */
 @Suppress("UNUSED_PARAMETER")
 fun terminateOnError(file: File, exception: IOException): OnErrorAction = OnErrorAction.TERMINATE
 
 /**
- * Handle filesystem errors by always throwing the exception.
+ * Handles filesystem errors by always throwing the exception.
  */
 @Suppress("UNUSED_PARAMETER")
 fun throwOnError(file: File, exception: IOException): Nothing {
@@ -69,16 +69,64 @@ private fun walkWithErrorHandler(walk: FileTreeWalk, onError: ErrorHandler, acti
 }
 
 /**
+ * A change to apply to a directory path that reflects a change in the filesystem.
+ *
+ * Instances of this class are used in implementations of [Action].
+ */
+sealed class ViewModifier {
+    /**
+     * The path to add or remove from a directory path.
+     */
+    abstract val path: FSPath
+
+    /**
+     * Adds or removes [path] from [viewDir] if [path] is relative or a descendant of [viewDir].
+     */
+    abstract fun apply(viewDir: MutableDirPath)
+
+    /**
+     * A change that adds [path] to a directory.
+     */
+    data class Add(override val path: FSPath) : ViewModifier() {
+        override fun apply(viewDir: MutableDirPath) {
+            val absolutePath = path.withAncestor(viewDir)
+            if (absolutePath.startsWith(viewDir)) viewDir.descendants.add(path as MutableFSPath)
+        }
+    }
+
+    /**
+     * A change that removes [path] from a directory.
+     */
+    data class Remove(override val path: FSPath) : ViewModifier() {
+        override fun apply(viewDir: MutableDirPath) {
+            val absolutePath = path.withAncestor(viewDir)
+            if (absolutePath.startsWith(viewDir)) viewDir.descendants.remove(path as MutableFSPath)
+        }
+    }
+}
+
+/**
  * A change to apply to the filesystem.
  */
 interface Action {
     /**
-     * Applies the change to [dirPath] by modifying it. This does not modify the filesystem.
+     * A list of changes to apply to a directory path to provide a view of what the filesystem will look like.
      *
-     * After this is called, [dirPath] should match what the filesystem would look like with the change applied assuming
-     * there are no errors. Relative paths passed to [Action] instances are resolved against [dirPath].
+     * These changes are applied to a directory by [applyView].
      */
-    fun applyView(dirPath: MutableDirPath)
+    val viewModifiers: List<ViewModifier>
+
+    /**
+     * Modifies [dirPath] to provide a view of what the filesystem will look like after [applyView] is called.
+     *
+     * After this is called, [dirPath] should match what the filesystem would look like if [applyFilesystem] were called
+     * assuming there are no errors. Relative paths passed to [Action] instances are resolved against [dirPath].
+     */
+    fun applyView(dirPath: MutableDirPath) {
+        for (modifier in viewModifiers) {
+            modifier.apply(dirPath)
+        }
+    }
 
     /**
      * Applies the change to the filesystem.
@@ -104,15 +152,15 @@ interface Action {
  * - [AccessDeniedException]: There was an attempt to open a directory that didn't succeed.
  * - [IOException]: Some other problem occurred while moving.
  */
-class MoveAction(
+data class MoveAction(
     val source: FSPath, val target: FSPath,
     val overwrite: Boolean = false,
     val onError: ErrorHandler = DEFAULT_ERROR_HANDLER
 ) : Action {
-    override fun applyView(dirPath: MutableDirPath) {
-        if (source.startsWith(dirPath)) dirPath.descendants.remove(source)
-        if (target.startsWith(dirPath)) dirPath.descendants.add(target as MutableFSPath)
-    }
+    override val viewModifiers: List<ViewModifier> = listOf(
+        ViewModifier.Remove(source),
+        ViewModifier.Add(target)
+    )
 
     override fun applyFilesystem(dirPath: DirPath): Boolean {
         val absoluteSource = source.withAncestor(dirPath).toFile()
@@ -171,14 +219,14 @@ class MoveAction(
  * - [AccessDeniedException]: There was an attempt to open a directory that didn't succeed.
  * - [IOException]: Some other problem occurred while copying.
  */
-class CopyAction(
+data class CopyAction(
     val source: FSPath, val target: FSPath,
     val overwrite: Boolean = false,
     val onError: ErrorHandler = DEFAULT_ERROR_HANDLER
 ) : Action {
-    override fun applyView(dirPath: MutableDirPath) {
-        if (target.startsWith(dirPath)) dirPath.descendants.add(target as MutableFSPath)
-    }
+    override val viewModifiers: List<ViewModifier> = listOf(
+        ViewModifier.Add(target)
+    )
 
     override fun applyFilesystem(dirPath: DirPath): Boolean {
         val absoluteSource = source.withAncestor(dirPath).toFile()
@@ -198,14 +246,14 @@ class CopyAction(
  * - [FileAlreadyExistsException]: The file already exists.
  * - [IOException]: Some other problem occurred while creating the file.
  */
-class CreateFileAction(
+data class CreateFileAction(
     val path: FilePath,
     val contents: InputStream = ByteArrayInputStream(ByteArray(0)),
     val onError: ErrorHandler = DEFAULT_ERROR_HANDLER
 ) : Action {
-    override fun applyView(dirPath: MutableDirPath) {
-        dirPath.descendants.add(path as MutableFSPath)
-    }
+    override val viewModifiers: List<ViewModifier> = listOf(
+        ViewModifier.Add(path)
+    )
 
     override fun applyFilesystem(dirPath: DirPath): Boolean {
         val absolutePath = path.withAncestor(dirPath).toFile()
@@ -237,10 +285,10 @@ class CreateFileAction(
  * - [FileAlreadyExistsException]: The file already exists.
  * - [IOException]: Some other problem occurred while creating the directory.
  */
-class CreateDirAction(val path: DirPath, val onError: ErrorHandler = DEFAULT_ERROR_HANDLER) : Action {
-    override fun applyView(dirPath: MutableDirPath) {
-        dirPath.descendants.add(path as MutableFSPath)
-    }
+data class CreateDirAction(val path: DirPath, val onError: ErrorHandler = DEFAULT_ERROR_HANDLER) : Action {
+    override val viewModifiers: List<ViewModifier> = listOf(
+        ViewModifier.Add(path)
+    )
 
     override fun applyFilesystem(dirPath: DirPath): Boolean {
         val absolutePath = path.withAncestor(dirPath).toFile()
@@ -269,10 +317,10 @@ class CreateDirAction(val path: DirPath, val onError: ErrorHandler = DEFAULT_ERR
  * - [AccessDeniedException]: There was an attempt to open a directory that didn't succeed.
  * - [IOException]: Some other problem occurred while deleting.
  */
-class DeleteAction(val path: FSPath, val onError: ErrorHandler = DEFAULT_ERROR_HANDLER) : Action {
-    override fun applyView(dirPath: MutableDirPath) {
-        dirPath.descendants.remove(path)
-    }
+data class DeleteAction(val path: FSPath, val onError: ErrorHandler = DEFAULT_ERROR_HANDLER) : Action {
+    override val viewModifiers: List<ViewModifier> = listOf(
+        ViewModifier.Remove(path)
+    )
 
     override fun applyFilesystem(dirPath: DirPath): Boolean {
         val absolutePath = path.withAncestor(dirPath).toFile()
