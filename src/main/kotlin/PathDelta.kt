@@ -89,6 +89,12 @@ private fun walkWithErrorHandler(walk: FileTreeWalk, onError: ErrorHandler, acti
  */
 interface Action {
     /**
+     * A function that is called for each error that occurs while changes are being applied which determines how to
+     * handle them.
+     */
+    val onError: ErrorHandler
+
+    /**
      * Modifies [viewDir] to provide a view of what the filesystem will look like after [applyView] is called.
      *
      * After this is called, [viewDir] should match what the filesystem would look like if [applyFilesystem] were called
@@ -114,7 +120,6 @@ interface Action {
  * @property [source] The file or directory to move.
  * @property [target] The file or directory to move [source] to.
  * @property [overwrite] If a file already exists at [target], replace it.
- * @property [onError] The function used to handle errors.
  *
  * [onError] can be passed the following exceptions:
  * - [NoSuchFileException]: There was an attempt to move a nonexistent file.
@@ -125,7 +130,7 @@ interface Action {
 data class MoveAction(
     val source: FSPath, val target: FSPath,
     val overwrite: Boolean = false,
-    val onError: ErrorHandler = DEFAULT_ERROR_HANDLER
+    override val onError: ErrorHandler = DEFAULT_ERROR_HANDLER
 ) : Action {
     override fun applyView(viewDir: MutableDirPath) {
         removePathFromView(viewDir, source)
@@ -181,7 +186,6 @@ data class MoveAction(
  * @property [source] The file or directory to copy.
  * @property [target] The file or directory to copy [source] to.
  * @property [overwrite] If a file already exists at [target], replace it.
- * @property [onError] The function used to handle errors.
  *
  * [onError] can be passed the following exceptions:
  * - [NoSuchFileException]: There was an attempt to copy a nonexistent file.
@@ -192,7 +196,7 @@ data class MoveAction(
 data class CopyAction(
     val source: FSPath, val target: FSPath,
     val overwrite: Boolean = false,
-    val onError: ErrorHandler = DEFAULT_ERROR_HANDLER
+    override val onError: ErrorHandler = DEFAULT_ERROR_HANDLER
 ) : Action {
     override fun applyView(viewDir: MutableDirPath) {
         addPathToView(viewDir, target)
@@ -210,7 +214,6 @@ data class CopyAction(
  *
  * @property [path] The path of the new file.
  * @property [contents] A stream containing the data to fill the file with.
- * @property [onError] The function used to handle errors.
  *
  * [onError] can be passed the following exceptions:
  * - [FileAlreadyExistsException]: The file already exists.
@@ -219,7 +222,7 @@ data class CopyAction(
 data class CreateFileAction(
     val path: FilePath,
     val contents: InputStream = ByteArrayInputStream(ByteArray(0)),
-    val onError: ErrorHandler = DEFAULT_ERROR_HANDLER
+    override val onError: ErrorHandler = DEFAULT_ERROR_HANDLER
 ) : Action {
     override fun applyView(viewDir: MutableDirPath) {
         addPathToView(viewDir, path)
@@ -249,13 +252,15 @@ data class CreateFileAction(
  * An action that creates a new directory and any necessary parent directories.
  *
  * @property [path] The path of the new directory.
- * @property [onError] The function used to handle errors.
  *
  * [onError] can be passed the following exceptions:
  * - [FileAlreadyExistsException]: The file already exists.
  * - [IOException]: Some other problem occurred while creating the directory.
  */
-data class CreateDirAction(val path: DirPath, val onError: ErrorHandler = DEFAULT_ERROR_HANDLER) : Action {
+data class CreateDirAction(
+    val path: DirPath,
+    override val onError: ErrorHandler = DEFAULT_ERROR_HANDLER
+) : Action {
     override fun applyView(viewDir: MutableDirPath) {
         addPathToView(viewDir, path)
     }
@@ -280,14 +285,16 @@ data class CreateDirAction(val path: DirPath, val onError: ErrorHandler = DEFAUL
  * An action that recursively deletes a file or directory.
  *
  * @property [path] The path of the file or directory to delete.
- * @property [onError] The function used to handle errors.
  *
  * [onError] can be passed the following exceptions:
  * - [NoSuchFileException]: There was an attempt to delete a nonexistent file.
  * - [AccessDeniedException]: There was an attempt to open a directory that didn't succeed.
  * - [IOException]: Some other problem occurred while deleting.
  */
-data class DeleteAction(val path: FSPath, val onError: ErrorHandler = DEFAULT_ERROR_HANDLER) : Action {
+data class DeleteAction(
+    val path: FSPath,
+    override val onError: ErrorHandler = DEFAULT_ERROR_HANDLER
+) : Action {
     override fun applyView(viewDir: MutableDirPath) {
         removePathFromView(viewDir, path)
     }
