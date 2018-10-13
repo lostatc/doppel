@@ -312,16 +312,24 @@ data class DeleteAction(val path: FSPath, val onError: ErrorHandler = DEFAULT_ER
 }
 
 /**
+ * The default filesystem actions which are available.
+ */
+val DEFAULT_ACTIONS: List<KClass<out Action>> = listOf(
+    MoveAction::class, CopyAction::class, CreateFileAction::class, CreateDirAction::class, DeleteAction::class
+)
+/**
  * A set of changes to apply to the filesystem.
  *
  * This class allows for creating a set of changes that can be applied to multiple directories. Changes are stored in a
- * queue and can be applied to the filesystem all at once. New changes can be queued up by passing an instance of
- * [Action] to the [add] method, but the filesystem is not modified until [apply] is called. There are actions for
- * moving, copying, creating and deleting files and directories. Custom actions can be created by subclassing [Action].
+ * queue and can be applied to the filesystem all at once. New changes can be queued up by passing instances of [Action]
+ * to the [add] method, but the filesystem is not modified until [apply] is called. There are actions for moving,
+ * copying, creating and deleting files and directories. Custom actions can be created by subclassing [Action].
  *
  * [Action] classes accept both absolute paths and relative paths. If the paths are relative, they are resolved against
- * the path provided to [apply]. The [view] method can be used to see what a directory will look like after all changes
- * are applied. The [clear] and [undo] methods can be used to undo changes before they're applied.
+ * the path provided to [apply]. Using relative paths allows you to apply the changes to multiple directories.
+ *
+ * The [view] method can be used to see what a directory will look like after all changes are applied. The [clear] and
+ * [undo] methods can be used to undo changes before they're applied.
  */
 class PathDelta {
     /**
@@ -330,21 +338,23 @@ class PathDelta {
     private val actions: Deque<Action> = LinkedList()
 
     /**
-     * Adds a change to the queue.
+     * Adds the given [changes] to the queue.
      *
-     * This change is not applied to the filesystem until the [apply] method is called.
+     * These changes are not applied to the filesystem until the [apply] method is called.
      */
-    fun add(change: Action) {
-        actions.addLast(change)
+    fun add(vararg changes: Action) {
+        for (change in changes) {
+            actions.addLast(change)
+        }
     }
 
     /**
      * Removes the last [numChanges] changes from the queue and returns how many were removed.
      *
-     * @throws [IllegalArgumentException] The given number of numChanges is negative.
+     * @throws [IllegalArgumentException] The given [numChanges] is negative.
      */
     fun undo(numChanges: Int): Int {
-        require(numChanges < 0) { "the given number of changes must be positive" }
+        require(numChanges > 0) { "the given number of changes must be positive" }
 
         val startSize = actions.size
         repeat(numChanges) { actions.pollLast() }
@@ -375,7 +385,7 @@ class PathDelta {
     }
 
     /**
-     * Applies the changes in this delta to the filesystem in the order they were made.
+     * Applies the changes in the queue to the filesystem in the order they were made.
      *
      * Any relative paths that were passed to [Action] classes are resolved against [dirPath]. Applying the changes does
      * not consume them. If an [ErrorHandler] that was passed to an [Action] class throws an exception, it will be
