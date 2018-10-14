@@ -5,22 +5,6 @@ import java.nio.file.Path
 import java.util.*
 
 /**
- * Returns a list of paths representing the immediate children of [directory] in the filesystem.
- */
-internal fun scanChildren(directory: DirPath): List<MutableFSPath> {
-    val dirChildren = directory.toFile().listFiles()
-    dirChildren ?: throw IOException(
-        "cannot access children because the path is not an accessible directory or because of an IO error"
-    )
-    return dirChildren.map {
-        when {
-            it.isDirectory -> MutableDirPath(it.toPath().fileName)
-            else -> MutableFilePath(it.toPath().fileName)
-        }
-    }
-}
-
-/**
  * Returns a list of paths of the descendants of [directory] in the filesystem.
  */
 private fun scanDescendants(directory: DirPath): List<MutableFSPath> =

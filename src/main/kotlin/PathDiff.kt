@@ -1,35 +1,11 @@
 package diffir
 
 import java.io.File
-import java.security.DigestInputStream
-import java.security.MessageDigest
 
 /**
  * This function returns true if the two files are the same and false otherwise.
  */
 typealias FileCompareFunc = (File, File) -> Boolean
-
-/**
- * This is the size of the buffer used when computing the checksum of a file.
- */
-const val CHECKSUM_BUFFER_SIZE: Int = 4096
-
-/**
- * This function computes and returns a SHA-256 checksum of the given [file].
- */
-private fun getFileChecksum(file: File): ByteArray {
-    val messageDigest = MessageDigest.getInstance("SHA-256")
-    val inputStream = file.inputStream()
-    val buffer = ByteArray(CHECKSUM_BUFFER_SIZE)
-
-    DigestInputStream(inputStream, messageDigest).use {
-        do {
-            val bytesRead = it.read(buffer)
-        } while (bytesRead != -1)
-    }
-
-    return messageDigest.digest()
-}
 
 /**
  * This function compares the files [left] and [right] by size and checksum and returns whether they are the same.
