@@ -319,12 +319,6 @@ data class DeleteAction(
 }
 
 /**
- * The default filesystem actions which are available.
- */
-val DEFAULT_ACTIONS: List<KClass<out Action>> = listOf(
-    MoveAction::class, CopyAction::class, CreateFileAction::class, CreateDirAction::class, DeleteAction::class
-)
-/**
  * A set of changes to apply to the filesystem.
  *
  * This class allows for creating a set of changes that can be applied to multiple directories. Changes are stored in a
