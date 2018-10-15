@@ -24,7 +24,14 @@ private fun getDirFromSegments(segments: List<String>): MutableDirPath? =
 /**
  * A mutable representation of a file or directory path.
  */
-abstract class MutableFSPath(override val fileName: String, override val parent: MutableDirPath?) : FSPath {
+abstract class MutableFSPath(
+    final override val fileName: String,
+    final override val parent: MutableDirPath? = null
+) : FSPath {
+    init {
+        require(fileName.isNotEmpty()) { "The file name may not be empty." }
+    }
+
     /**
      * Constructs a new path from the given path [segments] without path separators.
      *
