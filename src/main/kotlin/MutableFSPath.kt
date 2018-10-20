@@ -1,6 +1,7 @@
 package diffir
 
 import java.io.IOException
+import java.nio.file.Files
 import java.nio.file.Path
 import java.util.*
 
@@ -57,7 +58,7 @@ abstract class MutableFSPath(
      * @return A hierarchy of [MutableFSPath] objects where the last segment becomes the new path's [fileName], and
      * the rest of them become the new path's parent and ancestors.
      */
-    constructor(path: Path) : this(path.map { it.toString() })
+    constructor(path: Path) : this(listOfNotNull(path.root?.toString()) + path.map { it.toString() })
 
     /**
      * Returns the ancestor whose [parent] is `null`.
@@ -119,7 +120,7 @@ class MutableFilePath : MutableFSPath, FilePath {
      *
      * @param [checkType] Check not only whether the file exists, but also whether it is a normal file.
      */
-    override fun exists(checkType: Boolean): Boolean = if (checkType) toFile().isFile else toFile().exists()
+    override fun exists(checkType: Boolean): Boolean = if (checkType) Files.isRegularFile(toPath()) else Files.exists(toPath())
 
     override fun copy(fileName: String, parent: DirPath?): MutableFilePath {
         return MutableFilePath(fileName, parent as MutableDirPath?)
@@ -174,7 +175,7 @@ class MutableDirPath : MutableFSPath, DirPath {
      *
      * @param [checkType] Check not only whether the file exists, but also whether it is a directory.
      */
-    override fun exists(checkType: Boolean): Boolean = if (checkType) toFile().isDirectory else toFile().exists()
+    override fun exists(checkType: Boolean): Boolean = if (checkType) Files.isDirectory(toPath()) else Files.exists(toPath())
 
     /**
      * Returns a copy of this path.

@@ -1,8 +1,8 @@
 package diffir
 
-import java.io.File
+import java.nio.file.FileSystem
+import java.nio.file.FileSystems
 import java.nio.file.Path
-import java.nio.file.Paths
 
 /**
  * A read-only representation of a file or directory path.
@@ -94,13 +94,11 @@ interface FSPath {
 
     /**
      * Returns a [Path] representing this path.
+     *
+     * @param [filesystem] The filesystem to use to construct the path. By default, this uses the default filesystem.
      */
-    fun toPath(): Path = Paths.get("", *pathSegments.toTypedArray())
-
-    /**
-     * Returns a [File] representing this path.
-     */
-    fun toFile(): File = toPath().toFile()
+    fun toPath(filesystem: FileSystem = FileSystems.getDefault()): Path =
+        filesystem.getPath(pathSegments.first(), *pathSegments.drop(1).toTypedArray())
 
     /**
      * Returns whether this path starts with the path [other].

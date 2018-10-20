@@ -1,30 +1,36 @@
 package diffir
 
-import java.io.File
-import java.io.IOException
+import java.nio.file.CopyOption
+import java.nio.file.Files
+import java.nio.file.Path
 import java.security.DigestInputStream
 import java.security.MessageDigest
+import kotlin.streams.toList
 
 /**
  * Returns a list of paths representing the immediate children of [directory] in the filesystem.
  */
 internal fun scanChildren(directory: DirPath): List<MutableFSPath> {
-    val dirChildren = directory.toFile().listFiles()
-    dirChildren ?: throw IOException(
-        "cannot access children because the path is not an accessible directory or because of an IO error"
-    )
-    return dirChildren.map {
+    return Files.list(directory.toPath()).map {
         when {
-            it.isDirectory -> MutableDirPath(it.toPath().fileName)
-            else -> MutableFilePath(it.toPath().fileName)
+            Files.isDirectory(it) -> MutableDirPath(it.fileName)
+            else -> MutableFilePath(it.fileName)
         }
-    }
+    }.toList()
+}
+
+/**
+ * Copies basic file attributes from [source] to [target].
+ */
+internal fun copyFileAttributes(source: Path, target: Path) {
+    val mtime = Files.getLastModifiedTime(source)
+    Files.setLastModifiedTime(target, mtime)
 }
 
 /**
  * This is the size of the buffer used when computing the checksum of a file.
  */
-const val CHECKSUM_BUFFER_SIZE: Int = 4096
+private const val CHECKSUM_BUFFER_SIZE: Int = 4096
 
 /**
  * An algorithm used to create a message digest.
@@ -49,11 +55,11 @@ internal enum class DigestAlgorithm(val algorithmName: String) {
 }
 
 /**
- * This function computes and returns a SHA-256 checksum of the given [file].
+ * This function computes and returns a checksum of the given [file] using the given [algorithm].
  */
-internal fun getFileChecksum(file: File, algorithm: DigestAlgorithm = DigestAlgorithm.SHA256): ByteArray {
+internal fun getFileChecksum(file: Path, algorithm: DigestAlgorithm = DigestAlgorithm.SHA256): ByteArray {
     val messageDigest = MessageDigest.getInstance(algorithm.algorithmName)
-    val inputStream = file.inputStream()
+    val inputStream = Files.newInputStream(file)
     val buffer = ByteArray(CHECKSUM_BUFFER_SIZE)
 
     DigestInputStream(inputStream, messageDigest).use {

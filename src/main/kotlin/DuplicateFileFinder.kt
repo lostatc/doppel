@@ -1,6 +1,8 @@
 package diffir
 
-import java.io.File
+import java.nio.file.FileVisitOption
+import java.nio.file.Files
+import java.nio.file.Path
 
 /**
  * A class that identifies duplicate files.
@@ -8,33 +10,37 @@ import java.io.File
  * Files are considered to be duplicates if they have the same size and checksum.
  *
  * @property [dirPath] The path of the directory to search for duplicate files.
+ * @property [followLinks] Follow symbolic links when walking the directory tree.
  */
-class DuplicateFileFinder(val dirPath: File) {
+class DuplicateFileFinder(val dirPath: Path, val followLinks: Boolean = false) {
     /**
      * A map that maps each file path to a set of duplicates.
      *
      * Each key is included in its own set of duplicates. To populate this map, call the [find] method.
      */
-    var duplicates: Map<FilePath, Set<FilePath>> = mapOf()
+    var duplicates: Map<Path, Set<Path>> = mapOf()
         private set
 
     /**
      * Finds duplicate files in [dirPath] and populates [duplicates].
      */
     fun find() {
-        // Groups files based on their size.
-        val fileSizes = mutableMapOf<Long, MutableSet<File>>()
-        for (file in dirPath.walkTopDown()) {
-            if (!file.isFile) continue
+        val walkOptions = mutableSetOf<FileVisitOption>()
+        if (followLinks) walkOptions.add(FileVisitOption.FOLLOW_LINKS)
+
+        // Group files based on their size.
+        val fileSizes = mutableMapOf<Long, MutableSet<Path>>()
+        for (file in Files.walk(dirPath)) {
+            if (Files.isDirectory(file)) continue
 
             fileSizes
-                .getOrPut(file.length()) { mutableSetOf() }
+                .getOrPut(Files.size(file)) { mutableSetOf() }
                 .add(file)
         }
 
         // Group files that are identical.
-        val fileGroups = mutableSetOf<MutableSet<File>>()
-        val fileChecksums = mutableMapOf<ByteArray, MutableSet<File>>()
+        val fileGroups = mutableSetOf<MutableSet<Path>>()
+        val fileChecksums = mutableMapOf<ByteArray, MutableSet<Path>>()
         for ((_, group) in fileSizes) {
             if (group.size == 1) {
                 // This file is unique. Add it to its own group.
@@ -55,11 +61,10 @@ class DuplicateFileFinder(val dirPath: File) {
         }
 
         // Construct a map from the groups of identical files.
-        val mutableDuplicates = mutableMapOf<FilePath, Set<FilePath>>()
+        val mutableDuplicates = mutableMapOf<Path, Set<Path>>()
         for (group in fileGroups) {
-            val pathGroup = group.asSequence().map { MutableFilePath(it.toPath()) }.toSet()
-            for (filePath in pathGroup) {
-                mutableDuplicates[filePath] = pathGroup
+            for (file in group) {
+                mutableDuplicates[file] = group
             }
         }
 

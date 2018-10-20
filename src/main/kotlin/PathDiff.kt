@@ -1,19 +1,20 @@
 package diffir
 
-import java.io.File
+import java.nio.file.Files
+import java.nio.file.Path
 
 /**
  * This function returns true if the two files are the same and false otherwise.
  */
-typealias FileCompareFunc = (File, File) -> Boolean
+typealias FileCompareFunc = (Path, Path) -> Boolean
 
 /**
  * This function compares the files [left] and [right] by size and checksum and returns whether they are the same.
  *
  * Checksums are only compared when both files are the same size.
  */
-private fun compareByHash(left: File, right: File): Boolean {
-    if (left.length() != right.length()) return false
+private fun compareByHash(left: Path, right: Path): Boolean {
+    if (Files.size(left) != Files.size(right)) return false
     return getFileChecksum(left) contentEquals getFileChecksum(right)
 }
 
@@ -79,7 +80,7 @@ class PathDiff(
         get() = common.asSequence().filter {
             when (it) {
                 is DirPath -> it.withAncestor(left).children == it.withAncestor(right).children
-                else -> fileCompareFunc(it.withAncestor(left).toFile(), it.withAncestor(right).toFile())
+                else -> fileCompareFunc(it.withAncestor(left).toPath(), it.withAncestor(right).toPath())
             }
         }.toSet()
 
