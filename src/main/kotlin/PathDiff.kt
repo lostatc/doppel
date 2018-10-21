@@ -103,7 +103,9 @@ class PathDiff(
      */
     val rightNewer: Set<FSPath>
         get() = common.asSequence().filter {
-            it.withAncestor(right).toFile().lastModified() > it.withAncestor(left).toFile().lastModified()
+            val leftTime = Files.getLastModifiedTime(it.withAncestor(left).toPath())
+            val rightTime = Files.getLastModifiedTime(it.withAncestor(right).toPath())
+            rightTime > leftTime
         }.toSet()
 
     /**
