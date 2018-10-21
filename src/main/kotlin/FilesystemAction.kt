@@ -1,9 +1,7 @@
 package diffir
 
 import java.io.ByteArrayInputStream
-import java.io.IOException
 import java.io.InputStream
-import java.nio.file.FileSystemLoopException
 import java.nio.file.attribute.FileAttribute
 
 /**
@@ -57,7 +55,7 @@ interface FilesystemAction {
 }
 
 /**
- * An action that recursively moves a file or directory.
+ * An action that recursively moves a file or directory from [source] to [target].
  *
  * This action is implemented using [moveRecursively]. See its documentation for more information.
  *
@@ -90,7 +88,7 @@ data class MoveAction(
 }
 
 /**
- * An action that recursively copies a file or directory.
+ * An action that recursively copies a file or directory from [source] to [target].
  *
  * This action is implemented using [copyRecursively]. See its documentation for more information.
  *
@@ -127,7 +125,7 @@ data class CopyAction(
 }
 
 /**
- * An action that creates a new file with given [attributes] and [contents].
+ * An action that creates a new file at [path] with given [attributes] and [contents].
  *
  * This action is implemented using [createFile]. See its documentation for more information.
  *
@@ -153,7 +151,34 @@ data class CreateFileAction(
 }
 
 /**
- * An action that creates a new directory and any necessary parent directories with given [attributes].
+ * An action that creates a symbolic link named [link] pointing to [target].
+ *
+ * This action is implemented using [createSymbolicLink]. See its documentation for more information.
+ *
+ * @property [link] The path of the symbolic link.
+ * @property [target] The path the symbolic link points to.
+ * @property [attributes] A set of file attributes to set atomically when creating the file.
+ */
+data class CreateSymbolicLinkAction(
+    val link: FilePath,
+    val target: DirPath,
+    val attributes: Set<FileAttribute<*>> = emptySet(),
+    override val onError: ErrorHandler = DEFAULT_ERROR_HANDLER
+) : FilesystemAction {
+    override fun applyView(viewDir: MutableDirPath) {
+        addPathToView(viewDir, link)
+    }
+
+    override fun applyFilesystem(dirPath: DirPath) {
+        val absoluteLinkPath = link.withAncestor(dirPath).toPath()
+        val absoluteTargetPath = target.withAncestor(dirPath).toPath()
+
+        createSymbolicLink(absoluteLinkPath, absoluteTargetPath, attributes = attributes, onError = onError)
+    }
+}
+
+/**
+ * An action that creates a new directory and [path] with any necessary parent directories and given [attributes].
  *
  * This action is implemented using [createDir]. See its documentation for more information.
  *
@@ -177,7 +202,7 @@ data class CreateDirAction(
 }
 
 /**
- * An action that recursively deletes a file or directory.
+ * An action that recursively deletes a file or directory at [path].
  *
  * This action is implemented using [deleteRecursively]. See its documentation for more information.
  *

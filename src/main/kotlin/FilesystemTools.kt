@@ -33,7 +33,7 @@ internal fun copyFileAttributes(source: Path, target: Path) {
 /**
  * An algorithm used to create a message digest.
  *
- * @property [algorithmName] The name of the algorithm.
+ * @param [algorithmName] The name of the algorithm.
  */
 enum class DigestAlgorithm(val algorithmName: String) {
     /**
@@ -110,11 +110,12 @@ private fun handleWalkErrors(onError: ErrorHandler, file: Path, tryFunc: () -> U
  * This move may or may not be atomic. If it is not atomic and an exception is thrown, the state of the filesystem is
  * not defined.
  *
- * @property [source] The file or directory to move.
- * @property [target] The file or directory to move [source] to.
- * @property [overwrite] If a file or directory already exists at [target], replace it. If the directory is not empty,
- * it is deleted recursively.
- * @property [followLinks] Follow symbolic links when walking the directory tree.
+ * @param [source] The file or directory to move.
+ * @param [target] The file or directory to move [source] to.
+ * @param [overwrite] If a file or directory already exists at [target], replace it. If the directory is not empty, it
+ * is deleted recursively.
+ * @param [followLinks] Follow symbolic links when walking the directory tree.
+ * @param [onError] A function that handles errors.
  *
  * The following exceptions can be passed on [onError]:
  * - [NoSuchFileException]: There was an attempt to move a nonexistent file.
@@ -188,15 +189,16 @@ fun moveRecursively(
  * Copying a file or directory is not an atomic operation. If an [IOException] is thrown, then the state of the
  * filesystem is undefined.
  *
- * @property [source] The file or directory to copy.
- * @property [target] The file or directory to copy [source] to.
- * @property [overwrite] If a file or directory already exists at [target], replace it. If the directory is not empty,
- * it is deleted recursively.
- * @property [copyAttributes] Attempt to copy file attributes from [source] to [target]. The last modified time is
- * always copied if supported. Whether other attributes are copied is platform and filesystem dependent. File attributes
- * of links may not be copied.
- * @property [followLinks] Follow symbolic links when walking the directory tree and copy the targets of links instead
- * of links themselves.
+ * @param [source] The file or directory to copy.
+ * @param [target] The file or directory to copy [source] to.
+ * @param [overwrite] If a file or directory already exists at [target], replace it. If the directory is not empty, it
+ * is deleted recursively.
+ * @param [copyAttributes] Attempt to copy file attributes from [source] to [target]. The last modified time is always
+ * copied if supported. Whether other attributes are copied is platform and filesystem dependent. File attributes of
+ * links may not be copied.
+ * @param [followLinks] Follow symbolic links when walking the directory tree and copy the targets of links instead of
+ * links themselves.
+ * @param [onError] A function that handles errors.
  *
  * The following exceptions can be passed on [onError]:
  * - [NoSuchFileException]: There was an attempt to copy a nonexistent file.
@@ -257,16 +259,14 @@ fun copyRecursively(
 }
 
 /**
- * Creates a new file with given [attributes] and [contents].
- *
- * The file [attributes] are set atomically when the file is created. If more than one attribute of the same name is
- * passed in then all but the last occurrence is ignored.
+ * Creates a new file at [path] with given [attributes] and [contents].
  *
  * The creation of the file and the writing of [contents] to the file are not atomic.
  *
- * @property [path] The path of the new file.
- * @property [attributes] A set of file attributes to set atomically when creating the file.
- * @property [contents] A stream containing the data to fill the file with.
+ * @param [path] The path of the new file.
+ * @param [attributes] A set of file attributes to set atomically when creating the file.
+ * @param [contents] A stream containing the data to fill the file with.
+ * @param [onError] A function that handles errors.
  *
  * The following exceptions can be passed on [onError]:
  * - [UnsupportedOperationException]: [attributes] contains an attribute that cannot be set atomically when creating
@@ -287,17 +287,48 @@ fun createFile(
 }
 
 /**
- * Creates a new directory and any necessary parent directories with given [attributes].
+ * Creates a symbolic link named [link] pointing to [target].
  *
- * The file [attributes] are set atomically when the directories are created. If more than one attribute of the same
- * name is passed in then all but the last occurrence is ignored.
+ * The [target] may be an absolute or relative path and may not exist. If [target] is relative, then it is considered
+ * relative to [link].
  *
- * This function does not throw if  * This operation is not atomic. Individual deletions may not be atomic either.[path] already exists and is a directory.
+ * If the underlying [FileStore] does not support symbolic links or special privileges are required to create them, an
+ * [IOException] is thrown.
+ *
+ * @param [link] The path of the symbolic link.
+ * @param [target] The path the symbolic link points to.
+ * @param [attributes] A set of file attributes to set atomically when creating the file.
+ * @param [onError] A function that handles errors.
+ *
+ * The following exceptions can be passed on [onError]:
+ * - [UnsupportedOperationException]: [attributes] contains an attribute that cannot be set atomically when creating
+ *   the file.
+ * - [FileAlreadyExistsException]: [link] already exists.
+ * - [IOException]: Some other problem occurred while creating the link.
+ */
+fun createSymbolicLink(
+    link: Path,
+    target: Path,
+    attributes: Set<FileAttribute<*>> = emptySet(),
+    onError: ErrorHandler = DEFAULT_ERROR_HANDLER
+) {
+    handleWalkErrors(onError, link) {
+        Files.createSymbolicLink(link, target, *attributes.toTypedArray())
+    }
+}
+
+/**
+ * Creates a new directory and [path] with any necessary parent directories and given [attributes].
+ *
+ * This function does not throw if [path] already exists and is a directory.
+ *
+ * This operation is not atomic. Individual deletions may not be atomic either.
  *
  * If this method fails, then it may do so without having created all the directories.
  *
- * @property [path] The path of the new directory.
- * @property [attributes] A set of file attributes to set atomically when creating the directory.
+ * @param [path] The path of the new directory.
+ * @param [attributes] A set of file attributes to set atomically when creating the directory.
+ * @param [onError] A function that handles errors.
  *
  * The following exceptions can be passed on [onError]:
  * - [UnsupportedOperationException]: [attributes] contains an attribute that cannot be set atomically when creating
@@ -315,14 +346,15 @@ fun createDir(
     }
 }
 /**
- * Recursively deletes a file or directory.
+ * Recursively deletes a file or directory at [path].
  *
  * This operation is not atomic. Deleting an individual file or directory may not be atomic either.
  *
  * If the file to be deleted is a symbolic link then the link itself, and not its target, is deleted.
  *
- * @property [path] The path of the file or directory to delete.
- * @property [followLinks] Follow symbolic links when walking the directory tree.
+ * @param [path] The path of the file or directory to delete.
+ * @param [followLinks] Follow symbolic links when walking the directory tree.
+ * @param [onError] A function that handles errors.
  *
  * The following exceptions can be passed on [onError]:
  * - [NoSuchFileException]: There was an attempt to delete a nonexistent file.
