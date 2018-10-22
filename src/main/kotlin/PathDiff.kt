@@ -26,7 +26,7 @@ private fun compareByHash(left: Path, right: Path): Boolean {
  * @property [fileCompareFunc] The function used to determine if two files are the same. The default function compares
  * files by size and checksum.
  */
-class PathDiff(
+data class PathDiff(
     val left: DirPath,
     val right: DirPath,
     val fileCompareFunc: FileCompareFunc = ::compareByHash

@@ -3,6 +3,7 @@ package diffir
 import java.nio.file.FileVisitOption
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.*
 
 /**
  * A class that identifies duplicate files.
@@ -20,6 +21,15 @@ class DuplicateFileFinder(val dirPath: Path, val followLinks: Boolean = false) {
      */
     var duplicates: Map<Path, Set<Path>> = mapOf()
         private set
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+        other as DuplicateFileFinder
+        return dirPath == other.dirPath && followLinks == other.followLinks && duplicates == other.duplicates
+    }
+
+    override fun hashCode(): Int = Objects.hash(dirPath, followLinks, duplicates)
 
     /**
      * Finds duplicate files in [dirPath] and populates [duplicates].

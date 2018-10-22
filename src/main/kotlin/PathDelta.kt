@@ -22,6 +22,15 @@ class PathDelta {
      */
     private val actions: Deque<FilesystemAction> = LinkedList()
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+        other as PathDelta
+        return actions == other.actions
+    }
+
+    override fun hashCode(): Int = Objects.hash(actions)
+
     /**
      * Adds the given [changes] to the queue.
      *
