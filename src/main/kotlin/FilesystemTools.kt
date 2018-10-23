@@ -11,18 +11,6 @@ import java.security.MessageDigest
 import kotlin.streams.toList
 
 /**
- * Returns a list of paths representing the immediate children of [directory] in the filesystem.
- */
-internal fun scanChildren(directory: DirPath): List<MutableFSPath> {
-    return Files.list(directory.toPath()).map {
-        when {
-            Files.isDirectory(it) -> MutableDirPath(it.fileName)
-            else -> MutableFilePath(it.fileName)
-        }
-    }.toList()
-}
-
-/**
  * Copies basic file attributes from [source] to [target].
  */
 internal fun copyFileAttributes(source: Path, target: Path) {

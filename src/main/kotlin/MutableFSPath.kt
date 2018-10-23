@@ -1,20 +1,19 @@
 package diffir
 
 import java.io.IOException
-import java.nio.file.Files
-import java.nio.file.Path
+import java.nio.file.*
 import java.util.*
+import kotlin.streams.toList
 
 /**
- * Returns a list of paths of the descendants of [directory] in the filesystem.
+ * Create a [MutableFilePath] or [MutableDirPath] from a [Path].
  */
-private fun scanDescendants(directory: DirPath): List<MutableFSPath> =
-    scanChildren(directory)
-        .asSequence()
-        .map { it.withAncestor(directory) }
-        .map { if (it is MutableDirPath) scanDescendants(it) + it else listOf(it) }
-        .flatten()
-        .toList()
+private fun createPath(path: Path): MutableFSPath {
+    return when {
+        Files.isDirectory(path) -> MutableDirPath(path)
+        else -> MutableFilePath(path)
+    }
+}
 
 /**
  * Returns a directory created from the given path [segments] or `null` if [segments] is empty.
@@ -200,11 +199,15 @@ class MutableDirPath : MutableFSPath, DirPath {
      * This method reads the filesystem to get the list of immediate children of the directory represented by this
      * object. It then creates path objects from those file paths and populates [children] with them.
      *
+     * @param [filesystem] The filesystem on which to search for paths.
+     *
      * @throws [IOException] This exception is thrown if the path represented by this object is not the path of an
      * accessible directory or if there is an IO error.
      */
-    fun findChildren() {
-        children.addAll(scanChildren(this))
+    fun findChildren(filesystem: FileSystem = FileSystems.getDefault()) {
+        val path = toPath(filesystem = filesystem)
+        val childPaths = Files.list(path).map { createPath(it) }.toList()
+        children.addAll(childPaths)
     }
 
     /**
@@ -213,11 +216,19 @@ class MutableDirPath : MutableFSPath, DirPath {
      * This method reads the filesystem to get the list of descendants of the directory represented by this object. It
      * then creates path objects from those file paths and populates [descendants] with them.
      *
+     * @param [filesystem] The filesystem on which to search for paths.
+     * @param [followLinks] Follow symbolic links when walking the directory tree.
+     *
      * @throws [IOException] This exception is thrown if the path represented by this object is not the path of an
      * accessible directory or if there is an IO error.
      */
-    fun findDescendants() {
-        descendants.addAll(scanDescendants(this))
+    fun findDescendants(filesystem: FileSystem = FileSystems.getDefault(), followLinks: Boolean = false) {
+        val visitOptions = mutableSetOf<FileVisitOption>()
+        if (followLinks) visitOptions.add(FileVisitOption.FOLLOW_LINKS)
+
+        val path = toPath(filesystem = filesystem)
+        val descendantPaths = Files.walk(path, *visitOptions.toTypedArray()).map { createPath(it) }.toList()
+        descendants.addAll(descendantPaths)
     }
 
     /**
