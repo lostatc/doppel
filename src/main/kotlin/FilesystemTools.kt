@@ -19,6 +19,18 @@ internal fun copyFileAttributes(source: Path, target: Path) {
 }
 
 /**
+ * Compares the files [left] and [right] by size and checksum and returns whether they have the same contents.
+ *
+ * Checksums are only compared when both files are the same size.
+ *
+ * @throws [IOException] An I/O error occurred.
+ */
+internal fun compareContents(left: Path, right: Path): Boolean {
+    if (Files.size(left) != Files.size(right)) return false
+    return getFileChecksum(left) contentEquals getFileChecksum(right)
+}
+
+/**
  * An algorithm used to create a message digest.
  *
  * @param [algorithmName] The name of the algorithm.
@@ -47,6 +59,8 @@ private const val CHECKSUM_BUFFER_SIZE: Int = 4096
 
 /**
  * This function computes and returns a checksum of the given [file] using the given [algorithm].
+ *
+ * @throws [IOException] An I/O error occurred.
  */
 fun getFileChecksum(file: Path, algorithm: DigestAlgorithm = DigestAlgorithm.SHA256): ByteArray {
     val messageDigest = MessageDigest.getInstance(algorithm.algorithmName)

@@ -1,7 +1,9 @@
 package diffir
 
+import java.io.IOException
 import java.nio.file.FileSystem
 import java.nio.file.FileSystems
+import java.nio.file.Files
 import java.nio.file.Path
 
 /**
@@ -176,9 +178,45 @@ interface DirPath : FSPath {
         exists(checkType) && walkChildren().all { it.exists(checkType) }
 
     /**
-     * Returns a representation of the difference between two directories.
+     * Returns an immutable representation of the difference between two directories.
+     *
+     * @throws [IOException] An I/O error occurred.
      */
-    infix fun diff(other: DirPath): PathDiff = PathDiff(this, other)
+    infix fun diff(other: DirPath): PathDiff {
+        // Get the descendants of the directories as relative paths.
+        val leftRelativeDescendants = this.descendants.asSequence().map { it.relativeTo(this) }.toSet()
+        val rightRelativeDescendants = other.descendants.asSequence().map { it.relativeTo(other) }.toSet()
+
+        // Compare files in the directories.
+        val common = leftRelativeDescendants intersect rightRelativeDescendants
+        val leftOnly = leftRelativeDescendants - rightRelativeDescendants
+        val rightOnly = rightRelativeDescendants - leftRelativeDescendants
+
+        // Compare the contents of files in the directories.
+        val same = common.asSequence().filter {
+            when (it) {
+                is DirPath -> it.withAncestor(this).children == it.withAncestor(other).children
+                else -> compareContents(it.withAncestor(this).toPath(), it.withAncestor(other).toPath())
+            }
+        }.toSet()
+        val different = common - same
+
+        // Compare the times of files in the directories.
+        val rightNewer = common.asSequence().filter {
+            val leftTime = Files.getLastModifiedTime(it.withAncestor(this).toPath())
+            val rightTime = Files.getLastModifiedTime(it.withAncestor(other).toPath())
+            rightTime > leftTime
+        }.toSet()
+        val leftNewer = common - rightNewer
+
+        return PathDiff(
+            this, other,
+            common = common,
+            leftOnly = leftOnly, rightOnly = rightOnly,
+            same = same, different = different,
+            leftNewer = leftNewer, rightNewer = rightNewer
+        )
+    }
 
     /**
      * Return a copy of this path as a mutable directory path.
