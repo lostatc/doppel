@@ -14,8 +14,14 @@ internal class PathChildren(
      * Create a copy of [element] with [innerPath] as its parent and add it to the collection.
      *
      * @return `true` if the element has been added, `false` if the element is already contained in the collection.
+     *
+     * @throws [IllegalArgumentException] The given path is associated with a different filesystem.
      */
     override fun add(element: MutableFSPath): Boolean {
+        require(element.path.fileSystem == innerPath.path.fileSystem) {
+            "Cannot add a path associated with a different filesystem."
+        }
+
         val newElement = element.copy(parent = innerPath)
         return innerSet.add(newElement)
     }

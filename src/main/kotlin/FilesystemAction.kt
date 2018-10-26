@@ -77,8 +77,8 @@ data class MoveAction(
     }
 
     override fun applyFilesystem(dirPath: DirPath) {
-        val absoluteSource = source.withAncestor(dirPath).toPath()
-        val absoluteTarget = target.withAncestor(dirPath).toPath()
+        val absoluteSource = source.withAncestor(dirPath).path
+        val absoluteTarget = target.withAncestor(dirPath).path
 
         moveRecursively(
             absoluteSource, absoluteTarget,
@@ -114,8 +114,8 @@ data class CopyAction(
     }
 
     override fun applyFilesystem(dirPath: DirPath) {
-        val absoluteSource = source.withAncestor(dirPath).toPath()
-        val absoluteTarget = target.withAncestor(dirPath).toPath()
+        val absoluteSource = source.withAncestor(dirPath).path
+        val absoluteTarget = target.withAncestor(dirPath).path
 
         copyRecursively(
             absoluteSource, absoluteTarget,
@@ -144,7 +144,7 @@ data class CreateFileAction(
     }
 
     override fun applyFilesystem(dirPath: DirPath) {
-        val absolutePath = path.withAncestor(dirPath).toPath()
+        val absolutePath = path.withAncestor(dirPath).path
 
         createFile(absolutePath, attributes = attributes, contents = contents, onError = onError)
     }
@@ -170,8 +170,8 @@ data class CreateSymbolicLinkAction(
     }
 
     override fun applyFilesystem(dirPath: DirPath) {
-        val absoluteLinkPath = link.withAncestor(dirPath).toPath()
-        val absoluteTargetPath = target.withAncestor(dirPath).toPath()
+        val absoluteLinkPath = link.withAncestor(dirPath).path
+        val absoluteTargetPath = target.withAncestor(dirPath).path
 
         createSymbolicLink(absoluteLinkPath, absoluteTargetPath, attributes = attributes, onError = onError)
     }
@@ -195,7 +195,7 @@ data class CreateDirAction(
     }
 
     override fun applyFilesystem(dirPath: DirPath) {
-        val absolutePath = path.withAncestor(dirPath).toPath()
+        val absolutePath = path.withAncestor(dirPath).path
 
         createDir(absolutePath, attributes = attributes, onError = onError)
     }
@@ -219,7 +219,7 @@ data class DeleteAction(
     }
 
     override fun applyFilesystem(dirPath: DirPath) {
-        val absolutePath = path.withAncestor(dirPath).toPath()
+        val absolutePath = path.withAncestor(dirPath).path
 
         deleteRecursively(absolutePath, followLinks = followLinks, onError = onError)
     }

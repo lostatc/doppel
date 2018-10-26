@@ -8,7 +8,6 @@ import java.nio.file.attribute.BasicFileAttributes
 import java.nio.file.attribute.FileAttribute
 import java.security.DigestInputStream
 import java.security.MessageDigest
-import kotlin.streams.toList
 
 /**
  * Copies basic file attributes from [source] to [target].

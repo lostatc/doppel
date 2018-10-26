@@ -16,48 +16,38 @@ private fun createPath(path: Path): MutableFSPath {
 }
 
 /**
- * Returns a directory created from the given path [segments] or `null` if [segments] is empty.
- */
-private fun getDirFromSegments(segments: List<String>): MutableDirPath? =
-    if (segments.isEmpty()) null else MutableDirPath(segments)
-
-/**
  * A mutable representation of a file or directory path.
  */
 abstract class MutableFSPath(
-    final override val fileName: String,
+    final override val fileName: Path,
     final override val parent: MutableDirPath? = null
 ) : FSPath {
-    init {
-        require(fileName.isNotEmpty()) { "The file name may not be empty." }
-    }
+
+    override val path: Path
+        get() = parent?.path?.resolve(fileName) ?: fileName
 
     /**
-     * Constructs a new path from the given path [segments] without path separators.
+     * Constructs a new path from the given [path].
      *
-     * @return A hierarchy of [MutableFSPath] objects where the last segment becomes the new path's [fileName], and
-     * the rest of them become the new path's parent and ancestors.
+     * This recursively sets the [parent] property so that a hierarchy of [MutableFSPath] objects going all the way up
+     * to the root is returned.
      */
-    constructor(segments: List<String>) : this(segments.last(), getDirFromSegments(segments.dropLast(1)))
+    constructor(path: Path) : this(path.fileName, MutableDirPath(path.parent))
 
     /**
-     * Constructs a new path from the given path segments without path separators.
+     * Constructs a new path from the given segments without path separators.
      *
-     * @param [firstSegment] The first segment of the new path.
-     * @param [segments] The remaining segments of the new path.
+     * The constructed path will be associated with the default filesystem.
      *
-     * @return A hierarchy of [MutableFSPath] objects where the last segment becomes the new path's [fileName], and
-     * the rest of them become the new path's parent and ancestors.
+     * This recursively sets the [parent] property so that a hierarchy of [MutableFSPath] objects going all the way up
+     * to the root is returned.
+     *
+     * @param [firstSegment] The first segment of the path.
+     * @param [segments] The remaining segments of the path.
+     *
+     * @see [Paths.get]
      */
-    constructor(firstSegment: String, vararg segments: String) : this(listOf(firstSegment, *segments))
-
-    /**
-     * Constructs a new path from the segments of the given [path].
-     *
-     * @return A hierarchy of [MutableFSPath] objects where the last segment becomes the new path's [fileName], and
-     * the rest of them become the new path's parent and ancestors.
-     */
-    constructor(path: Path) : this(listOfNotNull(path.root?.toString()) + path.map { it.toString() })
+    constructor(firstSegment: String, vararg segments: String) : this(Paths.get(firstSegment, *segments))
 
     /**
      * Returns the ancestor whose [parent] is `null`.
@@ -70,7 +60,7 @@ abstract class MutableFSPath(
         return current
     }
 
-    override fun toString(): String = toPath().toString()
+    override fun toString(): String = path.toString()
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -81,7 +71,7 @@ abstract class MutableFSPath(
 
     override fun hashCode(): Int = Objects.hash(fileName, parent)
 
-    abstract override fun copy(fileName: String, parent: DirPath?): MutableFSPath
+    abstract override fun copy(fileName: Path, parent: DirPath?): MutableFSPath
 
     override fun relativeTo(ancestor: DirPath): MutableFSPath {
         if (!startsWith(ancestor))
@@ -106,28 +96,28 @@ class MutableFilePath : MutableFSPath, FilePath {
         parent?._children?.add(this)
     }
 
-    constructor(fileName: String, parent: MutableDirPath?) : super(fileName, parent)
-
-    constructor(segments: List<String>) : super(segments)
-
-    constructor(firstSegment: String, vararg segments: String) : super(firstSegment, *segments)
+    constructor(path: Path, parent: MutableDirPath?) : super(path, parent)
 
     constructor(path: Path) : super(path)
+
+    constructor(firstSegment: String, vararg segments: String) : super(firstSegment, *segments)
 
     /**
      * Returns whether the file represented by this path exists in the filesystem.
      *
      * @param [checkType] Check not only whether the file exists, but also whether it is a normal file.
      */
-    override fun exists(checkType: Boolean): Boolean = if (checkType) Files.isRegularFile(toPath()) else Files.exists(toPath())
+    override fun exists(checkType: Boolean): Boolean =
+        if (checkType) Files.isRegularFile(path) else Files.exists(path)
 
-    override fun copy(fileName: String, parent: DirPath?): MutableFilePath {
-        return MutableFilePath(fileName, parent as MutableDirPath?)
-    }
+    override fun copy(fileName: Path, parent: DirPath?): MutableFilePath =
+        MutableFilePath(fileName, parent as MutableDirPath?)
 
-    override fun relativeTo(ancestor: DirPath): MutableFilePath = super.relativeTo(ancestor) as MutableFilePath
+    override fun relativeTo(ancestor: DirPath): MutableFilePath =
+        super.relativeTo(ancestor) as MutableFilePath
 
-    override fun withAncestor(ancestor: DirPath): MutableFilePath = super.withAncestor(ancestor) as MutableFilePath
+    override fun withAncestor(ancestor: DirPath): MutableFilePath =
+        super.withAncestor(ancestor) as MutableFilePath
 }
 
 /**
@@ -161,37 +151,39 @@ class MutableDirPath : MutableFSPath, DirPath {
      */
     override val descendants: MutableSet<MutableFSPath> = PathDescendants(this)
 
-    constructor(fileName: String, parent: MutableDirPath?) : super(fileName, parent)
-
-    constructor(segments: List<String>) : super(segments)
-
-    constructor(firstSegment: String, vararg segments: String) : super(firstSegment, *segments)
+    constructor(path: Path, parent: MutableDirPath?) : super(path, parent)
 
     constructor(path: Path) : super(path)
+
+    constructor(firstSegment: String, vararg segments: String) : super(firstSegment, *segments)
 
     /**
      * Returns whether the file represented by this path exists in the filesystem.
      *
      * @param [checkType] Check not only whether the file exists, but also whether it is a directory.
      */
-    override fun exists(checkType: Boolean): Boolean = if (checkType) Files.isDirectory(toPath()) else Files.exists(toPath())
+    override fun exists(checkType: Boolean): Boolean =
+        if (checkType) Files.isDirectory(path) else Files.exists(path)
 
     /**
      * Returns a copy of this path.
      *
      * Children of this path are copied deeply.
      */
-    override fun copy(fileName: String, parent: DirPath?): MutableDirPath {
+    override fun copy(fileName: Path, parent: DirPath?): MutableDirPath {
         val new = MutableDirPath(fileName, parent as MutableDirPath?)
         new.children.addAll(children.map { it.copy() })
         return new
     }
 
-    override fun relativeTo(ancestor: DirPath): MutableDirPath = super.relativeTo(ancestor) as MutableDirPath
+    override fun relativeTo(ancestor: DirPath): MutableDirPath =
+        super.relativeTo(ancestor) as MutableDirPath
 
-    override fun withAncestor(ancestor: DirPath): MutableDirPath = super.withAncestor(ancestor) as MutableDirPath
+    override fun withAncestor(ancestor: DirPath): MutableDirPath =
+        super.withAncestor(ancestor) as MutableDirPath
 
-    override fun walkChildren(): Sequence<MutableFSPath> = super.walkChildren().map { it as MutableFSPath }
+    override fun walkChildren(): Sequence<MutableFSPath> =
+        super.walkChildren().map { it as MutableFSPath }
 
     /**
      * Populates [children] with paths from the filesystem.
@@ -199,13 +191,10 @@ class MutableDirPath : MutableFSPath, DirPath {
      * This method reads the filesystem to get the list of immediate children of the directory represented by this
      * object. It then creates path objects from those file paths and populates [children] with them.
      *
-     * @param [filesystem] The filesystem on which to search for paths.
-     *
      * @throws [IOException] This exception is thrown if the path represented by this object is not the path of an
      * accessible directory or if there is an IO error.
      */
-    fun findChildren(filesystem: FileSystem = FileSystems.getDefault()) {
-        val path = toPath(filesystem = filesystem)
+    fun findChildren() {
         val childPaths = Files.list(path).map { createPath(it) }.toList()
         children.addAll(childPaths)
     }
@@ -216,17 +205,15 @@ class MutableDirPath : MutableFSPath, DirPath {
      * This method reads the filesystem to get the list of descendants of the directory represented by this object. It
      * then creates path objects from those file paths and populates [descendants] with them.
      *
-     * @param [filesystem] The filesystem on which to search for paths.
      * @param [followLinks] Follow symbolic links when walking the directory tree.
      *
      * @throws [IOException] This exception is thrown if the path represented by this object is not the path of an
      * accessible directory or if there is an IO error.
      */
-    fun findDescendants(filesystem: FileSystem = FileSystems.getDefault(), followLinks: Boolean = false) {
+    fun findDescendants(followLinks: Boolean = false) {
         val visitOptions = mutableSetOf<FileVisitOption>()
         if (followLinks) visitOptions.add(FileVisitOption.FOLLOW_LINKS)
 
-        val path = toPath(filesystem = filesystem)
         val descendantPaths = Files.walk(path, *visitOptions.toTypedArray()).map { createPath(it) }.toList()
         descendants.addAll(descendantPaths)
     }
@@ -242,7 +229,8 @@ class MutableDirPath : MutableFSPath, DirPath {
      * @see [of]
      */
     fun file(firstSegment: String, vararg segments: String): MutableFilePath {
-        val filePath = MutableFilePath(firstSegment, *segments)
+        val newPath = path.fileSystem.getPath(firstSegment, *segments)
+        val filePath = MutableFilePath(newPath)
         children.add(filePath.getRoot())
         return filePath
     }
@@ -258,8 +246,12 @@ class MutableDirPath : MutableFSPath, DirPath {
      *
      * @see [of]
      */
-    fun dir(firstSegment: String, vararg segments: String, init: MutableDirPath.() -> Unit = {}): MutableDirPath {
-        val dirPath = MutableDirPath(firstSegment, *segments)
+    fun dir(
+        firstSegment: String, vararg segments: String,
+        init: MutableDirPath.() -> Unit = {}
+    ): MutableDirPath {
+        val newPath = path.fileSystem.getPath(firstSegment, *segments)
+        val dirPath = MutableDirPath(newPath)
         dirPath.init()
         children.add(dirPath.getRoot())
         return dirPath
@@ -267,19 +259,22 @@ class MutableDirPath : MutableFSPath, DirPath {
 
     companion object {
         /**
-         * Constructs a new directory path from the given path segments and its children.
+         * Constructs a new directory path from the given path and its children.
          *
          * This method is a type-safe builder. It allows you to create a tree of file and directory paths. The [init]
          * parameter accepts a lambda in which you can call [file] and [dir] to create new file and directory paths as
          * children of this path.
          *
-         * @param [firstSegment] The first segment of the new path.
-         * @param [segments] The remaining segments of the new path.
+         * The whole tree of file and directory paths will be associated with the same filesystem as [path].
+         *
+         * @param [path] The path to construct the new directory path from.
          * @param [init] A function with receiver in which you can call [file] and [dir] to construct children.
          *
          * Example:
          * ```
-         * MutableDirPath.of("/", "home", "user") {
+         * val path = Paths.get("/", "home", "user")
+         *
+         * val dirPath = MutableDirPath.of(path) {
          *     file("Photo.png")
          *     dir("Documents", "Reports") {
          *         file("Quarterly.odt")
@@ -290,8 +285,8 @@ class MutableDirPath : MutableFSPath, DirPath {
          *
          * @return A new directory path containing the given children.
          */
-        fun of(firstSegment: String, vararg segments: String, init: MutableDirPath.() -> Unit): MutableDirPath {
-            val dirPath = MutableDirPath(firstSegment, *segments)
+        fun of(path: Path, init: MutableDirPath.() -> Unit): MutableDirPath {
+            val dirPath = MutableDirPath(path)
             dirPath.init()
             return dirPath
         }

@@ -1,44 +1,34 @@
 package diffir
 
 import java.io.IOException
-import java.nio.file.FileSystem
-import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
 
 /**
  * A read-only representation of a file or directory path.
  *
- * Properties in this interface must be read-only and methods must not modify the state. [FSPath] objects can represent
- * absolute or relative paths. Unlike [java.nio.file.Path], objects of this type form a tree to represent a file
- * hierarchy; every path has a [parent] property that points to a separate [FSPath] object. Each [FSPath] object stores
- * only a file name; the full path is retrieved by joining the paths of all of its ancestors.
+ * [FSPath] objects wrap a [Path] object to allow them to form a tree of file and directory paths. This allows file
+ * hierarchies to be represented and manipulated in memory. Every [FSPath] object has a [fileName] property representing
+ * the name of the current file and a [parent] property that points to another [FSPath] object. A [Path] object
+ * representing the path can be accessed through the [path] property.
  */
 interface FSPath {
     /**
-     * The name of the current file.
+     * The name of the file or directory represented by this path.
      */
-    val fileName: String
+    val fileName: Path
 
     /**
-     * The parent path. Null if there is no parent.
+     * The parent path or `null` if there is no parent.
      */
     val parent: DirPath?
 
     /**
-     * The segments of the path, excluding path separators.
+     * A [Path] representing this path.
      *
-     * If [parent] is `null`, then this is equal to [fileName]. Otherwise it is equal to
-     * [parent.pathSegments][DirPath.pathSegments] + [fileName].
+     * This is computed using on [fileName] and [parent].
      */
-    val pathSegments: List<String>
-        get() = (parent?.pathSegments ?: listOf()) + fileName
-
-    /**
-     * Whether the path is an absolute path.
-     */
-    val isAbsolute: Boolean
-        get() = toPath().isAbsolute
+    val path: Path
 
     /**
      * Returns the string representation of this path.
@@ -48,14 +38,14 @@ interface FSPath {
     /**
      * Indicates wither the object [other] is equal to this one.
      *
-     * This path and [other] are equal if they are the same type and their [fileName] and [parent] properties are equal.
+     * This path and [other] are equal if they are the same type and their [path] and [parent] properties are equal.
      */
     override operator fun equals(other: Any?): Boolean
 
     /**
      * Returns a hash code value for the object.
      *
-     * The hash code value is based on the [fileName] and [parent] properties.
+     * The hash code value is based on the [path] and [parent] properties.
      */
     override fun hashCode(): Int
 
@@ -73,7 +63,7 @@ interface FSPath {
      * @param [fileName] The new file name to assign to the copy.
      * @param [parent] The new parent to assign to the copy.
      */
-    fun copy(fileName: String = this.fileName, parent: DirPath? = this.parent): FSPath
+    fun copy(fileName: Path = this.fileName, parent: DirPath? = this.parent): FSPath
 
     /**
      * Returns a copy of this path which is relative to [ancestor].
@@ -95,40 +85,32 @@ interface FSPath {
     fun withAncestor(ancestor: DirPath): FSPath
 
     /**
-     * Returns a [Path] representing this path.
-     *
-     * @param [filesystem] The filesystem to use to construct the path. By default, this uses the default filesystem.
-     */
-    fun toPath(filesystem: FileSystem = FileSystems.getDefault()): Path =
-        filesystem.getPath(pathSegments.first(), *pathSegments.drop(1).toTypedArray())
-
-    /**
      * Returns whether this path starts with the path [other].
      *
      * @see [Path.startsWith]
      */
-    fun startsWith(other: FSPath): Boolean = toPath().startsWith(other.toPath())
+    fun startsWith(other: FSPath): Boolean = path.startsWith(other.path)
 
     /**
      * Returns whether this path ends with the path [other].
      *
      * @see [Path.endsWith]
      */
-    fun endsWith(other: FSPath): Boolean = toPath().endsWith(other.toPath())
+    fun endsWith(other: FSPath): Boolean = path.endsWith(other.path)
 }
 
 /**
  * A read-only representation of a file path.
  */
 interface FilePath : FSPath {
-    override fun copy(fileName: String, parent: DirPath?): FilePath
+    override fun copy(fileName: Path, parent: DirPath?): FilePath
 
     override fun relativeTo(ancestor: DirPath): FilePath
 
     override fun withAncestor(ancestor: DirPath): FilePath
 
     /**
-     * Return a copy of this path as a mutable file path.
+     * Returns a copy of this path as a mutable file path.
      */
     fun toMutableFilePath(): MutableFilePath = copy() as MutableFilePath
 }
@@ -147,7 +129,7 @@ interface DirPath : FSPath {
      */
     val descendants: Set<FSPath>
 
-    override fun copy(fileName: String, parent: DirPath?): DirPath
+    override fun copy(fileName: Path, parent: DirPath?): DirPath
 
     override fun relativeTo(ancestor: DirPath): DirPath
 
@@ -196,15 +178,15 @@ interface DirPath : FSPath {
         val same = common.asSequence().filter {
             when (it) {
                 is DirPath -> it.withAncestor(this).children == it.withAncestor(other).children
-                else -> compareContents(it.withAncestor(this).toPath(), it.withAncestor(other).toPath())
+                else -> compareContents(it.withAncestor(this).path, it.withAncestor(other).path)
             }
         }.toSet()
         val different = common - same
 
         // Compare the times of files in the directories.
         val rightNewer = common.asSequence().filter {
-            val leftTime = Files.getLastModifiedTime(it.withAncestor(this).toPath())
-            val rightTime = Files.getLastModifiedTime(it.withAncestor(other).toPath())
+            val leftTime = Files.getLastModifiedTime(it.withAncestor(this).path)
+            val rightTime = Files.getLastModifiedTime(it.withAncestor(other).path)
             rightTime > leftTime
         }.toSet()
         val leftNewer = common - rightNewer
@@ -219,7 +201,7 @@ interface DirPath : FSPath {
     }
 
     /**
-     * Return a copy of this path as a mutable directory path.
+     * Returns a copy of this path as a mutable directory path.
      */
     fun toMutableDirPath(): MutableDirPath = copy() as MutableDirPath
 }
