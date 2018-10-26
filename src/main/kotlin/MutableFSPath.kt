@@ -22,6 +22,11 @@ abstract class MutableFSPath(
     final override val fileName: Path,
     final override val parent: MutableDirPath? = null
 ) : FSPath {
+    init {
+        require (parent == null || fileName.fileSystem == parent.path.fileSystem) {
+            "The given file name must be associated with the same filesystem as the given parent."
+        }
+    }
 
     override val path: Path
         get() = parent?.path?.resolve(fileName) ?: fileName
