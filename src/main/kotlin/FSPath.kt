@@ -83,7 +83,6 @@ interface FSPath {
      * parent a copy of [ancestor]. If this path is absolute, then this method returns a copy of this path.
      */
     fun withAncestor(ancestor: DirPath): FSPath
-
     /**
      * Returns whether this path starts with the path [other].
      *
@@ -139,16 +138,12 @@ interface DirPath : FSPath {
      * Returns a sequence of all the descendants of this directory path.
      *
      * This walks through the tree of [children]. A top-down, depth-first search is used and directory paths are visited
-     * before their contents.
+     * before their contents. This path is not included in the output.
      */
-    fun walkChildren(): Sequence<FSPath> {
-        fun walk(node: DirPath): Sequence<FSPath> {
-            return node.children.asSequence().flatMap {
-                if (it is DirPath) sequenceOf(it) + walk(it) else sequenceOf(it)
-            }
+    fun walkChildren(): Sequence<FSPath> =
+        children.asSequence().flatMap {
+            if (it is DirPath) sequenceOf(it) + it.walkChildren() else sequenceOf(it)
         }
-        return walk(this)
-    }
 
     /**
      * Returns whether every path in the tree exists in the filesystem.
