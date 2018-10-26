@@ -37,7 +37,10 @@ abstract class MutableFSPath(
      * This recursively sets the [parent] property so that a hierarchy of [MutableFSPath] objects going all the way up
      * to the root is returned.
      */
-    constructor(path: Path) : this(path.fileName, MutableDirPath(path.parent))
+    constructor(path: Path) : this(
+        path.fileName ?: path,
+        if (path.parent == null) null else MutableDirPath(path.parent)
+    )
 
     /**
      * Constructs a new path from the given segments without path separators.
