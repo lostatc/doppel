@@ -32,10 +32,22 @@ abstract class MutableFSPath(
         get() = parent?.path?.resolve(fileName) ?: fileName
 
     /**
+     * The ancestor whose [parent] is `null`.
+     */
+    internal val root: MutableFSPath
+        get() {
+            var current = this
+            while (true) {
+                current = current.parent ?: break
+            }
+            return current
+        }
+
+    /**
      * Constructs a new path from the given [path].
      *
      * This recursively sets the [parent] property so that a hierarchy of [MutableFSPath] objects going all the way up
-     * to the root is returned.
+     * to the root is returned. The root component of the path will be its own path.
      */
     constructor(path: Path) : this(
         path.fileName ?: path,
@@ -48,7 +60,7 @@ abstract class MutableFSPath(
      * The constructed path will be associated with the default filesystem.
      *
      * This recursively sets the [parent] property so that a hierarchy of [MutableFSPath] objects going all the way up
-     * to the root is returned.
+     * to the root is returned. The root component of the path will be its own path.
      *
      * @param [firstSegment] The first segment of the path.
      * @param [segments] The remaining segments of the path.
@@ -56,17 +68,6 @@ abstract class MutableFSPath(
      * @see [Paths.get]
      */
     constructor(firstSegment: String, vararg segments: String) : this(Paths.get(firstSegment, *segments))
-
-    /**
-     * Returns the ancestor whose [parent] is `null`.
-     */
-    internal fun getRoot(): MutableFSPath {
-        var current = this
-        while (true) {
-            current = current.parent ?: break
-        }
-        return current
-    }
 
     override fun toString(): String = path.toString()
 
@@ -93,7 +94,7 @@ abstract class MutableFSPath(
     }
 
     override fun withAncestor(ancestor: DirPath): MutableFSPath =
-        getRoot().copy(parent = ancestor)
+        root.copy(parent = ancestor)
 }
 
 /**
@@ -239,7 +240,7 @@ class MutableDirPath : MutableFSPath, DirPath {
     fun file(firstSegment: String, vararg segments: String): MutableFilePath {
         val newPath = path.fileSystem.getPath(firstSegment, *segments)
         val filePath = MutableFilePath(newPath)
-        children.add(filePath.getRoot())
+        children.add(filePath.root)
         return filePath
     }
 
@@ -261,7 +262,7 @@ class MutableDirPath : MutableFSPath, DirPath {
         val newPath = path.fileSystem.getPath(firstSegment, *segments)
         val dirPath = MutableDirPath(newPath)
         dirPath.init()
-        children.add(dirPath.getRoot())
+        children.add(dirPath.root)
         return dirPath
     }
 
