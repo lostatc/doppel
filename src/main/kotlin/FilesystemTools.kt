@@ -61,7 +61,7 @@ private const val CHECKSUM_BUFFER_SIZE: Int = 4096
  *
  * @throws [IOException] An I/O error occurred.
  */
-fun getFileChecksum(file: Path, algorithm: DigestAlgorithm = DigestAlgorithm.SHA256): ByteArray {
+fun getFileChecksum(file: Path, algorithm: DigestAlgorithm = DigestAlgorithm.SHA1): ByteArray {
     val messageDigest = MessageDigest.getInstance(algorithm.algorithmName)
     val inputStream = Files.newInputStream(file)
     val buffer = ByteArray(CHECKSUM_BUFFER_SIZE)
