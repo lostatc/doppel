@@ -10,7 +10,7 @@ import java.nio.file.attribute.FileAttribute
  * This function can be used to implement [FilesystemAction.applyView].
  */
 fun addPathToView(viewDir: MutableDirPath, path: FSPath) {
-    val absolutePath = path.withAncestor(viewDir)
+    val absolutePath = viewDir.resolve(path)
     if (absolutePath.startsWith(viewDir)) viewDir.descendants.add(path as MutableFSPath)
 }
 
@@ -20,7 +20,7 @@ fun addPathToView(viewDir: MutableDirPath, path: FSPath) {
  * This function can be used to implement [FilesystemAction.applyView].
  */
 fun removePathFromView(viewDir: MutableDirPath, path: FSPath) {
-    val absolutePath = path.withAncestor(viewDir)
+    val absolutePath = viewDir.resolve(path)
     if (absolutePath.startsWith(viewDir)) viewDir.descendants.remove(path)
 }
 
@@ -77,8 +77,8 @@ data class MoveAction(
     }
 
     override fun applyFilesystem(dirPath: DirPath) {
-        val absoluteSource = source.withAncestor(dirPath).path
-        val absoluteTarget = target.withAncestor(dirPath).path
+        val absoluteSource = dirPath.resolve(source).path
+        val absoluteTarget = dirPath.resolve(target).path
 
         moveRecursively(
             absoluteSource, absoluteTarget,
@@ -114,8 +114,8 @@ data class CopyAction(
     }
 
     override fun applyFilesystem(dirPath: DirPath) {
-        val absoluteSource = source.withAncestor(dirPath).path
-        val absoluteTarget = target.withAncestor(dirPath).path
+        val absoluteSource = dirPath.resolve(source).path
+        val absoluteTarget = dirPath.resolve(target).path
 
         copyRecursively(
             absoluteSource, absoluteTarget,
@@ -144,7 +144,7 @@ data class CreateFileAction(
     }
 
     override fun applyFilesystem(dirPath: DirPath) {
-        val absolutePath = path.withAncestor(dirPath).path
+        val absolutePath = dirPath.resolve(path).path
 
         createFile(absolutePath, attributes = attributes, contents = contents, onError = onError)
     }
@@ -170,8 +170,8 @@ data class CreateSymbolicLinkAction(
     }
 
     override fun applyFilesystem(dirPath: DirPath) {
-        val absoluteLinkPath = link.withAncestor(dirPath).path
-        val absoluteTargetPath = target.withAncestor(dirPath).path
+        val absoluteLinkPath = dirPath.resolve(link).path
+        val absoluteTargetPath = dirPath.resolve(target).path
 
         createSymbolicLink(absoluteLinkPath, absoluteTargetPath, attributes = attributes, onError = onError)
     }
@@ -195,7 +195,7 @@ data class CreateDirAction(
     }
 
     override fun applyFilesystem(dirPath: DirPath) {
-        val absolutePath = path.withAncestor(dirPath).path
+        val absolutePath = dirPath.resolve(path).path
 
         createDir(absolutePath, attributes = attributes, onError = onError)
     }
@@ -219,7 +219,7 @@ data class DeleteAction(
     }
 
     override fun applyFilesystem(dirPath: DirPath) {
-        val absolutePath = path.withAncestor(dirPath).path
+        val absolutePath = dirPath.resolve(path).path
 
         deleteRecursively(absolutePath, followLinks = followLinks, onError = onError)
     }

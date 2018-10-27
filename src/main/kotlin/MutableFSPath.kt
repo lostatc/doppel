@@ -47,7 +47,7 @@ abstract class MutableFSPath(
      * Constructs a new path from the given [path].
      *
      * This recursively sets the [parent] property so that a hierarchy of [MutableFSPath] objects going all the way up
-     * to the root is returned. The root component of the path will be its own path.
+     * to the root is returned. The root component of the path will be its own [MutableFSPath].
      */
     constructor(path: Path) : this(
         path.fileName ?: path,
@@ -60,7 +60,7 @@ abstract class MutableFSPath(
      * The constructed path will be associated with the default filesystem.
      *
      * This recursively sets the [parent] property so that a hierarchy of [MutableFSPath] objects going all the way up
-     * to the root is returned. The root component of the path will be its own path.
+     * to the root is returned. The root component of the path will be its own [MutableFSPath].
      *
      * @param [firstSegment] The first segment of the path.
      * @param [segments] The remaining segments of the path.
@@ -81,20 +81,6 @@ abstract class MutableFSPath(
     override fun hashCode(): Int = Objects.hash(fileName, parent)
 
     abstract override fun copy(fileName: Path, parent: DirPath?): MutableFSPath
-
-    override fun relativeTo(ancestor: DirPath): MutableFSPath {
-        if (!startsWith(ancestor))
-            throw IllegalArgumentException("the given path must be an ancestor of this path")
-
-        var current = this
-        while (current.parent != ancestor) {
-            current = current.parent ?: break
-        }
-        return current.copy(parent = null)
-    }
-
-    override fun withAncestor(ancestor: DirPath): MutableFSPath =
-        root.copy(parent = ancestor)
 }
 
 /**
@@ -121,12 +107,6 @@ class MutableFilePath : MutableFSPath, FilePath {
 
     override fun copy(fileName: Path, parent: DirPath?): MutableFilePath =
         MutableFilePath(fileName, parent as MutableDirPath?)
-
-    override fun relativeTo(ancestor: DirPath): MutableFilePath =
-        super.relativeTo(ancestor) as MutableFilePath
-
-    override fun withAncestor(ancestor: DirPath): MutableFilePath =
-        super.withAncestor(ancestor) as MutableFilePath
 }
 
 /**
@@ -178,6 +158,9 @@ class MutableDirPath : MutableFSPath, DirPath {
      * Returns a copy of this path.
      *
      * Children of this path are copied deeply.
+     *
+     * @param [fileName] The new file name to assign to the copy.
+     * @param [parent] The new parent to assign to the copy.
      */
     override fun copy(fileName: Path, parent: DirPath?): MutableDirPath {
         val new = MutableDirPath(fileName, parent as MutableDirPath?)
@@ -185,11 +168,16 @@ class MutableDirPath : MutableFSPath, DirPath {
         return new
     }
 
-    override fun relativeTo(ancestor: DirPath): MutableDirPath =
-        super.relativeTo(ancestor) as MutableDirPath
+    override fun <T : FSPath> relativize(other: T): T {
+        require(other.startsWith(this)) { "The given path must start with this path." }
+        require(path.isAbsolute == other.path.isAbsolute) {
+            "Either both paths must be absolute or both paths must be relative."
+        }
 
-    override fun withAncestor(ancestor: DirPath): MutableDirPath =
-        super.withAncestor(ancestor) as MutableDirPath
+        return other.replaceAncestor(this, null)
+    }
+
+    override fun <T : FSPath> resolve(other: T): T = other.replaceAncestor(null, this)
 
     override fun walkChildren(): Sequence<MutableFSPath> =
         super.walkChildren().map { it as MutableFSPath }

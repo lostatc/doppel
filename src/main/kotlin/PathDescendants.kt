@@ -38,7 +38,7 @@ internal class PathDescendants(private val innerPath: MutableDirPath) : MutableS
      */
     override fun add(element: MutableFSPath): Boolean {
         val new = try {
-            if (element.path.isAbsolute) element.relativeTo(innerPath) else element.copy()
+            if (element.path.isAbsolute) innerPath.relativize(element) else element.copy()
         } catch (e: IllegalArgumentException) {
             throw IllegalArgumentException("The given path must either be relative or be a descendant of this path.", e)
         }
@@ -48,7 +48,7 @@ internal class PathDescendants(private val innerPath: MutableDirPath) : MutableS
         val ancestors = LinkedList<MutableFSPath>()
         var current: MutableFSPath? = new
         while (current != null) {
-            ancestors.addFirst(current.withAncestor(innerPath))
+            ancestors.addFirst(innerPath.resolve(current))
             current = current.parent
         }
 

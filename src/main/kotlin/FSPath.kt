@@ -3,6 +3,7 @@ package diffir
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.*
 
 /**
  * A read-only representation of a file or directory path.
@@ -66,24 +67,6 @@ interface FSPath {
     fun copy(fileName: Path = this.fileName, parent: DirPath? = this.parent): FSPath
 
     /**
-     * Returns a copy of this path which is relative to [ancestor].
-     *
-     * This method climbs the tree of parents until it finds the path whose parent is [ancestor]. It then returns a copy
-     * of that path with the parent set to `null`. If this is an absolute path, then [ancestor] must be an an absolute
-     * path. Similarly, if this is a relative path, then [ancestor] must also be a relative path.
-     *
-     * @throws [IllegalArgumentException] This exception is thrown if [ancestor] is not an ancestor of this path.
-     */
-    fun relativeTo(ancestor: DirPath): FSPath
-
-    /**
-     * Returns a copy of this path with [ancestor] as its ancestor.
-     *
-     * This method climbs the tree of parents until it finds a path whose parent is `null`. It then makes that path's
-     * parent a copy of [ancestor]. If this path is absolute, then this method returns a copy of this path.
-     */
-    fun withAncestor(ancestor: DirPath): FSPath
-    /**
      * Returns whether this path starts with the path [other].
      *
      * @see [Path.startsWith]
@@ -103,10 +86,6 @@ interface FSPath {
  */
 interface FilePath : FSPath {
     override fun copy(fileName: Path, parent: DirPath?): FilePath
-
-    override fun relativeTo(ancestor: DirPath): FilePath
-
-    override fun withAncestor(ancestor: DirPath): FilePath
 
     /**
      * Returns a copy of this path as a mutable file path.
@@ -130,9 +109,24 @@ interface DirPath : FSPath {
 
     override fun copy(fileName: Path, parent: DirPath?): DirPath
 
-    override fun relativeTo(ancestor: DirPath): DirPath
+    /**
+     * Returns a copy of [other] which is relative to this path.
+     *
+     * If this path is "/a/b" and [other] is "/a/b/c/d", then the resulting path will be "c/d".
+     *
+     * If this is an absolute path, then [other] must be an an absolute path. Similarly, if this is a relative path,
+     * then [other] must also be a relative path.
+     *
+     * @throws [IllegalArgumentException] [other] is not a path that can be relativized against this path.
+     */
+    fun <T : FSPath> relativize(other: T): T
 
-    override fun withAncestor(ancestor: DirPath): DirPath
+    /**
+     * Returns a copy of [other] with this path as its ancestor.
+     *
+     * If [other] is absolute, then this method returns a copy of [other].
+     */
+    fun <T : FSPath> resolve(other: T): T
 
     /**
      * Returns a sequence of all the descendants of this directory path.
@@ -161,8 +155,8 @@ interface DirPath : FSPath {
      */
     infix fun diff(other: DirPath): PathDiff {
         // Get the descendants of the directories as relative paths.
-        val leftRelativeDescendants = this.descendants.asSequence().map { it.relativeTo(this) }.toSet()
-        val rightRelativeDescendants = other.descendants.asSequence().map { it.relativeTo(other) }.toSet()
+        val leftRelativeDescendants = this.descendants.asSequence().map { this.relativize(it) }.toSet()
+        val rightRelativeDescendants = other.descendants.asSequence().map { other.relativize(it) }.toSet()
 
         // Compare files in the directories.
         val common = leftRelativeDescendants intersect rightRelativeDescendants
@@ -172,16 +166,16 @@ interface DirPath : FSPath {
         // Compare the contents of files in the directories.
         val same = common.asSequence().filter {
             when (it) {
-                is DirPath -> it.withAncestor(this).children == it.withAncestor(other).children
-                else -> compareContents(it.withAncestor(this).path, it.withAncestor(other).path)
+                is DirPath -> resolve(it).children == other.resolve(it).children
+                else -> compareContents(resolve(it).path, other.resolve(it).path)
             }
         }.toSet()
         val different = common - same
 
         // Compare the times of files in the directories.
         val rightNewer = common.asSequence().filter {
-            val leftTime = Files.getLastModifiedTime(it.withAncestor(this).path)
-            val rightTime = Files.getLastModifiedTime(it.withAncestor(other).path)
+            val leftTime = Files.getLastModifiedTime(resolve(it).path)
+            val rightTime = Files.getLastModifiedTime(other.resolve(it).path)
             rightTime > leftTime
         }.toSet()
         val leftNewer = common - rightNewer
@@ -199,4 +193,34 @@ interface DirPath : FSPath {
      * Returns a copy of this path as a mutable directory path.
      */
     fun toMutableDirPath(): MutableDirPath = copy() as MutableDirPath
+}
+
+/**
+ * Returns a copy of this path with [oldAncestor] replaced with [newAncestor].
+ *
+ * @throws [IllegalArgumentException] [oldAncestor] is not an ancestor of this path.
+ */
+@Suppress("UNCHECKED_CAST")
+internal fun <T : FSPath> T.replaceAncestor(oldAncestor: DirPath?, newAncestor: DirPath?): T {
+    // Implementations of [FSPath.copy] should always return the type of their class. Because Kotlin does not have self
+    // types to enforce this, unsafe casts must be used in this function.
+
+    require(oldAncestor == null || startsWith(oldAncestor)) { "The given ancestor is not an ancestor of this path." }
+
+    // Get the ancestor that is the immediate child of [oldAncestor]. Keep a stack of ancestors that have been visited.
+    val ancestorStack: Deque<DirPath> = LinkedList()
+    var childOfAncestor = this.parent ?: return copy() as T
+    while (childOfAncestor.parent != oldAncestor) {
+        ancestorStack.addFirst(childOfAncestor)
+        childOfAncestor = childOfAncestor.parent ?: break
+    }
+
+    // Set [oldAncestor] to [newAncestor]. Pop each ancestor off the stack and create a copy with the previous
+    // ancestor as its parent until we get a copy of the parent of this path.
+    var newParent = childOfAncestor.copy(parent = newAncestor)
+    while (!ancestorStack.isEmpty()) {
+        newParent = ancestorStack.removeFirst().copy(parent = newParent)
+    }
+
+    return copy(parent = newParent) as T
 }
