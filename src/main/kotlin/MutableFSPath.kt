@@ -30,20 +30,8 @@ abstract class MutableFSPath(
         }
     }
 
-    override val path: Path
-        get() = parent?.path?.resolve(fileName) ?: fileName
-
-    /**
-     * The ancestor whose [parent] is `null`.
-     */
-    internal val root: MutableFSPath
-        get() {
-            var current = this
-            while (true) {
-                current = current.parent ?: break
-            }
-            return current
-        }
+    override val root: MutableFSPath
+        get() = walkAncestors().lastOrNull() ?: this
 
     /**
      * Constructs a new path from the given [path].
@@ -83,6 +71,8 @@ abstract class MutableFSPath(
     override fun hashCode(): Int = Objects.hash(fileName, parent)
 
     abstract override fun copy(fileName: Path, parent: DirPath?): MutableFSPath
+
+    override fun walkAncestors(): Sequence<MutableDirPath> = parent?.let { sequenceOf(it) + it.walkAncestors() } ?: sequenceOf()
 }
 
 /**
@@ -170,19 +160,46 @@ class MutableDirPath : MutableFSPath, DirPath {
         return new
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun <T : FSPath> relativize(other: T): T {
         require(other.startsWith(this)) { "The given path must start with this path." }
         require(path.isAbsolute == other.path.isAbsolute) {
             "Either both paths must be absolute or both paths must be relative."
         }
 
-        return other.replaceAncestor(this, null)
+        // Climb the tree of ancestors of [other] until we find the ancestor equal to this path. Then replace that
+        // ancestor with `null`. Finally, climb back down the tree and return the copy of the original path.
+
+        var childOfAncestor = other.walkAncestors().find { it.parent == this } ?: this
+
+        childOfAncestor = childOfAncestor.copy(parent = null)
+
+        // Implementations of [FSPath.copy] should always return the type of their class. Because Kotlin does not have self
+        // types to enforce this, an unsafe cast must be used.
+        return (childOfAncestor.walkChildren().find { other.endsWith(it) } ?: childOfAncestor) as T
     }
 
-    override fun <T : FSPath> resolve(other: T): T = other.replaceAncestor(null, this)
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : FSPath> resolve(other: T): T {
+        if (other.path.isAbsolute) return other
+
+        // Get the root node of [other]. Then set the parent of that node to be this path. Finally, climb back down the
+        // tree and return the copy of the original path.
+
+        // This cast is safe.
+        var childOfAncestor = other.root as MutableDirPath
+
+        childOfAncestor = childOfAncestor.copy(parent = this)
+
+        // Implementations of [FSPath.copy] should always return the type of their class. Because Kotlin does not have self
+        // types to enforce this, an unsafe cast must be used.
+        return (childOfAncestor.walkChildren().find { it.endsWith(other) } ?: childOfAncestor) as T
+    }
 
     override fun walkChildren(): Sequence<MutableFSPath> =
-        super.walkChildren().map { it as MutableFSPath }
+        children.asSequence().flatMap {
+            if (it is MutableDirPath) sequenceOf(it) + it.walkChildren() else sequenceOf(it)
+        }
 
     /**
      * Populates [children] with paths from the filesystem.

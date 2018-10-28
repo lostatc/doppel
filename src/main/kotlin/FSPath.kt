@@ -3,7 +3,6 @@ package diffir
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
-import java.util.*
 
 /**
  * A read-only representation of a file or directory path.
@@ -25,11 +24,17 @@ interface FSPath {
     val parent: DirPath?
 
     /**
+     * The ancestor whose [parent] is `null`. This could be this path.
+     */
+    val root: FSPath
+
+    /**
      * A [Path] representing this path.
      *
-     * This is computed using on [fileName] and [parent].
+     * This is computed using [fileName] and [parent].
      */
     val path: Path
+        get() = parent?.path?.resolve(fileName) ?: fileName
 
     /**
      * Returns the string representation of this path.
@@ -65,6 +70,13 @@ interface FSPath {
      * @param [parent] The new parent to assign to the copy.
      */
     fun copy(fileName: Path = this.fileName, parent: DirPath? = this.parent): FSPath
+
+    /**
+     * Returns a sequence of all the ancestors of this directory path.
+     *
+     * The ancestors are visited in order starting with the parent and ending with the most distant ancestor.
+     */
+    fun walkAncestors(): Sequence<DirPath>
 
     /**
      * Returns whether this path starts with the path [other].
@@ -124,7 +136,9 @@ interface DirPath : FSPath {
     /**
      * Returns a copy of [other] with this path as its ancestor.
      *
-     * If [other] is absolute, then this method returns a copy of [other].
+     * If this path is "/a/b", and [other] is "c/d", then the resulting path will be "/a/b/c/d".
+     *
+     * If [other] is absolute, then this method returns [other].
      */
     fun <T : FSPath> resolve(other: T): T
 
@@ -134,10 +148,7 @@ interface DirPath : FSPath {
      * This walks through the tree of [children]. A top-down, depth-first search is used and directory paths are visited
      * before their contents. This path is not included in the output.
      */
-    fun walkChildren(): Sequence<FSPath> =
-        children.asSequence().flatMap {
-            if (it is DirPath) sequenceOf(it) + it.walkChildren() else sequenceOf(it)
-        }
+    fun walkChildren(): Sequence<FSPath>
 
     /**
      * Returns whether every path in the tree exists in the filesystem.
@@ -193,34 +204,4 @@ interface DirPath : FSPath {
      * Returns a copy of this path as a mutable directory path.
      */
     fun toMutableDirPath(): MutableDirPath = copy() as MutableDirPath
-}
-
-/**
- * Returns a copy of this path with [oldAncestor] replaced with [newAncestor].
- *
- * @throws [IllegalArgumentException] [oldAncestor] is not an ancestor of this path.
- */
-@Suppress("UNCHECKED_CAST")
-internal fun <T : FSPath> T.replaceAncestor(oldAncestor: DirPath?, newAncestor: DirPath?): T {
-    // Implementations of [FSPath.copy] should always return the type of their class. Because Kotlin does not have self
-    // types to enforce this, unsafe casts must be used in this function.
-
-    require(oldAncestor == null || startsWith(oldAncestor)) { "The given ancestor is not an ancestor of this path." }
-
-    // Get the ancestor that is the immediate child of [oldAncestor]. Keep a stack of ancestors that have been visited.
-    val ancestorStack: Deque<DirPath> = LinkedList()
-    var childOfAncestor = this.parent ?: return copy() as T
-    while (childOfAncestor.parent != oldAncestor) {
-        ancestorStack.addFirst(childOfAncestor)
-        childOfAncestor = childOfAncestor.parent ?: break
-    }
-
-    // Set [oldAncestor] to [newAncestor]. Pop each ancestor off the stack and create a copy with the previous
-    // ancestor as its parent until we get a copy of the parent of this path.
-    var newParent = childOfAncestor.copy(parent = newAncestor)
-    while (!ancestorStack.isEmpty()) {
-        newParent = ancestorStack.removeFirst().copy(parent = newParent)
-    }
-
-    return copy(parent = newParent) as T
 }

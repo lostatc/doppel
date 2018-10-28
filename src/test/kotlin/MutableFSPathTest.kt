@@ -96,6 +96,7 @@ class MutableFSPathTest : WordSpec() {
             }
         }
 
+        // TODO: Move this to [MutableFilePath] test.
         "MutableFSPath.copy" should {
             "return a copy that's equal to the original" {
                 val newPath = MutableFilePath("/", "a", "b")
