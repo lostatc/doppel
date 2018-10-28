@@ -20,10 +20,12 @@ private fun createPath(path: Path): MutableFSPath {
  */
 abstract class MutableFSPath(
     final override val fileName: Path,
-    final override val parent: MutableDirPath? = null
+    final override val parent: MutableDirPath?
 ) : FSPath {
     init {
-        require (parent == null || fileName.fileSystem == parent.path.fileSystem) {
+        require(fileName.parent == null) { "The given file name must not have a parent." }
+
+        require(parent == null || fileName.fileSystem == parent.path.fileSystem) {
             "The given file name must be associated with the same filesystem as the given parent."
         }
     }
