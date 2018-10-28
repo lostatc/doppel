@@ -38,9 +38,19 @@ class MutableFSPathTest : WordSpec() {
             }
         }
 
+        "MutableFSPath.root" should {
+            "return the root node for absolute paths" {
+                MutableFilePath("/", "a", "b").root shouldBe MutableDirPath("/")
+            }
+
+            "return the root node for relative paths" {
+                MutableFilePath("a", "b", "c").root shouldBe MutableDirPath("a")
+            }
+        }
+
         "MutableFSPath.path" should {
             "work for multiple segments" {
-                MutableFilePath("/", "a", "b").path shouldBe Paths.get("/", "a", "b")
+                 MutableFilePath("/", "a", "b").path shouldBe Paths.get("/", "a", "b")
             }
 
             "work for a single segment" {
@@ -77,6 +87,7 @@ class MutableFSPathTest : WordSpec() {
             }
         }
 
+        // TODO: Move this to [MutableFilePath] and [MutableDirPath] tests.
         "MutableFSPath.exists" should {
             "return whether a path exists in the filesystem" {
                 val existingFile = Files.createTempFile("", ".tmp")
@@ -96,7 +107,7 @@ class MutableFSPathTest : WordSpec() {
             }
         }
 
-        // TODO: Move this to [MutableFilePath] test.
+        // TODO: Move this to [MutableFilePath] and [MutableDirPath] tests.
         "MutableFSPath.copy" should {
             "return a copy that's equal to the original" {
                 val newPath = MutableFilePath("/", "a", "b")
@@ -113,6 +124,17 @@ class MutableFSPathTest : WordSpec() {
                 val newParent = MutableDirPath("/", "a")
                 val newPath = MutableFilePath(Paths.get("/", "b", "c"))
                 newPath.copy(parent = newParent).parent shouldBe newParent
+            }
+        }
+
+        "MutableFSPath.walkAncestors" should {
+            "return all ancestors" {
+                val ancestors = listOf(MutableDirPath("/", "a"), MutableDirPath("/"))
+                MutableFilePath("/", "a", "b").walkAncestors().toList() shouldBe ancestors
+            }
+
+            "return an empty list when there are no ancestors" {
+                MutableFilePath("a").walkAncestors().toList() shouldBe emptyList()
             }
         }
 
