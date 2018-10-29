@@ -33,4 +33,12 @@ internal class PathChildren(
      * modified.
      */
     override fun addAll(elements: Collection<MutableFSPath>): Boolean = elements.filter { add(it) }.any()
+
+    // These methods must be delegated explicitly because they are not a part of the [MutableSet] interface.
+
+    override fun toString(): String = innerSet.toString()
+
+    override fun equals(other: Any?): Boolean = innerSet == other
+
+    override fun hashCode(): Int = innerSet.hashCode()
 }
