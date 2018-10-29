@@ -72,7 +72,13 @@ abstract class MutableFSPath(
 
     abstract override fun copy(fileName: Path, parent: DirPath?): MutableFSPath
 
-    override fun walkAncestors(): Sequence<MutableDirPath> = parent?.let { sequenceOf(it) + it.walkAncestors() } ?: sequenceOf()
+    override fun walkAncestors(direction: WalkDirection): Sequence<MutableDirPath> = sequence {
+        parent?.let {
+            if (direction == WalkDirection.BOTTOM_UP) yield(it)
+            yieldAll(it.walkAncestors(direction))
+            if (direction == WalkDirection.TOP_DOWN) yield(it)
+        }
+    }
 }
 
 /**
@@ -196,10 +202,13 @@ class MutableDirPath : MutableFSPath, DirPath {
         return (childOfAncestor.walkChildren().find { it.endsWith(other) } ?: childOfAncestor) as T
     }
 
-    override fun walkChildren(): Sequence<MutableFSPath> =
-        children.asSequence().flatMap {
-            if (it is MutableDirPath) sequenceOf(it) + it.walkChildren() else sequenceOf(it)
+    override fun walkChildren(direction: WalkDirection): Sequence<MutableFSPath> = sequence {
+        for (child in children) {
+            if (direction == WalkDirection.TOP_DOWN) yield(child)
+            if (child is MutableDirPath) yieldAll(child.walkChildren(direction))
+            if (direction == WalkDirection.BOTTOM_UP) yield(child)
         }
+    }
 
     /**
      * Populates [children] with paths from the filesystem.

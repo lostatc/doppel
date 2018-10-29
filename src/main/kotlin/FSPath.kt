@@ -5,6 +5,21 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 /**
+ * Possible orders in which hierarchical data can be iterated over.
+ */
+enum class WalkDirection {
+    /**
+     * The data is iterated over from the trunk to the leaves.
+     */
+    TOP_DOWN,
+
+    /**
+     * The data is iterated over from the leaves to the trunk.
+     */
+    BOTTOM_UP
+}
+
+/**
  * A read-only representation of a file or directory path.
  *
  * [FSPath] objects wrap a [Path] object to allow them to form a tree of file and directory paths. This allows file
@@ -74,9 +89,9 @@ interface FSPath {
     /**
      * Returns a sequence of all the ancestors of this directory path.
      *
-     * The ancestors are visited in order starting with the parent and ending with the most distant ancestor.
+     * @param [direction] The direction in which to iterate over ancestors.
      */
-    fun walkAncestors(): Sequence<DirPath>
+    fun walkAncestors(direction: WalkDirection = WalkDirection.BOTTOM_UP): Sequence<DirPath>
 
     /**
      * Returns whether this path starts with the path [other].
@@ -145,10 +160,12 @@ interface DirPath : FSPath {
     /**
      * Returns a sequence of all the descendants of this directory path.
      *
-     * This walks through the tree of [children]. A top-down, depth-first search is used and directory paths are visited
-     * before their contents. This path is not included in the output.
+     * This walks through the tree of [children] depth-first regardless of which [direction] is being used. This path is
+     * not included in the output.
+     *
+     * @param [direction] The direction in which to walk the tree.
      */
-    fun walkChildren(): Sequence<FSPath>
+    fun walkChildren(direction: WalkDirection = WalkDirection.TOP_DOWN): Sequence<FSPath>
 
     /**
      * Returns whether every path in the tree exists in the filesystem.
