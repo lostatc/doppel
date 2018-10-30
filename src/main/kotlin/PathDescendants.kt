@@ -17,12 +17,6 @@ internal class PathDescendants(private val innerPath: MutableDirPath) : MutableS
     private val descendants: Set<MutableFSPath>
         get() = innerPath.walkChildren().toSet()
 
-    /**
-     * A read-only list containing all the directories in the tree.
-     */
-    private val allDirectories: List<MutableDirPath>
-        get() = descendants.filterIsInstance<MutableDirPath>() + innerPath
-
     override val size: Int
         get() = descendants.size
 
@@ -31,41 +25,32 @@ internal class PathDescendants(private val innerPath: MutableDirPath) : MutableS
      *
      * If [element] is a relative path, then it is considered to be relative to [innerPath].
      *
-     * @throws [IllegalArgumentException] This exception is thrown if [element] is absolute and [innerPath] is not an
-     * ancestor of it.
+     * @throws [IllegalArgumentException] This exception is thrown if [element] is absolute and not a descendant of
+     * [innerPath].
      *
      * @return `true` if the element has been added, `false` if the element is already contained in the collection.
      */
     override fun add(element: MutableFSPath): Boolean {
-        val new = try {
-            if (element.path.isAbsolute) innerPath.relativize(element) else element.copy()
-        } catch (e: IllegalArgumentException) {
-            throw IllegalArgumentException("The given path must either be relative or be a descendant of this path.", e)
-        }
-        var successful = false
-
-        // Get a list of all the ancestors in the hierarchy going back to the root.
-        val ancestors = LinkedList<MutableFSPath>()
-        var current: MutableFSPath? = new
-        while (current != null) {
-            ancestors.addFirst(innerPath.resolve(current))
-            current = current.parent
+        require(!element.path.isAbsolute || element.startsWith(innerPath)) {
+            "The given path must either be relative or be a descendant of this path."
         }
 
-        // Start at the root of the hierarchy and work downwards to find where the new path should be inserted. At each
-        // level, check if that ancestor is in the set of descendants. Make the new path a child of the last ancestor
-        // that exists in the set of descendants.
-        var parent: MutableFSPath = innerPath
-        for (ancestor in ancestors) {
-            if (ancestor !in allDirectories) {
-                // The ancestor is not in the list of descendants. Add the new path to the parent of this ancestor.
-                allDirectories.find { it == parent }?.children?.add(ancestor)
-                successful = true
-            }
-            parent = ancestor
+        val newPath = innerPath.resolve(element)
+
+        // Get the longest common path between the new path and the descendants of this directory.
+        var longestCommonPath = innerPath
+        for (dirPath in innerPath.walkChildren().filterIsInstance<MutableDirPath>()) {
+            if (newPath.startsWith(dirPath)) longestCommonPath = dirPath
         }
 
-        return successful
+        // Check if the path already exists in the tree.
+        if (newPath in longestCommonPath.children) return false
+
+        // Add the new path as a child of the longest common path.
+        val relativeNewPath = longestCommonPath.relativize(newPath)
+        longestCommonPath.children.add(relativeNewPath.root)
+
+        return true
     }
 
     /**
