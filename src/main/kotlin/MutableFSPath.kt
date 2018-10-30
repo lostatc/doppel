@@ -86,7 +86,7 @@ abstract class MutableFSPath(
  */
 class MutableFilePath : MutableFSPath, FilePath {
     init {
-        parent?._children?.add(this)
+        parent?.addChild(this)
     }
 
     constructor(path: Path, parent: MutableDirPath?) : super(path, parent)
@@ -112,13 +112,13 @@ class MutableFilePath : MutableFSPath, FilePath {
  */
 class MutableDirPath : MutableFSPath, DirPath {
     init {
-        parent?._children?.add(this)
+        parent?.addChild(this)
     }
 
     /**
      * The backing property of [children]. This is used to add new children to the set without changing their parent.
      */
-    internal val _children: MutableSet<MutableFSPath> = mutableSetOf()
+    private val _children: MutableSet<MutableFSPath> = mutableSetOf()
 
     /**
      * A mutable representation of the paths of the immediate children of the directory.
@@ -143,6 +143,13 @@ class MutableDirPath : MutableFSPath, DirPath {
     constructor(path: Path) : super(path)
 
     constructor(firstSegment: String, vararg segments: String) : super(firstSegment, *segments)
+
+    /**
+     * Add a child to [children] without setting its parent.
+     *
+     * @return `true` if the child has been added, `false` if the child is already contained in [children].
+     */
+    internal fun addChild(child: MutableFSPath): Boolean = _children.add(child)
 
     /**
      * Returns whether the file represented by this path exists in the filesystem.
