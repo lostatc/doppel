@@ -173,15 +173,18 @@ class MutableDirPath : MutableFSPath, DirPath {
             "Either both paths must be absolute or both paths must be relative."
         }
 
+        // Implementations of [FSPath.copy] should always return the type of their class. Because Kotlin does not have
+        // self types to enforce this, an unsafe cast must be used.
+
         // Climb the tree of ancestors of [other] until we find the ancestor equal to this path. Then replace that
         // ancestor with `null`. Finally, climb back down the tree and return the copy of the original path.
 
-        var childOfAncestor = other.walkAncestors().find { it.parent == this } ?: this
+        var childOfAncestor = other.walkAncestors().find { it.parent == this }
+
+        childOfAncestor ?: return other.copy(parent = null) as T
 
         childOfAncestor = childOfAncestor.copy(parent = null)
 
-        // Implementations of [FSPath.copy] should always return the type of their class. Because Kotlin does not have self
-        // types to enforce this, an unsafe cast must be used.
         return (childOfAncestor.walkChildren().find { other.endsWith(it) } ?: childOfAncestor) as T
     }
 
@@ -189,16 +192,16 @@ class MutableDirPath : MutableFSPath, DirPath {
     override fun <T : FSPath> resolve(other: T): T {
         if (other.path.isAbsolute) return other
 
+        // Implementations of [FSPath.copy] should always return the type of their class. Because Kotlin does not have
+        // self types to enforce this, an unsafe cast must be used.
+
         // Get the root node of [other]. Then set the parent of that node to be this path. Finally, climb back down the
         // tree and return the copy of the original path.
 
-        // This cast is safe.
-        var childOfAncestor = other.root as MutableDirPath
+        var childOfAncestor = other.root as MutableDirPath // This cast is safe.
 
         childOfAncestor = childOfAncestor.copy(parent = this)
 
-        // Implementations of [FSPath.copy] should always return the type of their class. Because Kotlin does not have self
-        // types to enforce this, an unsafe cast must be used.
         return (childOfAncestor.walkChildren().find { it.endsWith(other) } ?: childOfAncestor) as T
     }
 
@@ -239,7 +242,11 @@ class MutableDirPath : MutableFSPath, DirPath {
         val visitOptions = mutableSetOf<FileVisitOption>()
         if (followLinks) visitOptions.add(FileVisitOption.FOLLOW_LINKS)
 
-        val descendantPaths = Files.walk(path, *visitOptions.toTypedArray()).map { createPath(it) }.toList()
+        val descendantPaths = Files.walk(path, *visitOptions.toTypedArray())
+            .skip(1) // Skip the directory itself.
+            .map { createPath(it) }
+            .toList()
+
         descendants.addAll(descendantPaths)
     }
 

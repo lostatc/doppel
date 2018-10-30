@@ -265,6 +265,13 @@ class MutableDirPathTest : WordSpec() {
                 newPath.relativize(otherPath).shouldBe(MutableDirPath("c",  "d"))
             }
 
+            "return a relativized path when one is the parent of the other" {
+                val newPath = MutableDirPath("a", "b")
+                val otherPath = MutableDirPath("a", "b", "c")
+
+                newPath.relativize(otherPath).shouldBe(MutableDirPath("c"))
+            }
+
             "work with immutable paths" {
                 val newPath = MutableDirPath("a", "b") as DirPath
                 val otherPath = MutableDirPath("a", "b", "c", "d") as DirPath
