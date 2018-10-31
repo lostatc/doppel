@@ -177,36 +177,53 @@ interface DirPath : FSPath {
         exists(checkType) && walkChildren().all { it.exists(checkType) }
 
     /**
-     * Returns an immutable representation of the difference between two directories.
+     * Returns an immutable representation of the difference between this directory and [other].
      *
-     * @throws [IOException] An I/O error occurred.
+     * @param [onError] A function that is called for each I/O error that occurs and determines how to handle them.
+     *
+     * The following exceptions can be passed to [onError]:
+     * - [NoSuchFileException] A file in one of the directories was not found in the filesystem.
+     * - [IOException]: Some other I/O error occurred.
      */
-    infix fun diff(other: DirPath): PathDiff {
+    fun diff(other: DirPath, onError: ErrorHandler = ::skipOnError): PathDiff {
         // Get the descendants of the directories as relative paths.
         val leftRelativeDescendants = this.descendants.asSequence().map { this.relativize(it) }.toSet()
         val rightRelativeDescendants = other.descendants.asSequence().map { other.relativize(it) }.toSet()
 
-        // Compare files in the directories.
+        // Compare file paths.
         val common = leftRelativeDescendants intersect rightRelativeDescendants
         val leftOnly = leftRelativeDescendants - rightRelativeDescendants
         val rightOnly = rightRelativeDescendants - leftRelativeDescendants
 
-        // Compare the contents of files in the directories.
-        val same = common.asSequence().filter {
-            when (it) {
-                is DirPath -> resolve(it).children == other.resolve(it).children
-                else -> compareContents(resolve(it).path, other.resolve(it).path)
-            }
-        }.toSet()
-        val different = common - same
+        val same = mutableSetOf<FSPath>()
+        val different = mutableSetOf<FSPath>()
+        val leftNewer =  mutableSetOf<FSPath>()
+        val rightNewer =  mutableSetOf<FSPath>()
 
-        // Compare the times of files in the directories.
-        val rightNewer = common.asSequence().filter {
-            val leftTime = Files.getLastModifiedTime(resolve(it).path)
-            val rightTime = Files.getLastModifiedTime(other.resolve(it).path)
-            rightTime > leftTime
-        }.toSet()
-        val leftNewer = common - rightNewer
+        // Compare files in the filesystem.
+        common@ for (commonPath in common) {
+            try {
+                // Compare the contents of files in the directories.
+                val filesAreTheSame = when(commonPath) {
+                    is DirPath -> resolve(commonPath).children == other.resolve(commonPath).children
+                    else -> compareContents(resolve(commonPath).path, other.resolve(commonPath).path)
+                }
+
+                if (filesAreTheSame) same.add(commonPath) else different.add(commonPath)
+
+                // Compare the times of files in the directories.
+                val leftTime = Files.getLastModifiedTime(resolve(commonPath).path)
+                val rightTime = Files.getLastModifiedTime(other.resolve(commonPath).path)
+
+                if (leftTime > rightTime) leftNewer.add(commonPath) else rightNewer.add(commonPath)
+
+            } catch (e: IOException) {
+                when (onError(commonPath.path, e)) {
+                    OnErrorAction.SKIP -> continue@common
+                    OnErrorAction.TERMINATE -> break@common
+                }
+            }
+        }
 
         return PathDiff(
             this, other,
