@@ -186,11 +186,11 @@ class MutableDirPath : MutableFSPath, DirPath {
         // Climb the tree of ancestors of [other] until we find the ancestor equal to this path. Then replace that
         // ancestor with `null`. Finally, climb back down the tree and return the copy of the original path.
 
-        var childOfAncestor = other.walkAncestors().find { it.parent == this }
-
-        childOfAncestor ?: return other.copy(parent = null) as T
+        var childOfAncestor = other.walkAncestors().find { it.parent == this } ?: other
 
         childOfAncestor = childOfAncestor.copy(parent = null)
+
+        if (childOfAncestor !is DirPath) return childOfAncestor as T
 
         return (childOfAncestor.walkChildren().find { other.endsWith(it) } ?: childOfAncestor) as T
     }
@@ -205,9 +205,11 @@ class MutableDirPath : MutableFSPath, DirPath {
         // Get the root node of [other]. Then set the parent of that node to be this path. Finally, climb back down the
         // tree and return the copy of the original path.
 
-        var childOfAncestor = other.root as MutableDirPath // This cast is safe.
+        var childOfAncestor = other.root
 
         childOfAncestor = childOfAncestor.copy(parent = this)
+
+        if (childOfAncestor !is DirPath) return childOfAncestor as T
 
         return (childOfAncestor.walkChildren().find { it.endsWith(other) } ?: childOfAncestor) as T
     }

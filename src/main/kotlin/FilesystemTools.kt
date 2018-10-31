@@ -25,6 +25,7 @@ internal fun copyFileAttributes(source: Path, target: Path) {
  * @throws [IOException] An I/O error occurred.
  */
 internal fun compareContents(left: Path, right: Path): Boolean {
+    if (Files.isSameFile(left, right)) return true
     if (Files.size(left) != Files.size(right)) return false
     return getFileChecksum(left) contentEquals getFileChecksum(right)
 }
