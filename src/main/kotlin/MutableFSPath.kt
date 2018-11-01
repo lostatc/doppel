@@ -231,7 +231,7 @@ class MutableDirPath : MutableFSPath, DirPath {
      * @throws [IOException] This exception is thrown if the path represented by this object is not the path of an
      * accessible directory or if there is an IO error.
      */
-    fun findChildren() {
+    fun scanChildren() {
         val childPaths = Files.list(path).map { createPath(it) }.toList()
         children.addAll(childPaths)
     }
@@ -247,7 +247,7 @@ class MutableDirPath : MutableFSPath, DirPath {
      * @throws [IOException] This exception is thrown if the path represented by this object is not the path of an
      * accessible directory or if there is an IO error.
      */
-    fun findDescendants(followLinks: Boolean = false) {
+    fun scanDescendants(followLinks: Boolean = false) {
         val visitOptions = mutableSetOf<FileVisitOption>()
         if (followLinks) visitOptions.add(FileVisitOption.FOLLOW_LINKS)
 
