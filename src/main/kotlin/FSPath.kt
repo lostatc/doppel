@@ -192,13 +192,31 @@ interface DirPath : FSPath {
      */
     fun diff(other: DirPath, onError: ErrorHandler = ::skipOnError): PathDiff {
         // Get the descendants of the directories as relative paths.
-        val leftRelativeDescendants = this.descendants.asSequence().map { this.relativize(it) }.toSet()
-        val rightRelativeDescendants = other.descendants.asSequence().map { other.relativize(it) }.toSet()
+        val leftRelativeDescendants = this.descendants.asSequence().map { this.relativize(it) }
+        val rightRelativeDescendants = other.descendants.asSequence().map { other.relativize(it) }
+
+        // Get relative paths without children.
+        val leftRelativePaths = leftRelativeDescendants
+            .apply { if (this is DirPath) mutate { it.children.clear() } }
+            .toSet()
+        val rightRelativePaths = rightRelativeDescendants
+            .apply { if (this is DirPath) mutate { it.children.clear() } }
+            .toSet()
+
+        // Get a map that maps relative directory paths to their children in each directory.
+        val leftChildren = leftRelativeDescendants
+            .filterIsInstance<MutableDirPath>()
+            .map { it to it.children }
+            .toMap()
+        val rightChildren = rightRelativeDescendants
+            .filterIsInstance<MutableDirPath>()
+            .map { it to it.children }
+            .toMap()
 
         // Compare file paths.
-        val common = leftRelativeDescendants intersect rightRelativeDescendants
-        val leftOnly = leftRelativeDescendants - rightRelativeDescendants
-        val rightOnly = rightRelativeDescendants - leftRelativeDescendants
+        val common = leftRelativePaths intersect rightRelativePaths
+        val leftOnly = leftRelativePaths - rightRelativePaths
+        val rightOnly = rightRelativePaths - leftRelativePaths
 
         val same = mutableSetOf<FSPath>()
         val different = mutableSetOf<FSPath>()
@@ -210,7 +228,7 @@ interface DirPath : FSPath {
             try {
                 // Compare the contents of files in the directories.
                 val filesAreTheSame = when(commonPath) {
-                    is DirPath -> resolve(commonPath).children == other.resolve(commonPath).children
+                    is DirPath -> leftChildren[commonPath] == rightChildren[commonPath]
                     else -> compareContents(resolve(commonPath).path, other.resolve(commonPath).path)
                 }
 
