@@ -115,6 +115,11 @@ interface FilePath : FSPath {
     override fun copy(fileName: Path, parent: DirPath?): FilePath
 
     /**
+     * Returns a copy of this path with a [mutator] function applied to it.
+     */
+    fun mutate(mutator: (MutableFilePath) -> Unit): FilePath = toMutableFilePath().apply(mutator)
+
+    /**
      * Returns a copy of this path as a mutable file path.
      */
     fun toMutableFilePath(): MutableFilePath = copy() as MutableFilePath
@@ -233,6 +238,11 @@ interface DirPath : FSPath {
             leftNewer = leftNewer, rightNewer = rightNewer
         )
     }
+
+    /**
+     * Returns a copy of this path with a [mutator] function applied to it.
+     */
+    fun mutate(mutator: (MutableDirPath) -> Unit): DirPath = toMutableDirPath().apply(mutator)
 
     /**
      * Returns a copy of this path as a mutable directory path.
