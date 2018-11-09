@@ -116,9 +116,12 @@ class MutableDirPath : MutableFSPath, DirPath {
     }
 
     /**
-     * The backing property of [children]. This is used to add new children to the set without changing their parent.
+     * The backing property of [children].
+     *
+     * This is a map that maps each child to itself so that children can be quickly retrieved using another path that is
+     * equal. This is also used to add new children to the set without changing their parent.
      */
-    private val _children: MutableSet<MutableFSPath> = mutableSetOf()
+    private val _children: MutableMap<MutableFSPath, MutableFSPath> = mutableMapOf()
 
     /**
      * A mutable representation of the paths of the immediate children of the directory.
@@ -145,11 +148,18 @@ class MutableDirPath : MutableFSPath, DirPath {
     constructor(firstSegment: String, vararg segments: String) : super(firstSegment, *segments)
 
     /**
-     * Add a child to [children] without setting its parent.
+     * Adds a child to [children] without setting its parent.
      *
      * @return `true` if the child has been added, `false` if the child is already contained in [children].
      */
-    internal fun addChild(child: MutableFSPath): Boolean = _children.add(child)
+    internal fun addChild(child: MutableFSPath): Boolean = _children.put(child, child) != null
+
+    /**
+     * Returns the child that is equal to [searchKey] or `null` if there is none.
+     */
+    // This unchecked cast is okay because two [MutableFSPath] objects are only equal if they are the same type.
+    @Suppress("UNCHECKED_CAST")
+    internal fun <T : MutableFSPath> getChild(searchKey: T): T? = _children[searchKey] as T?
 
     /**
      * Returns whether the file represented by this path exists in the filesystem.
@@ -220,6 +230,20 @@ class MutableDirPath : MutableFSPath, DirPath {
             if (child is MutableDirPath) yieldAll(child.walkChildren(direction))
             if (direction == WalkDirection.BOTTOM_UP) yield(child)
         }
+    }
+
+    override fun <T : MutableFSPath> findDescendant(searchKey: T): T? {
+        require(searchKey.startsWith(this)) { "The given path must start with this path." }
+
+        // Drop the first ancestor because it will be equal to this path.
+        val ancestors = searchKey.walkAncestors(WalkDirection.TOP_DOWN).drop(1)
+        var parentOfDescendant = this
+
+        for (ancestor in ancestors) {
+            parentOfDescendant = parentOfDescendant.getChild(ancestor) ?: return null
+        }
+
+        return parentOfDescendant.getChild(searchKey)
     }
 
     /**

@@ -173,6 +173,17 @@ interface DirPath : FSPath {
     fun walkChildren(direction: WalkDirection = WalkDirection.TOP_DOWN): Sequence<FSPath>
 
     /**
+     * Returns the descendant of this path that is equal to [searchKey].
+     *
+     * The given [searchKey] can be either relative or absolute, but it must start with this path.
+     *
+     * @return The descendant if it exists and `null` if it does not.
+     *
+     * @throws [IllegalArgumentException] [searchKey] does not start with this path.
+     */
+    fun <T : MutableFSPath> findDescendant(searchKey: T): T?
+
+    /**
      * Returns whether every path in the tree exists in the filesystem.
      *
      * @param [checkType] Check not only whether each file exists, but also whether the type of file matches the type of

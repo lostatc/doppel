@@ -4,12 +4,12 @@ package diffir
  * A wrapper for modifying the children of a directory path.
  *
  * @param [innerPath] The directory path that this object represents the children of.
- * @param [innerSet] The backing set that contains the children of the directory.
+ * @param [innerMap] The backing map that contains the children of the directory mapped to themselves.
  */
 internal class PathChildren(
     private val innerPath: MutableDirPath,
-    private val innerSet: MutableSet<MutableFSPath>
-) : MutableSet<MutableFSPath> by innerSet {
+    private val innerMap: MutableMap<MutableFSPath, MutableFSPath>
+) : MutableSet<MutableFSPath> by innerMap.keys {
     /**
      * Create a copy of [element] with [innerPath] as its parent and add it to the collection.
      *
@@ -23,7 +23,7 @@ internal class PathChildren(
         }
 
         val newElement = element.copy(parent = innerPath)
-        return innerSet.add(newElement)
+        return innerMap.put(newElement, newElement) != null
     }
 
     /**
@@ -36,9 +36,9 @@ internal class PathChildren(
 
     // These methods must be delegated explicitly because they are not a part of the [MutableSet] interface.
 
-    override fun toString(): String = innerSet.toString()
+    override fun toString(): String = innerMap.keys.toString()
 
-    override fun equals(other: Any?): Boolean = innerSet == other
+    override fun equals(other: Any?): Boolean = innerMap.keys == other
 
-    override fun hashCode(): Int = innerSet.hashCode()
+    override fun hashCode(): Int = innerMap.keys.hashCode()
 }
