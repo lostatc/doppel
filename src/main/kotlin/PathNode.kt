@@ -130,7 +130,7 @@ interface PathNode {
      *
      * If this path node is "/a/b", and [other] is "c/d", then the resulting path node will be "/a/b/c/d".
      *
-     * If [other] is absolute, then this method returns [other].
+     * If [other] is absolute, then this method returns a copy of [other].
      */
     fun resolve(other: PathNode): PathNode
 
