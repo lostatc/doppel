@@ -10,51 +10,51 @@ import java.nio.file.Path
  * hierarchies to be represented and manipulated in memory.
  *
  * This class works like a prefix tree, where each [PathNode] stores only a single path segment as [fileName]. The
- * parent path can be accessed through the [parent] property and a map of child paths can be accessed through the
+ * parent node can be accessed through the [parent] property and a map of child nodes can be accessed through the
  * [children] property. The full [Path] can be accessed through the [path] property.
  *
- * Each [PathNode] has a [type], which indicates the type of file the path represents in the filesystem.
+ * Each [PathNode] has a [type], which indicates the type of file the node represents in the filesystem.
  */
 interface PathNode {
     /**
-     * The name of the file or directory represented by this path.
+     * The name of the file or directory represented by this node.
      */
     val fileName: Path
 
     /**
-     * The parent path or `null` if there is no parent.
+     * The parent node or `null` if there is no parent.
      */
     val parent: PathNode?
 
     /**
-     * The type of file represented by this path.
+     * The type of file represented by this node.
      */
     val type: FileType
 
     /**
-     * The ancestor whose [parent] is `null`, which could be this path.
+     * The ancestor whose [parent] is `null`, which could be this node.
      */
     val root: PathNode
 
     /**
-     * A [Path] representing this path.
+     * A [Path] representing this node.
      *
      * This is computed using [fileName] and [parent].
      */
     val path: Path
 
     /**
-     * A map of file names to path nodes for the immediate children of this path.
+     * A map of file names to path nodes for the immediate children of this node.
      */
     val children: Map<Path, PathNode>
 
     /**
-     * A map of file paths to path nodes for all the descendants of this path.
+     * A map of file paths to path nodes for all the descendants of this node.
      */
     val descendants: Map<Path, PathNode>
 
     /**
-     * Returns the string representation of this path.
+     * Returns the string representation of this node.
      */
     override fun toString(): String
 
@@ -83,52 +83,52 @@ interface PathNode {
     fun toMutablePathNode(): MutablePathNode
 
     /**
-     * Returns a sequence of all the ancestors of this directory path.
+     * Returns a sequence of all the ancestors of this node.
      *
      * @param [direction] The direction in which to iterate over ancestors.
      */
     fun walkAncestors(direction: WalkDirection = WalkDirection.BOTTOM_UP): Sequence<PathNode>
 
     /**
-     * Returns a sequence of all the descendants of this path node.
+     * Returns a sequence of all the descendants of this node.
      *
-     * This walks through the tree of [children] depth-first regardless of which [direction] is being used. This path is
-     * not included in the output.
+     * This walks through the tree of [children] depth-first regardless of which [direction] is being used. This node is
+     * not included in the sequence.
      *
      * @param [direction] The direction in which to walk the tree.
      */
     fun walkChildren(direction: WalkDirection = WalkDirection.TOP_DOWN): Sequence<PathNode>
 
     /**
-     * Returns whether this path starts with the path [other].
+     * Returns whether the path represented by this node starts with the path represented by [other].
      *
      * @see [Path.startsWith]
      */
     fun startsWith(other: PathNode): Boolean = path.startsWith(other.path)
 
     /**
-     * Returns whether this path ends with the path [other].
+     * Returns whether the path represented by this node ends with the path represented by [other].
      *
      * @see [Path.endsWith]
      */
     fun endsWith(other: PathNode): Boolean = path.endsWith(other.path)
 
     /**
-     * Returns a copy of [other] which is relative to this path.
+     * Returns a copy of [other] which is relative to this path node.
      *
-     * If this path is "/a/b" and [other] is "/a/b/c/d", then the resulting path will be "c/d".
+     * If this path node is "/a/b" and [other] is "/a/b/c/d", then the resulting path node will be "c/d".
      *
-     * If this is an absolute path, then [other] must be an an absolute path. Similarly, if this is a relative path,
-     * then [other] must also be a relative path.
+     * If the path represented by this node is absolute, then [other] must be absolute. Similarly, if the path
+     * represented by this node is relative, then [other] must also be relative.
      *
-     * @throws [IllegalArgumentException] [other] is not a path that can be relativized against this path.
+     * @throws [IllegalArgumentException] [other] is not a path node that can be relativized against this node.
      */
     fun relativize(other: PathNode): PathNode
 
     /**
-     * Returns a copy of [other] with this path as its ancestor.
+     * Returns a copy of [other] with this node as its ancestor.
      *
-     * If this path is "/a/b", and [other] is "c/d", then the resulting path will be "/a/b/c/d".
+     * If this path node is "/a/b", and [other] is "c/d", then the resulting path node will be "/a/b/c/d".
      *
      * If [other] is absolute, then this method returns [other].
      */
@@ -146,16 +146,16 @@ interface PathNode {
     fun diff(other: PathNode, onError: ErrorHandler = ::skipOnError): PathDiff
 
     /**
-     * Returns whether the file represented by this path exists in the filesystem.
+     * Returns whether the file represented by this path node exists in the filesystem.
      *
      * @param [checkType] Check not only whether the file exists, but also whether the type of file matches the [type]
      * of this object.
-     * @param [recursive] Check this path and all its descendants.
+     * @param [recursive] Check this node and all its descendants.
      */
     fun exists(checkType: Boolean = true, recursive: Boolean = false): Boolean
 
     /**
-     * Creates the file represented by this path in the filesystem.
+     * Creates the file represented by this path node in the filesystem.
      *
      * What type of file is created is determined by the [type].
      *
