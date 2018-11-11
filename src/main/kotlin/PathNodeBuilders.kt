@@ -3,20 +3,20 @@ package diffir
 import java.nio.file.Path
 
 /**
- * Builds a path node from the given file segments and type factory.
+ * Builds a path node from the given file segments and file type.
  *
- * This is meant to be used with [MutablePathNode.of] to construct a tree of path nodes.
+ * This can be used to create builder methods for use with [MutablePathNode.of] to create a tree of path nodes.
  *
  * @param [firstSegment] The first segment of the new path node.
  * @param [segments] The remaining segments of the new path node.
- * @param [typeFactory] A factory which determines the type of the created node.
+ * @param [type] The initial type of the created node.
  */
 fun MutablePathNode.pathNode(
     firstSegment: String, vararg segments: String,
-    typeFactory: FileTypeFactory = DefaultFileTypeFactory()
+    type: FileType
 ): MutablePathNode {
     val newPath = path.fileSystem.getPath(firstSegment, *segments)
-    val pathNode = MutablePathNode.fromPath(path = newPath, typeFactory = typeFactory)
+    val pathNode = MutablePathNode.fromPath(newPath, type)
     addDescendant(pathNode)
     return pathNode
 }
@@ -30,7 +30,7 @@ fun MutablePathNode.pathNode(
  * @param [segments] The remaining segments of the new path node.
  */
 fun MutablePathNode.file(firstSegment: String, vararg segments: String): MutablePathNode =
-    pathNode(firstSegment, *segments, typeFactory = DefaultFileTypeFactory(RegularFileType()))
+    pathNode(firstSegment, *segments, type = RegularFileType())
 
 /**
  * Builds a path node from the given file segments with a type of [DirectoryType].
@@ -45,7 +45,7 @@ fun MutablePathNode.dir(
     firstSegment: String, vararg segments: String,
     init: MutablePathNode.() -> Unit = {}
 ): MutablePathNode {
-    val pathNode = pathNode(firstSegment, *segments, typeFactory = DefaultFileTypeFactory(DirectoryType()))
+    val pathNode = pathNode(firstSegment, *segments, type = DirectoryType())
     pathNode.init()
     return pathNode
 }
@@ -60,7 +60,7 @@ fun MutablePathNode.dir(
  * @param [target] The path the link points to.
  */
 fun MutablePathNode.symlink(firstSegment: String, vararg segments: String, target: Path): MutablePathNode =
-    pathNode(firstSegment, *segments, typeFactory = DefaultFileTypeFactory(SymbolicLinkType(target)))
+    pathNode(firstSegment, *segments, type = SymbolicLinkType(target))
 
 /**
  * Builds a path node from the given file segments with a type of [UnknownType].
@@ -71,4 +71,4 @@ fun MutablePathNode.symlink(firstSegment: String, vararg segments: String, targe
  * @param [segments] The remaining segments of the new path node.
  */
 fun MutablePathNode.unknown(firstSegment: String, vararg segments: String): MutablePathNode =
-    pathNode(firstSegment, *segments, typeFactory = DefaultFileTypeFactory(UnknownType()))
+    pathNode(firstSegment, *segments, type = UnknownType())
