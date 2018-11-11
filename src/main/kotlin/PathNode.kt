@@ -4,16 +4,19 @@ import java.io.IOException
 import java.nio.file.Path
 
 /**
- * A read-only representation of a file or directory tree.
+ * A read-only representation of a tree of file paths.
  *
- * Objects of this type wrap a [Path] object to allow them to form a tree of file and directory paths. This allows file
- * hierarchies to be represented and manipulated in memory.
+ * Objects of this type wrap a [Path] object to allow them to form a tree of file paths. This allows file hierarchies to
+ * be represented and manipulated in memory.
  *
  * This class works like a prefix tree, where each [PathNode] stores only a single path segment as [fileName]. The
  * parent node can be accessed through the [parent] property and a map of child nodes can be accessed through the
  * [children] property. The full [Path] can be accessed through the [path] property.
  *
- * Each [PathNode] has a [type], which indicates the type of file the node represents in the filesystem.
+ * Each [PathNode] has a [type], which indicates the type of file the node represents in the filesystem. An initial type
+ * is provided through the constructor, but this type can change based on the state of the node. For example, if the
+ * [type] of a node is a regular file, then it will change to a directory if children are added. Custom file types with
+ * custom behavior can be created by implementing [FileType].
  */
 interface PathNode {
     /**

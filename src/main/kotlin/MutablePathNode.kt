@@ -7,7 +7,10 @@ import java.util.*
 private class Entry(override val key: Path, override val value: MutablePathNode) : Map.Entry<Path, MutablePathNode>
 
 /**
- * A mutable representation of a file or directory tree.
+ * A mutable representation of a tree of file paths.
+ *
+ * This [PathNode] implementation allows for modifying the tree of nodes in place using methods like [addDescendant],
+ * [removeDescendant] and [clearChildren].
  *
  * @param [initialType] The initial type for this path node.
  */
@@ -231,11 +234,12 @@ class MutablePathNode(
         }
 
         /**
-         * Constructs a new path node from the given path and its children.
+         * Constructs a new path node from the given [path] and its children.
          *
          * This method is a type-safe builder. It allows you to create a tree of path nodes of specified types. The
          * [init] parameter accepts a lambda in which you can call builder methods like [file], [dir], [symlink] and
-         * [unknown] to create new path nodes as children of this node.
+         * [unknown] to create new path nodes as children of this node. Builder methods can be created for custom
+         * [FileType] classes using [pathNode].
          *
          * The whole tree of path nodes will be associated with the same filesystem as [path].
          *
