@@ -1,19 +1,21 @@
 package diffir
 
+import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
 import java.util.*
 
 private class Entry(override val key: Path, override val value: MutablePathNode) : Map.Entry<Path, MutablePathNode>
 
 /**
  * A mutable representation of a file or directory tree.
+ *
+ * @property [typeFactory] The factory used for getting the [type] of a path.
  */
 class MutablePathNode(
     override val fileName: Path,
     override val parent: MutablePathNode?,
-    override val type: FileType = UnknownType(),
-    override val children: MutableMap<Path, MutablePathNode> = mutableMapOf()
+    override val children: MutableMap<Path, MutablePathNode>,
+    private val typeFactory: FileTypeFactory
 ) : PathNode {
     init {
         require(fileName.parent == null) { "The given file name must not have a parent." }
@@ -25,6 +27,9 @@ class MutablePathNode(
         // Make this path a child of its parent.
         parent?.children?.put(fileName, this)
     }
+
+    override val type: FileType
+        get() = typeFactory.getFileType(this)
 
     override val root: MutablePathNode
         get() = walkAncestors().lastOrNull() ?: this
@@ -59,40 +64,6 @@ class MutablePathNode(
         override fun isEmpty(): Boolean = children.isEmpty()
     }
 
-
-    /**
-     * Constructs a new path node from the given [path].
-     *
-     * This recursively sets the [parent] property so that a hierarchy of [MutablePathNode] objects going all the way up
-     * to the root is returned. The root component of the path will be its own [MutablePathNode].
-     */
-    constructor(
-        path: Path,
-        type: FileType = UnknownType(),
-        children: MutableMap<Path, MutablePathNode> = mutableMapOf()
-    ) : this(
-        fileName = path.fileName ?: path,
-        parent = if (path.parent == null) null else MutablePathNode(path.parent),
-        type = type,
-        children = children
-    )
-
-
-    /**
-     * Constructs a new path node from the given segments without path separators.
-     *
-     * The constructed node will be associated with the default filesystem.
-     *
-     * This recursively sets the [parent] property so that a hierarchy of [MutablePathNode] objects going all the way up
-     * to the root is returned. The root component of the path will be its own [MutablePathNode].
-     *
-     * @param [firstSegment] The first segment of the path.
-     * @param [segments] The remaining segments of the path.
-     *
-     * @see [Paths.get]
-     */
-    constructor(firstSegment: String, vararg segments: String) : this(Paths.get(firstSegment, *segments))
-
     override fun toString(): String = path.toString()
 
     override fun equals(other: Any?): Boolean {
@@ -111,15 +82,16 @@ class MutablePathNode(
      *
      * @param [fileName] The new file name to assign to the copy.
      * @param [parent] The new parent to assign to the copy.
-     * @param [type] The new file type to assign to the copy.
+     * @param [children] The new children to assign to the copy.
+     * @param [typeFactory] The new file type factory to assign to the copy.
      */
     fun copy(
         fileName: Path = this.fileName,
         parent: MutablePathNode? = this.parent,
-        type: FileType = this.type,
-        children: MutableMap<Path, MutablePathNode> = this.children
+        children: MutableMap<Path, MutablePathNode> = this.children,
+        typeFactory: FileTypeFactory = this.typeFactory
     ): MutablePathNode {
-        return MutablePathNode(fileName, parent, type, children)
+        return MutablePathNode(fileName, parent, children, typeFactory)
     }
 
     override fun toPathNode(): PathNode = toMutablePathNode()
@@ -218,4 +190,90 @@ class MutablePathNode(
      * @return `true` any of the descendants were removed or `false` if none of them exist.
      */
     fun removeAllDescendants(paths: Collection<Path>): Boolean = paths.filter { removeDescendant(it) }.any()
+
+    companion object {
+        /**
+         * Constructs a new path node from the given [path].
+         *
+         * This recursively sets the [parent] property so that a hierarchy of [MutablePathNode] objects going all the way up
+         * to the root is returned. The root component of the path will be its own [MutablePathNode].
+         *
+         * @param [path] The path to create the node from.
+         * @param [typeFactory] A factory which determines the type of the created node.
+         */
+        fun fromPath(path: Path, typeFactory: FileTypeFactory = DefaultFileTypeFactory()): MutablePathNode {
+            val fileName = path.fileName ?: path
+            val parent = if (path.parent == null) null else MutablePathNode.fromPath(path.parent)
+            return MutablePathNode(fileName, parent, mutableMapOf(), typeFactory)
+        }
+
+        /**
+         * Constructs a new path node from the given path and its children.
+         *
+         * This method is a type-safe builder. It allows you to create a tree of path nodes of specified types. The
+         * [init] parameter accepts a lambda in which you can call builder methods like [file], [dir], [symlink] and
+         * [unknown] to create new path nodes as children of this node.
+         *
+         * The whole tree of path nodes will be associated with the same filesystem as [path].
+         *
+         * Example:
+         * ```
+         * val path = Paths.get("/", "home", "user")
+         *
+         * val dirPath = MutablePathNode.of(path) {
+         *     file("Photo.png")
+         *     dir("Documents", "Reports") {
+         *         file("Monthly.odt")
+         *         file("Quarterly.odt")
+         *     }
+         * }
+         * ```
+         *
+         * @param [path] The path to construct the new path node from.
+         * @param [init] A function with receiver in which you can call builder methods to construct children.
+         *
+         * @return A new path node containing the given children.
+         */
+        fun of(
+            path: Path,
+            typeFactory: FileTypeFactory = DefaultFileTypeFactory(),
+            init: MutablePathNode.() -> Unit = {}
+        ): MutablePathNode {
+            val pathNode = MutablePathNode.fromPath(path = path, typeFactory = typeFactory)
+            pathNode.init()
+            return pathNode
+        }
+
+        /**
+         * Constructs a new path node from files in the filesystem.
+         *
+         * This method constructs a new node from the given [path] and gets the [type] of the node from the filesystem.
+         * If [recursive] is `true` it also gets all descendants of the given [path] from the filesystem and creates
+         * nodes for them, returning a tree of nodes.
+         *
+         * @param [path] The path to construct the new node from.
+         * @param [recursive] Create a tree of nodes recursively.
+         * @param [typeFactoryFunc] A function that determines which [FileTypeFactory] to assign to each file in the
+         * filesystem.
+         */
+        fun fromFilesystem(
+            path: Path,
+            recursive: Boolean = false,
+            typeFactoryFunc: (Path) -> FileTypeFactory = DefaultFileTypeFactory.Companion::fromFilesystem
+        ): MutablePathNode {
+            val newNode = MutablePathNode.fromPath(path = path, typeFactory = typeFactoryFunc(path))
+
+            if (recursive) {
+                for (descendantPath in Files.walk(path)) {
+                    val newDescendant = MutablePathNode.fromPath(
+                        path = descendantPath,
+                        typeFactory = typeFactoryFunc(descendantPath)
+                    )
+                    newNode.addDescendant(newDescendant)
+                }
+            }
+
+            return newNode
+        }
+    }
 }
