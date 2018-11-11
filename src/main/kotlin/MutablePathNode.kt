@@ -147,11 +147,18 @@ class MutablePathNode(
     }
 
     override fun exists(checkType: Boolean, recursive: Boolean): Boolean {
+        val fileExists = if (checkType) type.checkType(path) else Files.exists(path)
 
+        return if (recursive) {
+            fileExists && walkChildren().all { it.exists(checkType, false) }
+        } else {
+            fileExists
+        }
     }
 
     override fun createFile(recursive: Boolean) {
-
+        type.createFile(path)
+        if (recursive) walkChildren().apply { type.createFile(path) }
     }
 
     /**
