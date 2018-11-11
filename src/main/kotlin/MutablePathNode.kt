@@ -9,13 +9,12 @@ private class Entry(override val key: Path, override val value: MutablePathNode)
 /**
  * A mutable representation of a file or directory tree.
  *
- * @property [initialType] The initial type for this path node.
+ * @param [initialType] The initial type for this path node.
  */
 class MutablePathNode(
     override val fileName: Path,
-    override val parent: MutablePathNode?,
-    override val children: MutableMap<Path, MutablePathNode>,
-    private val initialType: FileType
+    override val parent: MutablePathNode? = null,
+    private val initialType: FileType = UnknownType()
 ) : PathNode {
     init {
         require(fileName.parent == null) { "The given file name must not have a parent." }
@@ -25,7 +24,7 @@ class MutablePathNode(
         }
 
         // Make this path a child of its parent.
-        parent?.children?.put(fileName, this)
+        parent?._children?.put(fileName, this)
     }
 
     override val type: FileType
@@ -36,6 +35,10 @@ class MutablePathNode(
 
     override val path: Path
         get() = parent?.path?.resolve(fileName) ?: fileName
+
+    private val _children: MutableMap<Path, MutablePathNode> = mutableMapOf()
+
+    override val children: Map<Path, MutablePathNode> = _children
 
     override val descendants: Map<Path, MutablePathNode> = object : Map<Path, MutablePathNode> {
         override val entries: Set<Map.Entry<Path, MutablePathNode>>
@@ -82,22 +85,25 @@ class MutablePathNode(
      *
      * @param [fileName] The new file name to assign to the copy.
      * @param [parent] The new parent to assign to the copy.
-     * @param [children] The new children to assign to the copy.
      * @param [type] The new file type to assign to the copy.
      */
     fun copy(
         fileName: Path = this.fileName,
         parent: MutablePathNode? = this.parent,
-        children: MutableMap<Path, MutablePathNode> = this.children,
         type: FileType = this.type
     ): MutablePathNode {
-        return MutablePathNode(fileName, parent, children, type)
+        val newNode = MutablePathNode(fileName, parent, type)
+        newNode.addAllDescendants(children.values)
+        return newNode
     }
 
     override fun toPathNode(): PathNode = toMutablePathNode()
 
     override fun toMutablePathNode(): MutablePathNode {
-        return copy(children = children.mapValues { it.value.toMutablePathNode() }.toMutableMap())
+        val newNode = MutablePathNode(fileName, parent, type)
+        val copyOfChildren = children.values.map { it.toMutablePathNode() }
+        newNode.addAllDescendants(copyOfChildren)
+        return newNode
     }
 
     override fun walkAncestors(direction: WalkDirection): Sequence<MutablePathNode> = sequence {
@@ -167,10 +173,13 @@ class MutablePathNode(
      * @return `true` if the node was added or `false` if it already exists.
      */
     fun addDescendant(pathNode: MutablePathNode): Boolean {
+        // Get the descendant of this node that will be the ancestor of the given node.
         val newAncestor = pathNode.path.fold(this) { node, segment -> node.children[segment] ?: node }
+
         val relativeNewNode = newAncestor.relativize(pathNode)
         val newNodeRoot = relativeNewNode.root
-        return newAncestor.children.put(newNodeRoot.fileName, newNodeRoot) != null
+
+        return newAncestor._children.put(newNodeRoot.fileName, newNodeRoot) != null
     }
 
     /**
@@ -188,7 +197,7 @@ class MutablePathNode(
      */
     fun removeDescendant(path: Path): Boolean {
         val nodeToRemove = descendants[path]
-        return nodeToRemove?.parent?.children?.remove(path) != null
+        return nodeToRemove?.parent?._children?.remove(path) != null
     }
 
     /**
@@ -197,6 +206,13 @@ class MutablePathNode(
      * @return `true` any of the descendants were removed or `false` if none of them exist.
      */
     fun removeAllDescendants(paths: Collection<Path>): Boolean = paths.filter { removeDescendant(it) }.any()
+
+    /**
+     * Removes all children from this node.
+     */
+    fun clearChildren() {
+        _children.clear()
+    }
 
     companion object {
         /**
@@ -211,7 +227,7 @@ class MutablePathNode(
         fun fromPath(path: Path, type: FileType = UnknownType()): MutablePathNode {
             val fileName = path.fileName ?: path
             val parent = if (path.parent == null) null else MutablePathNode.fromPath(path.parent)
-            return MutablePathNode(fileName, parent, mutableMapOf(), type)
+            return MutablePathNode(fileName, parent, type)
         }
 
         /**
