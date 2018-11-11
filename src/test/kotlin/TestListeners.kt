@@ -9,6 +9,16 @@ import java.nio.file.Path
 import java.nio.file.Paths
 
 /**
+ * Delete a directory and its descendants if they exist.
+ */
+fun cleanUpDirectory(directory: DirPath) {
+    for (descendant in directory.walkChildren(WalkDirection.BOTTOM_UP)) {
+        Files.deleteIfExists(descendant.path)
+    }
+    Files.deleteIfExists(directory.path)
+}
+
+/**
  * A test listener that creates existing and a nonexistent files for testing.
  */
 class NonexistentFileListener : TestListener {
@@ -46,11 +56,11 @@ class DirTreeListener : TestListener {
     /**
      * A directory path representing the tree of files and directories.
      */
-    lateinit var path: DirPath
+    lateinit var dirPath: DirPath
 
     override fun beforeTest(description: Description) {
         val tempPath = Files.createTempDirectory("")
-        path = MutableDirPath.of(tempPath) {
+        dirPath = MutableDirPath.of(tempPath) {
             file("b")
             dir("c", "d") {
                 file("e")
@@ -58,7 +68,7 @@ class DirTreeListener : TestListener {
             }
         }
 
-        for (descendant in path.descendants) {
+        for (descendant in dirPath.walkChildren(WalkDirection.TOP_DOWN)) {
             when (descendant) {
                 is DirPath -> Files.createDirectories(descendant.path)
                 is FilePath -> Files.createFile(descendant.path)
@@ -67,8 +77,6 @@ class DirTreeListener : TestListener {
     }
 
     override fun afterTest(description: Description, result: TestResult) {
-        for (descendant in path.walkChildren(WalkDirection.BOTTOM_UP)) {
-            Files.delete(descendant.path)
-        }
+        cleanUpDirectory(dirPath)
     }
 }

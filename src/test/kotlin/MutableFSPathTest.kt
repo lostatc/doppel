@@ -8,8 +8,11 @@ import io.kotlintest.extensions.TestListener
 import io.kotlintest.matchers.boolean.shouldBeFalse
 import io.kotlintest.matchers.boolean.shouldBeTrue
 import io.kotlintest.matchers.collections.*
+import io.kotlintest.properties.Gen.Companion.file
 import io.kotlintest.specs.WordSpec
 import io.kotlintest.tables.row
+import java.io.IOException
+import java.nio.file.Files
 import java.nio.file.Paths
 
 class MutableFSPathTest : WordSpec() {
@@ -192,8 +195,9 @@ class MutableFilePathTest : WordSpec() {
 class MutableDirPathTest : WordSpec() {
 
     val nonexistentListener: NonexistentFileListener = NonexistentFileListener()
+    val dirTreeListener: DirTreeListener = DirTreeListener()
 
-    override fun listeners(): List<TestListener> = listOf(nonexistentListener)
+    override fun listeners(): List<TestListener> = listOf(nonexistentListener, dirTreeListener)
 
     init {
         "MutableDirPath.exists" should {
@@ -362,20 +366,211 @@ class MutableDirPathTest : WordSpec() {
             }
         }
 
+        "MutableDirPath.findDescendant" should {
+            "return the descendant from a relative path" {
+                val directory = MutableDirPath.of(Paths.get("a")) {
+                    dir("b") {
+                        dir("c") {
+                            file("d")
+                        }
+                    }
+                    dir("e")
+                }
+
+                val descendant = directory.findDescendant(MutableDirPath("a", "b", "c"))
+
+                assertSoftly {
+                    descendant.shouldBe(MutableDirPath("a", "b", "c"))
+                    descendant?.children?.shouldContainExactly(MutableFilePath("a", "b", "c", "d"))
+                }
+            }
+
+            "throw if the given path does not start with this path" {
+                shouldThrow<IllegalArgumentException> {
+                    val directory = MutableDirPath("a", "b")
+                    directory.findDescendant(MutableDirPath("c", "d"))
+                }
+            }
+        }
+
         "MutableDirPath.treeExists" should {
-            // TODO: Add tests
+            "identify that an existing tree exists" {
+                dirTreeListener.dirPath.treeExists(checkType = false).shouldBeTrue()
+            }
+
+            "identify that the file types in an existing tree match" {
+                dirTreeListener.dirPath.treeExists(checkType = true).shouldBeTrue()
+            }
+
+            "identify that a nonexistent tree doesn't exist" {
+                val randomPath = dirTreeListener.dirPath.descendants
+                    .filterIsInstance<MutableFilePath>()
+                    .random()
+                    .path
+
+                Files.delete(randomPath)
+
+                dirTreeListener.dirPath.treeExists(checkType = false).shouldBeFalse()
+            }
+
+            "identify if file types in an existing tree don't match" {
+                val randomPath = dirTreeListener.dirPath.descendants
+                    .filterIsInstance<MutableFilePath>()
+                    .random()
+                    .path
+
+                Files.delete(randomPath)
+                Files.createDirectory(randomPath)
+
+                assertSoftly {
+                    dirTreeListener.dirPath.treeExists(checkType = true).shouldBeFalse()
+                    dirTreeListener.dirPath.treeExists(checkType = false).shouldBeTrue()
+                }
+            }
         }
 
         "MutableDirPath.diff" should {
             // TODO: Add tests
+
+            "provide properties for accessing paths" {
+                val leftPath = MutableDirPath("/", "a")
+                val rightPath = MutableDirPath("/", "b")
+                val diff = leftPath.diff(rightPath)
+
+                diff.left.shouldBe(leftPath)
+                diff.right.shouldBe(rightPath)
+            }
+
+            "correctly compare paths in the directories" {
+                val leftPath = MutableDirPath.of(Paths.get("/")) {
+                    dir("a") {
+                        file("b")
+                        dir("c")
+                    }
+                    file("d")
+                }
+
+                val rightPath = MutableDirPath.of(Paths.get("/")) {
+                    dir("a") {
+                        file("b")
+                    }
+                    file("e")
+                }
+
+                val diff = leftPath.diff(rightPath)
+                val expectedCommon = setOf(MutableDirPath("a"), MutableFilePath("a", "b"))
+                val expectedLeftOnly = setOf(MutableDirPath("a", "c"), MutableFilePath("d"))
+                val expectedRightOnly = setOf(MutableFilePath("e"))
+
+                assertSoftly {
+                    diff.common.shouldBe(expectedCommon)
+                    diff.leftOnly.shouldBe(expectedLeftOnly)
+                    diff.rightOnly.shouldBe(expectedRightOnly)
+                }
+            }
+
+            "correctly compare file contents" {
+                val leftPath = MutableDirPath(Files.createTempDirectory(""))
+                val rightPath = MutableDirPath(Files.createTempDirectory(""))
+
+                val leftSame = leftPath.resolve(MutableFilePath("same"))
+                val rightSame = rightPath.resolve(MutableFilePath("same"))
+                Files.write(leftSame.path, listOf("same contents"))
+                Files.write(rightSame.path, listOf("same contents"))
+
+                val leftDifferent = leftPath.resolve(MutableFilePath("different"))
+                val rightDifferent = rightPath.resolve(MutableFilePath("different"))
+                Files.write(leftDifferent.path, listOf("different contents 1"))
+                Files.write(rightDifferent.path, listOf("different contents 2"))
+
+                val diff = leftPath.diff(rightPath)
+
+                assertSoftly {
+                    diff.same.shouldContainExactly(leftPath.relativize(leftSame))
+                    diff.different.shouldContainExactly(leftPath.relativize(leftDifferent))
+                }
+
+                cleanUpDirectory(leftPath)
+                cleanUpDirectory(rightPath)
+            }
+
+            "correctly compare directory contents" {
+                val leftPath = MutableDirPath.of(Files.createTempDirectory("")) {
+                    dir("same") {
+                        file("file")
+                    }
+                    dir("different") {
+                        file("file1")
+                    }
+                }
+
+                val rightPath = MutableDirPath.of(Files.createTempDirectory("")) {
+                    dir("same") {
+                        file("file")
+                    }
+                    dir("different") {
+                        file("file2")
+                    }
+                }
+
+                val diff = leftPath.diff(rightPath)
+
+                assertSoftly {
+                    diff.same.shouldContainExactly(MutableDirPath("same"))
+                    diff.different.shouldContainExactly(MutableDirPath("different"))
+                }
+            }
+
+            "correctly compare file times" {
+
+            }
+
+            "skip on I/O errors and continue" {
+
+            }
+
+            "terminate on I/O errors" {
+
+            }
         }
 
-        "MutableDirPath.findChildren" should {
-            // TODO: Add tests
+        "MutableDirPath.scanChildren" should {
+            "get the children from the filesystem" {
+                val testDir = MutableDirPath(dirTreeListener.dirPath.path)
+                testDir.scanChildren()
+
+                testDir.children.shouldBe(dirTreeListener.dirPath.children)
+            }
+
+            "only get the immediate children" {
+                val testDir = MutableDirPath(dirTreeListener.dirPath.path)
+                testDir.scanChildren()
+
+                testDir.descendants.shouldBe(dirTreeListener.dirPath.children)
+            }
+
+            "throw if the directory doesn't exist" {
+                val testDir = MutableDirPath(nonexistentListener.nonexistentFile)
+                shouldThrow<IOException> {
+                    testDir.scanChildren()
+                }
+            }
         }
 
-        "MutableDirPath.findDescendants" should {
-            // TODO: Add tests
+        "MutableDirPath.scanDescendants" should {
+            "get the descendants from the filesystem" {
+                val testDir = MutableDirPath(dirTreeListener.dirPath.path)
+                testDir.scanDescendants()
+
+                testDir.descendants.shouldBe(dirTreeListener.dirPath.descendants)
+            }
+
+            "throw if the directory doesn't exist" {
+                val testDir = MutableDirPath(nonexistentListener.nonexistentFile)
+                shouldThrow<IOException> {
+                    testDir.scanDescendants()
+                }
+            }
         }
 
         "MutableDirPath.of" should {
