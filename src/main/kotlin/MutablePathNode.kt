@@ -212,9 +212,20 @@ class MutablePathNode(
         return type.checkSame(path, other.path)
     }
 
-    override fun createFile(recursive: Boolean) {
-        type.createFile(path)
-        if (recursive) walkChildren().apply { type.createFile(path) }
+    override fun createFile(recursive: Boolean, onError: ErrorHandler) {
+        var nodesToCreate = sequenceOf(this)
+        if (recursive) nodesToCreate += walkChildren()
+
+        create@ for (node in nodesToCreate) {
+            try {
+                node.type.createFile(node.path)
+            } catch (e: IOException) {
+                when (onError(node.path, e)) {
+                    OnErrorAction.SKIP -> continue@create
+                    OnErrorAction.TERMINATE -> break@create
+                }
+            }
+        }
     }
 
     /**

@@ -1,27 +1,27 @@
 package diffir
 
-import java.io.ByteArrayInputStream
-import java.io.InputStream
-import java.nio.file.attribute.FileAttribute
+import java.nio.file.Path
+import java.io.IOException
+import java.nio.file.FileSystemLoopException
 
 /**
- * Adds [path] to [viewDir] if [path] is relative or a descendant of [viewDir].
+ * Adds [path] to [viewNode] if [path] is relative or a descendant of [viewNode].
  *
  * This function can be used to implement [FilesystemAction.applyView].
  */
-fun addPathToView(viewDir: MutableDirPath, path: FSPath) {
-    val absolutePath = viewDir.resolve(path)
-    if (absolutePath.startsWith(viewDir)) viewDir.descendants.add(path as MutableFSPath)
+fun addNodeToView(viewNode: MutablePathNode, path: PathNode) {
+    val absolutePath = viewNode.resolve(path)
+    if (absolutePath.startsWith(viewNode)) viewNode.addDescendant(path.toMutablePathNode())
 }
 
 /**
- * Removes [path] from [viewDir] if [path] is relative or a descendant of [viewDir].
+ * Removes [path] from [viewNode] if [path] is relative or a descendant of [viewNode].
  *
  * This function can be used to implement [FilesystemAction.applyView].
  */
-fun removePathFromView(viewDir: MutableDirPath, path: FSPath) {
-    val absolutePath = viewDir.resolve(path)
-    if (absolutePath.startsWith(viewDir)) viewDir.descendants.remove(path)
+fun removeNodeFromView(viewNode: MutablePathNode, path: PathNode) {
+    val absolutePath = viewNode.resolve(path)
+    if (absolutePath.startsWith(viewNode)) viewNode.removeDescendant(path.path)
 }
 
 /**
@@ -35,51 +35,62 @@ interface FilesystemAction {
     val onError: ErrorHandler
 
     /**
-     * Modifies [viewDir] to provide a view of what the filesystem will look like after [applyView] is called.
+     * Modifies [viewNode] to provide a view of what the filesystem will look like after [applyView] is called.
      *
-     * After this is called, [viewDir] should match what the filesystem would look like if [applyFilesystem] were called
-     * assuming there are no errors. Relative paths passed to [FilesystemAction] instances are resolved against [viewDir].
+     * After this is called, [viewNode] should match what the filesystem would look like if [applyFilesystem] were called
+     * assuming there are no errors. Relative paths passed to [FilesystemAction] instances are resolved against [viewNode].
      *
-     * The functions [addPathToView] and [removePathFromView] can be useful in implementing this method.
+     * The functions [addNodeToView] and [removeNodeFromView] can be useful in implementing this method.
      */
-    fun applyView(viewDir: MutableDirPath)
+    fun applyView(viewNode: MutablePathNode)
 
     /**
      * Applies the change to the filesystem.
      *
      * Relative paths passed to [FilesystemAction] instances are resolved against [dirPath].
-     *
-     * @return `true` if the action completed successfully or `false` if there were errors.
      */
-    fun applyFilesystem(dirPath: DirPath)
+    fun applyFilesystem(dirPath: Path)
 }
 
 /**
  * An action that recursively moves a file or directory from [source] to [target].
  *
- * This action is implemented using [moveRecursively]. See its documentation for more information.
+ * If [source] and [target] represent the same file, then nothing is moved.
  *
- * @property [source] The file or directory to move.
- * @property [target] The file or directory to move [source] to.
+ * If the file to be moved is a symbolic link then the link itself, and not its target, is moved.
+ *
+ * Moving a file will copy its last modified time if supported by both file stores.
+ *
+ * This move may or may not be atomic. If it is not atomic and an exception is thrown, the state of the filesystem is
+ * not defined.
+ *
+ * The following exceptions can be passed on [onError]:
+ * - [NoSuchFileException]: There was an attempt to move a nonexistent file.
+ * - [FileAlreadyExistsException]: The destination file already exists and [overwrite] is `false`.
+ * - [AccessDeniedException]: There was an attempt to open a directory that didn't succeed.
+ * - [FileSystemLoopException]: [followLinks] is `true` and a cycle of symbolic links was detected.
+ * - [IOException]: Some other problem occurred while moving.
+ *
+ * @property [source] A path node representing file or directory to move.
+ * @property [target] A path node representing file or directory to move [source] to.
  * @property [overwrite] If a file or directory already exists at [target], replace it. If the directory is not empty,
  * it is deleted recursively.
  * @property [followLinks] Follow symbolic links when walking the directory tree.
  */
 data class MoveAction(
-    val source: FSPath, val target: FSPath,
+    val source: PathNode, val target: PathNode,
     val overwrite: Boolean = false,
     val followLinks: Boolean = false,
     override val onError: ErrorHandler = DEFAULT_ERROR_HANDLER
 ) : FilesystemAction {
-    override fun applyView(viewDir: MutableDirPath) {
-        removePathFromView(viewDir, source)
-        addPathToView(viewDir, target)
+    override fun applyView(viewNode: MutablePathNode) {
+        removeNodeFromView(viewNode, source)
+        addNodeToView(viewNode, target)
     }
 
-    override fun applyFilesystem(dirPath: DirPath) {
-        val absoluteSource = dirPath.resolve(source).path
-        val absoluteTarget = dirPath.resolve(target).path
-
+    override fun applyFilesystem(dirPath: Path) {
+        val absoluteSource = dirPath.resolve(source.path)
+        val absoluteTarget = dirPath.resolve(target.path)
         moveRecursively(
             absoluteSource, absoluteTarget,
             overwrite = overwrite, followLinks = followLinks, onError = onError
@@ -90,10 +101,20 @@ data class MoveAction(
 /**
  * An action that recursively copies a file or directory from [source] to [target].
  *
- * This action is implemented using [copyRecursively]. See its documentation for more information.
+ * If [source] and [target] represent the same file, then nothing is copied.
  *
- * @property [source] The file or directory to copy.
- * @property [target] The file or directory to copy [source] to.
+ * Copying a file or directory is not an atomic operation. If an [IOException] is thrown, then the state of the
+ * filesystem is undefined.
+ *
+ * The following exceptions can be passed on [onError]:
+ * - [NoSuchFileException]: There was an attempt to copy a nonexistent file.
+ * - [FileAlreadyExistsException]: The destination file already exists.
+ * - [AccessDeniedException]: There was an attempt to open a directory that didn't succeed.
+ * - [FileSystemLoopException]: [followLinks] is `true` and a cycle of symbolic links was detected.
+ * - [IOException]: Some other problem occurred while copying.
+ *
+ * @property [source] A path node representing the file or directory to copy.
+ * @property [target] A path node representing the file or directory to copy [source] to.
  * @property [overwrite] If a file or directory already exists at [target], replace it. If the directory is not empty,
  * it is deleted recursively.
  * @property [copyAttributes] Attempt to copy file attributes from [source] to [target]. The last modified time is
@@ -103,19 +124,19 @@ data class MoveAction(
  * of links themselves.
  */
 data class CopyAction(
-    val source: FSPath, val target: FSPath,
+    val source: PathNode, val target: PathNode,
     val overwrite: Boolean = false,
     val copyAttributes: Boolean = false,
     val followLinks: Boolean = false,
     override val onError: ErrorHandler = DEFAULT_ERROR_HANDLER
 ) : FilesystemAction {
-    override fun applyView(viewDir: MutableDirPath) {
-        addPathToView(viewDir, target)
+    override fun applyView(viewNode: MutablePathNode) {
+        addNodeToView(viewNode, target)
     }
 
-    override fun applyFilesystem(dirPath: DirPath) {
-        val absoluteSource = dirPath.resolve(source).path
-        val absoluteTarget = dirPath.resolve(target).path
+    override fun applyFilesystem(dirPath: Path) {
+        val absoluteSource = dirPath.resolve(source.path)
+        val absoluteTarget = dirPath.resolve(target.path)
 
         copyRecursively(
             absoluteSource, absoluteTarget,
@@ -125,102 +146,56 @@ data class CopyAction(
 }
 
 /**
- * An action that creates a new file at [path] with given [attributes] and [contents].
+ * An action that creates the file represented by [pathNode].
  *
- * This action is implemented using [createFile]. See its documentation for more information.
+ * The following exceptions can be passed to [onError]:
+ * - [IOException]: Some problem occurred while creating the file.
  *
- * @property [path] The path of the new file.
- * @property [attributes] A set of file attributes to set atomically when creating the file.
- * @property [contents] A stream containing the data to fill the file with.
+ * @property [pathNode] The path node representing the file to create.
+ * @property [recursive] Create this file and all its descendants.
  */
-data class CreateFileAction(
-    val path: FilePath,
-    val attributes: Set<FileAttribute<*>> = emptySet(),
-    val contents: InputStream = ByteArrayInputStream(ByteArray(0)),
+data class CreateAction(
+    val pathNode: PathNode,
+    val recursive: Boolean = false,
     override val onError: ErrorHandler = DEFAULT_ERROR_HANDLER
 ) : FilesystemAction {
-    override fun applyView(viewDir: MutableDirPath) {
-        addPathToView(viewDir, path)
+    override fun applyView(viewNode: MutablePathNode) {
+        addNodeToView(viewNode, pathNode)
     }
 
-    override fun applyFilesystem(dirPath: DirPath) {
-        val absolutePath = dirPath.resolve(path).path
-
-        createFile(absolutePath, attributes = attributes, contents = contents, onError = onError)
+    override fun applyFilesystem(dirPath: Path) {
+        val absolutePath = MutablePathNode.fromPath(dirPath).resolve(pathNode)
+        absolutePath.createFile(recursive = recursive, onError = onError)
     }
 }
 
 /**
- * An action that creates a symbolic link named [link] pointing to [target].
+ * An action that recursively deletes a file or directory represented by [pathNode].
  *
- * This action is implemented using [createSymbolicLink]. See its documentation for more information.
+ * This operation is not atomic. Deleting an individual file or directory may not be atomic either.
  *
- * @property [link] The path of the symbolic link.
- * @property [target] The path the symbolic link points to.
- * @property [attributes] A set of file attributes to set atomically when creating the file.
- */
-data class CreateSymbolicLinkAction(
-    val link: FilePath,
-    val target: DirPath,
-    val attributes: Set<FileAttribute<*>> = emptySet(),
-    override val onError: ErrorHandler = DEFAULT_ERROR_HANDLER
-) : FilesystemAction {
-    override fun applyView(viewDir: MutableDirPath) {
-        addPathToView(viewDir, link)
-    }
-
-    override fun applyFilesystem(dirPath: DirPath) {
-        val absoluteLinkPath = dirPath.resolve(link).path
-        val absoluteTargetPath = dirPath.resolve(target).path
-
-        createSymbolicLink(absoluteLinkPath, absoluteTargetPath, attributes = attributes, onError = onError)
-    }
-}
-
-/**
- * An action that creates a new directory and [path] with any necessary parent directories and given [attributes].
+ * If the file to be deleted is a symbolic link then the link itself, and not its target, is deleted.
  *
- * This action is implemented using [createDir]. See its documentation for more information.
+ * The following exceptions can be passed on [onError]:
+ * - [NoSuchFileException]: There was an attempt to delete a nonexistent file.
+ * - [AccessDeniedException]: There was an attempt to open a directory that didn't succeed.
+ * - [FileSystemLoopException]: [followLinks] is `true` and a cycle of symbolic links was detected.
+ * - [IOException]: Some other problem occurred while deleting.
  *
- * @property [path] The path of the new directory.
- * @property [attributes] A set of file attributes to set atomically when creating the directory.
- */
-data class CreateDirAction(
-    val path: DirPath,
-    val attributes: Set<FileAttribute<*>> = emptySet(),
-    override val onError: ErrorHandler = DEFAULT_ERROR_HANDLER
-) : FilesystemAction {
-    override fun applyView(viewDir: MutableDirPath) {
-        addPathToView(viewDir, path)
-    }
-
-    override fun applyFilesystem(dirPath: DirPath) {
-        val absolutePath = dirPath.resolve(path).path
-
-        createDir(absolutePath, attributes = attributes, onError = onError)
-    }
-}
-
-/**
- * An action that recursively deletes a file or directory at [path].
- *
- * This action is implemented using [deleteRecursively]. See its documentation for more information.
- *
- * @property [path] The path of the file or directory to delete.
+ * @property [pathNode] A path node representing the file or directory to delete.
  * @property [followLinks] Follow symbolic links when walking the directory tree.
  */
 data class DeleteAction(
-    val path: FSPath,
+    val pathNode: PathNode,
     val followLinks: Boolean = false,
     override val onError: ErrorHandler = DEFAULT_ERROR_HANDLER
 ) : FilesystemAction {
-    override fun applyView(viewDir: MutableDirPath) {
-        removePathFromView(viewDir, path)
+    override fun applyView(viewNode: MutablePathNode) {
+        removeNodeFromView(viewNode, pathNode)
     }
 
-    override fun applyFilesystem(dirPath: DirPath) {
-        val absolutePath = dirPath.resolve(path).path
-
+    override fun applyFilesystem(dirPath: Path) {
+        val absolutePath = dirPath.resolve(pathNode.path)
         deleteRecursively(absolutePath, followLinks = followLinks, onError = onError)
     }
 }

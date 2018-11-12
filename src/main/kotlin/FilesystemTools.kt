@@ -1,11 +1,8 @@
 package diffir
 
-import java.io.ByteArrayInputStream
 import java.io.IOException
-import java.io.InputStream
 import java.nio.file.*
 import java.nio.file.attribute.BasicFileAttributes
-import java.nio.file.attribute.FileAttribute
 import java.security.DigestInputStream
 import java.security.MessageDigest
 
@@ -22,7 +19,7 @@ internal fun copyFileAttributes(source: Path, target: Path) {
  *
  * @param [algorithmName] The name of the algorithm.
  */
-enum class DigestAlgorithm(val algorithmName: String) {
+internal enum class DigestAlgorithm(val algorithmName: String) {
     /**
      * The MD5 message digest algorithm as defined in [RFC 1321][http://www.ietf.org/rfc/rfc1319.txt].
      */
@@ -49,7 +46,7 @@ private const val CHECKSUM_BUFFER_SIZE: Int = 4096
  *
  * @throws [IOException] An I/O error occurred.
  */
-fun getFileChecksum(file: Path, algorithm: DigestAlgorithm = DigestAlgorithm.SHA1): ByteArray {
+internal fun getFileChecksum(file: Path, algorithm: DigestAlgorithm = DigestAlgorithm.SHA1): ByteArray {
     val messageDigest = MessageDigest.getInstance(algorithm.algorithmName)
     val inputStream = Files.newInputStream(file)
     val buffer = ByteArray(CHECKSUM_BUFFER_SIZE)
@@ -90,30 +87,9 @@ private fun handleWalkErrors(onError: ErrorHandler, file: Path, tryFunc: () -> U
 /**
  * Recursively moves a file or directory from [source] to [target].
  *
- * If [source] and [target] are the same file, then nothing is moved.
- *
- * If the file to be moved is a symbolic link then the link itself, and not its target, is moved.
- *
- * Moving a file will copy its last modified time if supported by both file stores.
- *
- * This move may or may not be atomic. If it is not atomic and an exception is thrown, the state of the filesystem is
- * not defined.
- *
- * @param [source] The file or directory to move.
- * @param [target] The file or directory to move [source] to.
- * @param [overwrite] If a file or directory already exists at [target], replace it. If the directory is not empty, it
- * is deleted recursively.
- * @param [followLinks] Follow symbolic links when walking the directory tree.
- * @param [onError] A function that handles errors.
- *
- * The following exceptions can be passed on [onError]:
- * - [NoSuchFileException]: There was an attempt to move a nonexistent file.
- * - [FileAlreadyExistsException]: The destination file already exists and [overwrite] is `false`.
- * - [AccessDeniedException]: There was an attempt to open a directory that didn't succeed.
- * - [FileSystemLoopException]: [followLinks] is `true` and a cycle of symbolic links was detected.
- * - [IOException]: Some other problem occurred while moving.
+ * @see [MoveAction]
  */
-fun moveRecursively(
+internal fun moveRecursively(
     source: Path, target: Path,
     overwrite: Boolean = false,
     followLinks: Boolean = false,
@@ -173,30 +149,9 @@ fun moveRecursively(
 /**
  * Recursively copies a file or directory from [source] to [target].
  *
- * If [source] and [target] are the same file, then nothing is copied.
- *
- * Copying a file or directory is not an atomic operation. If an [IOException] is thrown, then the state of the
- * filesystem is undefined.
- *
- * @param [source] The file or directory to copy.
- * @param [target] The file or directory to copy [source] to.
- * @param [overwrite] If a file or directory already exists at [target], replace it. If the directory is not empty, it
- * is deleted recursively.
- * @param [copyAttributes] Attempt to copy file attributes from [source] to [target]. The last modified time is always
- * copied if supported. Whether other attributes are copied is platform and filesystem dependent. File attributes of
- * links may not be copied.
- * @param [followLinks] Follow symbolic links when walking the directory tree and copy the targets of links instead of
- * links themselves.
- * @param [onError] A function that handles errors.
- *
- * The following exceptions can be passed on [onError]:
- * - [NoSuchFileException]: There was an attempt to copy a nonexistent file.
- * - [FileAlreadyExistsException]: The destination file already exists.
- * - [AccessDeniedException]: There was an attempt to open a directory that didn't succeed.
- * - [FileSystemLoopException]: [followLinks] is `true` and a cycle of symbolic links was detected.
- * - [IOException]: Some other problem occurred while copying.
+ * @see [CopyAction]
  */
-fun copyRecursively(
+internal fun copyRecursively(
     source: Path, target: Path,
     overwrite: Boolean = false,
     copyAttributes: Boolean = false,
@@ -248,110 +203,11 @@ fun copyRecursively(
 }
 
 /**
- * Creates a new file at [path] with given [attributes] and [contents].
- *
- * The creation of the file and the writing of [contents] to the file are not atomic.
- *
- * @param [path] The path of the new file.
- * @param [attributes] A set of file attributes to set atomically when creating the file.
- * @param [contents] A stream containing the data to fill the file with.
- * @param [onError] A function that handles errors.
- *
- * The following exceptions can be passed on [onError]:
- * - [UnsupportedOperationException]: [attributes] contains an attribute that cannot be set atomically when creating
- *   the file.
- * - [FileAlreadyExistsException]: The file at [path] already exists.
- * - [IOException]: Some other problem occurred while creating the file.
- */
-fun createFile(
-    path: Path,
-    attributes: Set<FileAttribute<*>> = emptySet(),
-    contents: InputStream = ByteArrayInputStream(ByteArray(0)),
-    onError: ErrorHandler = DEFAULT_ERROR_HANDLER
-) {
-    handleWalkErrors(onError, path) {
-        Files.createFile(path, *attributes.toTypedArray())
-        Files.copy(contents, path, StandardCopyOption.REPLACE_EXISTING)
-    }
-}
-
-/**
- * Creates a symbolic link named [link] pointing to [target].
- *
- * The [target] may be an absolute or relative path and may not exist. If [target] is relative, then it is considered
- * relative to [link].
- *
- * If the underlying [FileStore] does not support symbolic links or special privileges are required to create them, an
- * [IOException] is thrown.
- *
- * @param [link] The path of the symbolic link.
- * @param [target] The path the symbolic link points to.
- * @param [attributes] A set of file attributes to set atomically when creating the file.
- * @param [onError] A function that handles errors.
- *
- * The following exceptions can be passed on [onError]:
- * - [UnsupportedOperationException]: [attributes] contains an attribute that cannot be set atomically when creating
- *   the file.
- * - [FileAlreadyExistsException]: [link] already exists.
- * - [IOException]: Some other problem occurred while creating the link.
- */
-fun createSymbolicLink(
-    link: Path,
-    target: Path,
-    attributes: Set<FileAttribute<*>> = emptySet(),
-    onError: ErrorHandler = DEFAULT_ERROR_HANDLER
-) {
-    handleWalkErrors(onError, link) {
-        Files.createSymbolicLink(link, target, *attributes.toTypedArray())
-    }
-}
-
-/**
- * Creates a new directory and [path] with any necessary parent directories and given [attributes].
- *
- * This function does not throw if [path] already exists and is a directory.
- *
- * This operation is not atomic. Individual deletions may not be atomic either.
- *
- * If this method fails, then it may do so without having created all the directories.
- *
- * @param [path] The path of the new directory.
- * @param [attributes] A set of file attributes to set atomically when creating the directory.
- * @param [onError] A function that handles errors.
- *
- * The following exceptions can be passed on [onError]:
- * - [UnsupportedOperationException]: [attributes] contains an attribute that cannot be set atomically when creating
- *   the directory.
- * - [FileAlreadyExistsException]: The file already exists but is not a directory.
- * - [IOException]: Some other problem occurred while creating the directory.
- */
-fun createDir(
-    path: Path,
-    attributes: Set<FileAttribute<*>> = emptySet(),
-    onError: ErrorHandler = DEFAULT_ERROR_HANDLER
-) {
-    handleWalkErrors(onError, path) {
-        Files.createDirectories(path, *attributes.toTypedArray())
-    }
-}
-/**
  * Recursively deletes a file or directory at [path].
  *
- * This operation is not atomic. Deleting an individual file or directory may not be atomic either.
- *
- * If the file to be deleted is a symbolic link then the link itself, and not its target, is deleted.
- *
- * @param [path] The path of the file or directory to delete.
- * @param [followLinks] Follow symbolic links when walking the directory tree.
- * @param [onError] A function that handles errors.
- *
- * The following exceptions can be passed on [onError]:
- * - [NoSuchFileException]: There was an attempt to delete a nonexistent file.
- * - [AccessDeniedException]: There was an attempt to open a directory that didn't succeed.
- * - [FileSystemLoopException]: [followLinks] is `true` and a cycle of symbolic links was detected.
- * - [IOException]: Some other problem occurred while deleting.
+ * @see [DeleteAction]
  */
-fun deleteRecursively(
+internal fun deleteRecursively(
     path: Path,
     followLinks: Boolean = false,
     onError: ErrorHandler = DEFAULT_ERROR_HANDLER

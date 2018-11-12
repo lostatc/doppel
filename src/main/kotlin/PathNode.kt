@@ -4,6 +4,21 @@ import java.io.IOException
 import java.nio.file.Path
 
 /**
+ * Possible orders in which hierarchical data can be iterated over.
+ */
+enum class WalkDirection {
+    /**
+     * The data is iterated over from the root to the leaves.
+     */
+    TOP_DOWN,
+
+    /**
+     * The data is iterated over from the leaves to the root.
+     */
+    BOTTOM_UP
+}
+
+/**
  * A read-only representation of a tree of file paths.
  *
  * Objects of this type wrap a [Path] object to allow them to form a tree of file paths. This allows file hierarchies to
@@ -140,11 +155,11 @@ interface PathNode {
     /**
      * Returns an immutable representation of the difference between this directory and [other].
      *
-     * @param [onError] A function that is called for each I/O error that occurs and determines how to handle them.
-     *
      * The following exceptions can be passed to [onError]:
      * - [NoSuchFileException] A file in one of the directories was not found in the filesystem.
      * - [IOException]: Some other I/O error occurred.
+     *
+     * @param [onError] A function that is called for each I/O error that occurs and determines how to handle them.
      */
     fun diff(other: PathNode, onError: ErrorHandler = ::skipOnError): PathDiff
 
@@ -167,9 +182,13 @@ interface PathNode {
      *
      * What type of file is created is determined by the [type].
      *
+     * The following exceptions can be passed to [onError]:
+     * - [IOException]: Some I/O error occurred while creating the file.
+     *
      * @param [recursive] Create this file and all its descendants.
+     * @param [onError] A function that is called for each I/O error that occurs and determines how to handle them.
      *
      * @throws [IOException] An I/O error occurred while creating the file.
      */
-    fun createFile(recursive: Boolean = false)
+    fun createFile(recursive: Boolean = false, onError: ErrorHandler = ::skipOnError)
 }
