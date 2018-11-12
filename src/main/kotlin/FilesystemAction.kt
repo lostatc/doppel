@@ -64,7 +64,7 @@ interface FilesystemAction {
  * This move may or may not be atomic. If it is not atomic and an exception is thrown, the state of the filesystem is
  * not defined.
  *
- * The following exceptions can be passed on [onError]:
+ * The following exceptions can be passed to [onError]:
  * - [NoSuchFileException]: There was an attempt to move a nonexistent file.
  * - [FileAlreadyExistsException]: The destination file already exists and [overwrite] is `false`.
  * - [AccessDeniedException]: There was an attempt to open a directory that didn't succeed.
@@ -106,7 +106,7 @@ data class MoveAction(
  * Copying a file or directory is not an atomic operation. If an [IOException] is thrown, then the state of the
  * filesystem is undefined.
  *
- * The following exceptions can be passed on [onError]:
+ * The following exceptions can be passed to [onError]:
  * - [NoSuchFileException]: There was an attempt to copy a nonexistent file.
  * - [FileAlreadyExistsException]: The destination file already exists.
  * - [AccessDeniedException]: There was an attempt to open a directory that didn't succeed.
@@ -176,7 +176,7 @@ data class CreateAction(
  *
  * If the file to be deleted is a symbolic link then the link itself, and not its target, is deleted.
  *
- * The following exceptions can be passed on [onError]:
+ * The following exceptions can be passed to [onError]:
  * - [NoSuchFileException]: There was an attempt to delete a nonexistent file.
  * - [AccessDeniedException]: There was an attempt to open a directory that didn't succeed.
  * - [FileSystemLoopException]: [followLinks] is `true` and a cycle of symbolic links was detected.

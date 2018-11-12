@@ -66,7 +66,7 @@ class DuplicateFileFinder(val dirPath: Path, val followLinks: Boolean = false) {
             }
 
             // Add each set of identical files to a group.
-            fileGroups.addAll(fileChecksums.map { it.value })
+            fileGroups.addAll(fileChecksums.values)
         }
 
         // Construct a map from the groups of identical files.

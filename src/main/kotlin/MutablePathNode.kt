@@ -61,12 +61,30 @@ class MutablePathNode(
 
         override fun containsValue(value: MutablePathNode): Boolean = get(value.path) != null
 
-        override operator fun get(key: Path): MutablePathNode? {
-            if (!key.startsWith(path)) return null
-            val relativeKey = path.relativize(key)
+        override operator fun get(key: Path): MutablePathNode? = relativeDescendants[path.relativize(key)]
 
-            return relativeKey.fold(this@MutablePathNode) { node, segment -> node.children[segment] ?: return null }
-        }
+        override fun isEmpty(): Boolean = children.isEmpty()
+    }
+
+    override val relativeDescendants: Map<Path, MutablePathNode> = object : Map<Path, MutablePathNode> {
+        override val entries: Set<Map.Entry<Path, MutablePathNode>>
+            get() = walkChildren().map { Entry(path.relativize(it.path), it) }.toSet()
+
+        override val keys: Set<Path>
+            get() = walkChildren().map { path.relativize(it.path) }.toSet()
+
+        override val values: Collection<MutablePathNode>
+            get() = walkChildren().toList()
+
+        override val size: Int
+            get() = entries.size
+
+        override fun containsKey(key: Path): Boolean = get(key) != null
+
+        override fun containsValue(value: MutablePathNode): Boolean = get(value.path) != null
+
+        override operator fun get(key: Path): MutablePathNode? =
+            key.fold(this@MutablePathNode) { node, segment -> node.children[segment] ?: return null }
 
         override fun isEmpty(): Boolean = children.isEmpty()
     }
@@ -168,8 +186,8 @@ class MutablePathNode(
         val rightNewer =  mutableSetOf<Path>()
 
         compare@ for (commonPath in common) {
-            val leftNode = this.descendants[this.path.resolve(commonPath)] ?: continue
-            val rightNode = other.descendants[other.path.resolve(commonPath)] ?: continue
+            val leftNode = this.relativeDescendants[commonPath] ?: continue
+            val rightNode = other.relativeDescendants[commonPath] ?: continue
 
             try {
                 // Compare the contents of files in the directories.

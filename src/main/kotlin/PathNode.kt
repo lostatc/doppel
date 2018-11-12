@@ -72,6 +72,13 @@ interface PathNode {
     val descendants: Map<Path, PathNode>
 
     /**
+     * A map of relative file paths to path nodes for all the descendants of this node.
+     *
+     * Keys in this map are paths relative to this path node.
+     */
+    val relativeDescendants: Map<Path, PathNode>
+
+    /**
      * Returns the string representation of this node.
      */
     override fun toString(): String
