@@ -170,50 +170,7 @@ class MutablePathNode(
         return childOfThisNode.descendants[fullPath] ?: childOfThisNode
     }
 
-    override fun diff(other: PathNode, onError: ErrorHandler): PathDiff {
-        val leftDescendants = this.relativize(this).descendants.keys
-        val rightDescendants = other.relativize(other).descendants.keys
-
-        // Compare file paths.
-        val common = leftDescendants intersect rightDescendants
-        val leftOnly = leftDescendants - rightDescendants
-        val rightOnly = rightDescendants - leftDescendants
-
-        // Compare files in the filesystem.
-        val same = mutableSetOf<Path>()
-        val different = mutableSetOf<Path>()
-        val leftNewer =  mutableSetOf<Path>()
-        val rightNewer =  mutableSetOf<Path>()
-
-        compare@ for (commonPath in common) {
-            val leftNode = this.relativeDescendants[commonPath] ?: continue
-            val rightNode = other.relativeDescendants[commonPath] ?: continue
-
-            try {
-                // Compare the contents of files in the directories.
-                if (leftNode.sameContentsAs(rightNode)) same.add(commonPath) else different.add(commonPath)
-
-                // Compare the times of files in the directories.
-                val leftTime = Files.getLastModifiedTime(leftNode.path)
-                val rightTime = Files.getLastModifiedTime(rightNode.path)
-                if (leftTime > rightTime) leftNewer.add(commonPath) else rightNewer.add(commonPath)
-
-            } catch (e: IOException) {
-                when (onError(commonPath, e)) {
-                    OnErrorAction.SKIP -> continue@compare
-                    OnErrorAction.TERMINATE -> break@compare
-                }
-            }
-        }
-
-        return PathDiff(
-            this, other,
-            common = common,
-            leftOnly = leftOnly, rightOnly = rightOnly,
-            same = same, different = different,
-            leftNewer = leftNewer, rightNewer = rightNewer
-        )
-    }
+    override fun diff(other: PathNode, onError: ErrorHandler): PathDiff = PathDiff.fromPathNodes(this, other, onError)
 
     override fun exists(checkType: Boolean, recursive: Boolean): Boolean {
         val fileExists = if (checkType) type.checkType(path) else Files.exists(path)

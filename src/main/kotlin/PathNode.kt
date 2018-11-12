@@ -166,6 +166,7 @@ interface PathNode {
      * - [NoSuchFileException] A file in one of the directories was not found in the filesystem.
      * - [IOException]: Some other I/O error occurred.
      *
+     * @param [other] The path node to compare this node with.
      * @param [onError] A function that is called for each I/O error that occurs and determines how to handle them.
      */
     fun diff(other: PathNode, onError: ErrorHandler = ::skipOnError): PathDiff
