@@ -158,6 +158,11 @@ interface PathNode {
     fun exists(checkType: Boolean = true, recursive: Boolean = false): Boolean
 
     /**
+     * Returns whether the files represented by this path node and [other] have the same contents.
+     */
+    fun sameContentsAs(other: PathNode): Boolean
+
+    /**
      * Creates the file represented by this path node in the filesystem.
      *
      * What type of file is created is determined by the [type].

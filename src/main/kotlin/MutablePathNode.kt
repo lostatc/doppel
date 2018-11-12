@@ -1,5 +1,6 @@
 package diffir
 
+import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.*
@@ -152,7 +153,48 @@ class MutablePathNode(
     }
 
     override fun diff(other: PathNode, onError: ErrorHandler): PathDiff {
+        val leftDescendants = this.relativize(this).descendants.keys
+        val rightDescendants = other.relativize(other).descendants.keys
 
+        // Compare file paths.
+        val common = leftDescendants intersect rightDescendants
+        val leftOnly = leftDescendants - rightDescendants
+        val rightOnly = rightDescendants - leftDescendants
+
+        // Compare files in the filesystem.
+        val same = mutableSetOf<Path>()
+        val different = mutableSetOf<Path>()
+        val leftNewer =  mutableSetOf<Path>()
+        val rightNewer =  mutableSetOf<Path>()
+
+        compare@ for (commonPath in common) {
+            val leftNode = this.descendants[this.path.resolve(commonPath)] ?: continue
+            val rightNode = other.descendants[other.path.resolve(commonPath)] ?: continue
+
+            try {
+                // Compare the contents of files in the directories.
+                if (leftNode.sameContentsAs(rightNode)) same.add(commonPath) else different.add(commonPath)
+
+                // Compare the times of files in the directories.
+                val leftTime = Files.getLastModifiedTime(leftNode.path)
+                val rightTime = Files.getLastModifiedTime(rightNode.path)
+                if (leftTime > rightTime) leftNewer.add(commonPath) else rightNewer.add(commonPath)
+
+            } catch (e: IOException) {
+                when (onError(commonPath, e)) {
+                    OnErrorAction.SKIP -> continue@compare
+                    OnErrorAction.TERMINATE -> break@compare
+                }
+            }
+        }
+
+        return PathDiff(
+            this, other,
+            common = common,
+            leftOnly = leftOnly, rightOnly = rightOnly,
+            same = same, different = different,
+            leftNewer = leftNewer, rightNewer = rightNewer
+        )
     }
 
     override fun exists(checkType: Boolean, recursive: Boolean): Boolean {
@@ -163,6 +205,11 @@ class MutablePathNode(
         } else {
             fileExists
         }
+    }
+
+    override fun sameContentsAs(other: PathNode): Boolean {
+        if (type != other.type) return false
+        return type.checkSame(path, other.path)
     }
 
     override fun createFile(recursive: Boolean) {

@@ -6,6 +6,8 @@ import java.nio.file.Path
 
 /**
  * A type of file in the filesystem.
+ *
+ * This class provides a common interface for interacting with the filesystem for different types of files.
  */
 interface FileType {
     /**
@@ -15,6 +17,13 @@ interface FileType {
      * type cannot be determined.
      */
     fun checkType(path: Path): Boolean
+
+    /**
+     * Returns whether the files [left] and [right] have the same contents.
+     *
+     * @throws [IOException] An I/O error occurred.
+     */
+    fun checkSame(left: Path, right: Path): Boolean
 
     /**
      * Creates a file of this type at the given [path] in the filesystem.
@@ -38,6 +47,17 @@ interface FileType {
 class RegularFileType : FileType {
     override fun checkType(path: Path): Boolean = Files.isRegularFile(path)
 
+    /**
+     * Returns whether the files [left] and [right] have the same size and checksum.
+     *
+     * @throws [IOException] An I/O error occurred.
+     */
+    override fun checkSame(left: Path, right: Path): Boolean {
+        if (Files.isSameFile(left, right)) return true
+        if (Files.size(left) != Files.size(right)) return false
+        return getFileChecksum(left) contentEquals getFileChecksum(right)
+    }
+
     override fun createFile(path: Path) {
         Files.createFile(path)
     }
@@ -48,6 +68,16 @@ class RegularFileType : FileType {
  */
 class DirectoryType : FileType {
     override fun checkType(path: Path): Boolean = Files.isDirectory(path)
+
+    /**
+     * Returns whether the directories [left] and [right] contain the same paths.
+     *
+     * @throws [IOException] An I/O error occurred.
+     */
+    override fun checkSame(left: Path, right: Path): Boolean {
+        if (Files.isSameFile(left, right)) return true
+        return Files.list(left) == Files.list(right)
+    }
 
     override fun createFile(path: Path) {
         Files.createDirectory(path)
@@ -62,6 +92,16 @@ class DirectoryType : FileType {
 class SymbolicLinkType(val target: Path) : FileType {
     override fun checkType(path: Path): Boolean = Files.isSymbolicLink(path)
 
+    /**
+     * Returns whether the symbolic links [left] and [right] point to the same path.
+     *
+     * @throws [IOException] An I/O error occurred.
+     */
+    override fun checkSame(left: Path, right: Path): Boolean {
+        if (Files.isSameFile(left, right)) return true
+        return Files.readSymbolicLink(left) == Files.readSymbolicLink(right)
+    }
+
     override fun createFile(path: Path) {
         Files.createSymbolicLink(path, target)
     }
@@ -72,6 +112,8 @@ class SymbolicLinkType(val target: Path) : FileType {
  */
 class UnknownType : FileType {
     override fun checkType(path: Path): Boolean = false
+
+    override fun checkSame(left: Path, right: Path): Boolean = false
 
     override fun createFile(path: Path) {}
 }
