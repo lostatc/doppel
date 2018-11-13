@@ -1,7 +1,6 @@
 import diffir.DirPath
 import diffir.FilePath
 import diffir.MutableDirPath
-import diffir.WalkDirection
 import io.kotlintest.*
 import io.kotlintest.extensions.TestListener
 import java.nio.file.Files
@@ -67,7 +66,7 @@ class DirTreeListener : TestListener {
     }
 
     override fun afterTest(description: Description, result: TestResult) {
-        for (descendant in path.walkChildren(WalkDirection.BOTTOM_UP)) {
+        for (descendant in path.walkChildren(path.WalkDirection.BOTTOM_UP)) {
             Files.delete(descendant.path)
         }
     }

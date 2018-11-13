@@ -1,7 +1,10 @@
-package diffir
+package diffir.filesystem
 
 import java.nio.file.Path
 import java.util.*
+
+import diffir.path.PathNode
+import diffir.error.ErrorHandler
 
 /**
  * A set of changes to apply to the filesystem.
@@ -82,9 +85,9 @@ class PathDelta {
     /**
      * Applies the changes in the queue to the filesystem in the order they were made.
      *
-     * Any relative paths that were passed to [FilesystemAction] classes are resolved against [dirPath]. Applying the changes does
-     * not consume them. If an [ErrorHandler] that was passed to an [FilesystemAction] class throws an exception, it will be
-     * thrown here.
+     * Any relative paths that were passed to [FilesystemAction] classes are resolved against [dirPath]. Applying the
+     * changes does not consume them. If an [ErrorHandler] that was passed to an [FilesystemAction] class throws an
+     * exception, it will be thrown here.
      */
     fun apply(dirPath: Path) {
         for (action in actions) {

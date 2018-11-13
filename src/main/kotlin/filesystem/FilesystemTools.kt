@@ -1,10 +1,12 @@
-package diffir
+package diffir.filesystem
 
 import java.io.IOException
 import java.nio.file.*
 import java.nio.file.attribute.BasicFileAttributes
 import java.security.DigestInputStream
 import java.security.MessageDigest
+
+import diffir.error.ErrorHandler
 
 /**
  * Copies basic file attributes from [source] to [target].
@@ -17,21 +19,21 @@ internal fun copyFileAttributes(source: Path, target: Path) {
 /**
  * An algorithm used to create a message digest.
  *
- * @param [algorithmName] The name of the algorithm.
+ * @property [algorithmName] The name of the algorithm.
  */
 internal enum class DigestAlgorithm(val algorithmName: String) {
     /**
-     * The MD5 message digest algorithm as defined in [RFC 1321][http://www.ietf.org/rfc/rfc1319.txt].
+     * The MD5 message digest algorithm.
      */
     MD5("MD5"),
 
     /**
-     * The SHA-1 hash algorithm defined in the [FIPS PUB 180-2][https://csrc.nist.gov/publications/fips].
+     * The SHA-1 hash algorithm.
      */
     SHA1("SHA-1"),
 
     /**
-     * The SHA-256 hash algorithm defined in the [FIPS PUB 180-2][https://csrc.nist.gov/publications/fips].
+     * The SHA-256 hash algorithm.
      */
     SHA256("SHA-256")
 }
@@ -91,9 +93,8 @@ private fun handleWalkErrors(onError: ErrorHandler, file: Path, tryFunc: () -> U
  */
 internal fun moveRecursively(
     source: Path, target: Path,
-    overwrite: Boolean = false,
-    followLinks: Boolean = false,
-    onError: ErrorHandler = DEFAULT_ERROR_HANDLER
+    overwrite: Boolean, followLinks: Boolean,
+    onError: ErrorHandler
 ) {
     val copyOptions = mutableSetOf<CopyOption>()
     if (overwrite) copyOptions.add(StandardCopyOption.REPLACE_EXISTING)
@@ -153,10 +154,8 @@ internal fun moveRecursively(
  */
 internal fun copyRecursively(
     source: Path, target: Path,
-    overwrite: Boolean = false,
-    copyAttributes: Boolean = false,
-    followLinks: Boolean = false,
-    onError: ErrorHandler = DEFAULT_ERROR_HANDLER
+    overwrite: Boolean, copyAttributes: Boolean, followLinks: Boolean,
+    onError: ErrorHandler
 ) {
     val copyOptions = mutableSetOf<CopyOption>()
     if (overwrite) copyOptions.add(StandardCopyOption.REPLACE_EXISTING)
@@ -209,8 +208,8 @@ internal fun copyRecursively(
  */
 internal fun deleteRecursively(
     path: Path,
-    followLinks: Boolean = false,
-    onError: ErrorHandler = DEFAULT_ERROR_HANDLER
+    followLinks: Boolean,
+    onError: ErrorHandler
 ) {
     val fileVisitor = object : ErrorHandlingVisitor(onError) {
         override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult =

@@ -1,8 +1,12 @@
-package diffir
+package diffir.path
 
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
+
+import diffir.error.ErrorHandler
+import diffir.error.ErrorHandlerAction
+import diffir.error.skipOnError
 
 /**
  * An immutable comparison of two path nodes.
@@ -67,8 +71,8 @@ data class PathDiff(
 
                 } catch (e: IOException) {
                     when (onError(commonPath, e)) {
-                        OnErrorAction.SKIP -> continue@compare
-                        OnErrorAction.TERMINATE -> break@compare
+                        ErrorHandlerAction.SKIP -> continue@compare
+                        ErrorHandlerAction.TERMINATE -> break@compare
                     }
                 }
             }

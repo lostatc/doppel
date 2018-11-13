@@ -1,7 +1,10 @@
-package diffir
+package diffir.path
 
 import java.io.IOException
 import java.nio.file.Path
+
+import diffir.error.ErrorHandler
+import diffir.error.skipOnError
 
 /**
  * Possible orders in which hierarchical data can be iterated over.

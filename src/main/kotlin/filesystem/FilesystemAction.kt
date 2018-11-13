@@ -1,8 +1,18 @@
-package diffir
+package diffir.filesystem
 
 import java.nio.file.Path
 import java.io.IOException
 import java.nio.file.FileSystemLoopException
+
+import diffir.path.PathNode
+import diffir.path.MutablePathNode
+import diffir.error.skipOnError
+import diffir.error.ErrorHandler
+
+/**
+ * The default error handler to use for [FilesystemAction] implementations.
+ */
+private val DEFAULT_ERROR_HANDLER: ErrorHandler = ::skipOnError
 
 /**
  * Adds [path] to [viewNode] if [path] is relative or a descendant of [viewNode].

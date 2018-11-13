@@ -1,9 +1,12 @@
-package diffir
+package diffir.path
 
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.*
+
+import diffir.error.ErrorHandler
+import diffir.error.ErrorHandlerAction
 
 private class Entry(override val key: Path, override val value: MutablePathNode) : Map.Entry<Path, MutablePathNode>
 
@@ -196,8 +199,8 @@ class MutablePathNode(
                 node.type.createFile(node.path)
             } catch (e: IOException) {
                 when (onError(node.path, e)) {
-                    OnErrorAction.SKIP -> continue@create
-                    OnErrorAction.TERMINATE -> break@create
+                    ErrorHandlerAction.SKIP -> continue@create
+                    ErrorHandlerAction.TERMINATE -> break@create
                 }
             }
         }

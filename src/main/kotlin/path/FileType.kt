@@ -1,8 +1,10 @@
-package diffir
+package diffir.path
 
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
+
+import diffir.filesystem.getFileChecksum
 
 /**
  * A type of file in the filesystem.

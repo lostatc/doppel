@@ -1,12 +1,10 @@
 import diffir.DirPath
 import diffir.MutableDirPath
 import diffir.MutableFilePath
-import diffir.WalkDirection
+import path.WalkDirection
 import io.kotlintest.*
 import io.kotlintest.data.forall
 import io.kotlintest.extensions.TestListener
-import io.kotlintest.matchers.boolean.shouldBeFalse
-import io.kotlintest.matchers.boolean.shouldBeTrue
 import io.kotlintest.matchers.collections.*
 import io.kotlintest.specs.WordSpec
 import io.kotlintest.tables.row
