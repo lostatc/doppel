@@ -1,12 +1,11 @@
 package diffir.path
 
+import diffir.error.ErrorHandler
+import diffir.error.ErrorHandlerAction
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
-import java.util.*
-
-import diffir.error.ErrorHandler
-import diffir.error.ErrorHandlerAction
+import java.util.Objects
 
 private class Entry(override val key: Path, override val value: MutablePathNode) : Map.Entry<Path, MutablePathNode>
 
@@ -98,9 +97,9 @@ class MutablePathNode(
         if (this === other) return true
         if (other == null || other !is PathNode) return false
         return fileName == other.fileName
-            && parent == other.parent
-            && type == other.type
-            && children == other.children
+                && parent == other.parent
+                && type == other.type
+                && children == other.children
     }
 
     override fun hashCode(): Int = Objects.hash(fileName, parent, type, children)

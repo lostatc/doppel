@@ -1,13 +1,12 @@
 package diffir.filesystem
 
-import java.nio.file.Path
+import diffir.error.ErrorHandler
+import diffir.error.skipOnError
+import diffir.path.MutablePathNode
+import diffir.path.PathNode
 import java.io.IOException
 import java.nio.file.FileSystemLoopException
-
-import diffir.path.PathNode
-import diffir.path.MutablePathNode
-import diffir.error.skipOnError
-import diffir.error.ErrorHandler
+import java.nio.file.Path
 
 /**
  * The default error handler to use for [FilesystemAction] implementations.

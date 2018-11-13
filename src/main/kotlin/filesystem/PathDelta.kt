@@ -1,10 +1,11 @@
 package diffir.filesystem
 
-import java.nio.file.Path
-import java.util.*
-
-import diffir.path.PathNode
 import diffir.error.ErrorHandler
+import diffir.path.PathNode
+import java.nio.file.Path
+import java.util.Deque
+import java.util.LinkedList
+import java.util.Objects
 
 /**
  * A set of changes to apply to the filesystem.

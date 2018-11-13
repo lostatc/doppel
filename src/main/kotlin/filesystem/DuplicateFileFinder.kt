@@ -3,7 +3,7 @@ package diffir.filesystem
 import java.nio.file.FileVisitOption
 import java.nio.file.Files
 import java.nio.file.Path
-import java.util.*
+import java.util.Objects
 
 /**
  * A class that identifies duplicate files.

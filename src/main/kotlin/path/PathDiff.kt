@@ -1,12 +1,11 @@
 package diffir.path
 
-import java.io.IOException
-import java.nio.file.Files
-import java.nio.file.Path
-
 import diffir.error.ErrorHandler
 import diffir.error.ErrorHandlerAction
 import diffir.error.skipOnError
+import java.io.IOException
+import java.nio.file.Files
+import java.nio.file.Path
 
 /**
  * An immutable comparison of two path nodes.
@@ -53,8 +52,8 @@ data class PathDiff(
             // Compare files in the filesystem.
             val same = mutableSetOf<Path>()
             val different = mutableSetOf<Path>()
-            val leftNewer =  mutableSetOf<Path>()
-            val rightNewer =  mutableSetOf<Path>()
+            val leftNewer = mutableSetOf<Path>()
+            val rightNewer = mutableSetOf<Path>()
 
             compare@ for (commonPath in common) {
                 val leftNode = left.relativeDescendants[commonPath] ?: continue

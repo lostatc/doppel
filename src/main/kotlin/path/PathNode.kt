@@ -1,10 +1,9 @@
 package diffir.path
 
-import java.io.IOException
-import java.nio.file.Path
-
 import diffir.error.ErrorHandler
 import diffir.error.skipOnError
+import java.io.IOException
+import java.nio.file.Path
 
 /**
  * Possible orders in which hierarchical data can be iterated over.
@@ -178,13 +177,15 @@ interface PathNode {
      * Returns whether the file represented by this path node exists in the filesystem.
      *
      * @param [checkType] Check not only whether the file exists, but also whether the type of file matches the [type]
-     * of this object.
+     * of its node.
      * @param [recursive] Check this node and all its descendants.
      */
     fun exists(checkType: Boolean = true, recursive: Boolean = false): Boolean
 
     /**
      * Returns whether the files represented by this path node and [other] have the same contents.
+     *
+     * How files are compared is determined by the [type].
      */
     fun sameContentsAs(other: PathNode): Boolean
 
