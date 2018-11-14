@@ -62,6 +62,10 @@ class RegularFileType : FileType {
     override fun createFile(path: Path) {
         Files.createFile(path)
     }
+
+    override fun equals(other: Any?): Boolean = other is RegularFileType
+
+    override fun hashCode(): Int = this::class.hashCode()
 }
 
 /**
@@ -83,6 +87,10 @@ class DirectoryType : FileType {
     override fun createFile(path: Path) {
         Files.createDirectory(path)
     }
+
+    override fun equals(other: Any?): Boolean = other is DirectoryType
+
+    override fun hashCode(): Int = this::class.hashCode()
 }
 
 /**
@@ -90,7 +98,7 @@ class DirectoryType : FileType {
  *
  * @property [target] The path the link points to.
  */
-class SymbolicLinkType(val target: Path) : FileType {
+data class SymbolicLinkType(val target: Path) : FileType {
     override fun checkType(path: Path): Boolean = Files.isSymbolicLink(path)
 
     /**
@@ -117,6 +125,10 @@ class UnknownType : FileType {
     override fun checkSame(left: Path, right: Path): Boolean = false
 
     override fun createFile(path: Path) {}
+
+    override fun equals(other: Any?): Boolean = other is UnknownType
+
+    override fun hashCode(): Int = this::class.hashCode()
 }
 
 /**

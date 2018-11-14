@@ -96,14 +96,11 @@ class MutablePathNode(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other == null || other !is PathNode) return false
-        return fileName == other.fileName
-                && parent == other.parent
-                && type == other.type
-                && children == other.children
+        if (other !is PathNode) return false
+        return path == other.path && type == other.type && children == other.children
     }
 
-    override fun hashCode(): Int = Objects.hash(fileName, parent, type, children)
+    override fun hashCode(): Int = Objects.hash(path, type, children)
 
     /**
      * Returns a shallow copy of this node.
