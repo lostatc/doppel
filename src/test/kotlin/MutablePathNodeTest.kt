@@ -1,45 +1,50 @@
-import diffir.DirPath
-import diffir.MutableDirPath
-import diffir.MutableFilePath
-import path.WalkDirection
-import io.kotlintest.*
+import diffir.path.WalkDirection
+import diffir.path.MutablePathNode
 import io.kotlintest.data.forall
 import io.kotlintest.extensions.TestListener
-import io.kotlintest.matchers.collections.*
+import io.kotlintest.matchers.collections.contain
+import io.kotlintest.matchers.maps.shouldContain
+import io.kotlintest.properties.Gen.Companion.file
+import io.kotlintest.shouldBe
+import io.kotlintest.shouldThrow
 import io.kotlintest.specs.WordSpec
 import io.kotlintest.tables.row
 import java.nio.file.Paths
 
-class MutableFSPathTest : WordSpec() {
+class MutablePathNodeTest : WordSpec() {
     init {
-        "MutableFSPath constructor" should {
+        "MutablePathNode constructor" should {
             "throw if the given file name has a parent" {
                 shouldThrow<IllegalArgumentException> {
-                    MutableFilePath(Paths.get("a", "b"), null)
+                    MutablePathNode(Paths.get("a", "b"), null)
                 }
-            }
-
-            "make the last segment the file name" {
-                MutableFilePath("parent", "fileName").fileName.shouldBe(Paths.get("fileName"))
-                MutableFilePath(Paths.get("parent", "fileName")).fileName.shouldBe(Paths.get("fileName"))
-            }
-
-            "make the second-last segment the parent" {
-                MutableFilePath("parent", "fileName").parent?.fileName.shouldBe(Paths.get("parent"))
-                MutableFilePath(Paths.get("parent", "fileName")).parent?.fileName.shouldBe(Paths.get("parent"))
-            }
-
-            "not create a parent from a single segment" {
-                MutableFilePath(Paths.get("fileName")).parent.shouldBe(null)
-                MutableFilePath("fileName").parent.shouldBe(null)
-            }
-
-            "make the path a child of its parent" {
-                val newPath = MutableFilePath("parent", "fileName")
-                newPath.parent!!.children should contain(newPath)
             }
         }
 
+        "MutablePathNode.fromPath" should {
+            "make the last segment the file name" {
+                val testPath = Paths.get("parent", "fileName")
+                MutablePathNode.fromPath(testPath).fileName.shouldBe(Paths.get("fileName"))
+            }
+
+            "make the second-last segment the parent" {
+                val testPath = Paths.get("parent", "fileName")
+                MutablePathNode.fromPath(testPath).parent?.fileName.shouldBe(Paths.get("parent"))
+            }
+
+            "not create a parent from a single segment" {
+                val testPath = Paths.get("fileName")
+                MutablePathNode.fromPath(testPath).parent.shouldBe(null)
+            }
+
+            "make the path a child of its parent" {
+                val testPath = Paths.get("parent", "fileName")
+                val testNode = MutablePathNode(testPath)
+                testNode.parent?.children?.shouldContain(testPath, testNode)
+            }
+        }
+
+        /*
         "MutableFSPath.root" should {
             "return the root node for absolute paths" {
                 MutableFilePath("/", "a", "b").root.shouldBe(MutableDirPath("/"))
@@ -260,7 +265,7 @@ class MutableDirPathTest : WordSpec() {
                 val newPath = MutableDirPath("a", "b")
                 val otherPath = MutableDirPath("a", "b", "c", "d")
 
-                newPath.relativize(otherPath).shouldBe(MutableDirPath("c",  "d"))
+                newPath.relativize(otherPath).shouldBe(MutableDirPath("c", "d"))
             }
 
             "return a relativized path when one is the parent of the other" {
@@ -281,7 +286,7 @@ class MutableDirPathTest : WordSpec() {
                 val newPath = MutableDirPath("a", "b")
                 val otherPath = MutableFilePath("a", "b", "c", "d")
 
-                newPath.relativize(otherPath).shouldBe(MutableFilePath("c",  "d"))
+                newPath.relativize(otherPath).shouldBe(MutableFilePath("c", "d"))
             }
         }
 
@@ -398,4 +403,5 @@ class MutableDirPathTest : WordSpec() {
             }
         }
     }
+        */
 }
