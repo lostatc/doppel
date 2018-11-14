@@ -4,6 +4,7 @@ import diffir.error.ErrorHandler
 import diffir.error.skipOnError
 import java.io.IOException
 import java.nio.file.Path
+import java.nio.file.Paths
 
 /**
  * Possible orders in which hierarchical data can be iterated over.
@@ -203,4 +204,94 @@ interface PathNode {
      * @throws [IOException] An I/O error occurred while creating the file.
      */
     fun createFile(recursive: Boolean = false, onError: ErrorHandler = ::skipOnError)
+
+    companion object : PathNodeFactory {
+        override fun of(path: Path, type: FileType, init: MutablePathNode.() -> Unit): PathNode {
+            return MutablePathNode.of(path, type, init)
+        }
+
+        override fun of(
+            firstSegment: String, vararg segments: String,
+            type: FileType,
+            init: MutablePathNode.() -> Unit
+        ): PathNode {
+            return MutablePathNode.of(firstSegment, *segments, type = type, init = init)
+        }
+
+        override fun fromFilesystem(path: Path, recursive: Boolean, typeFactory: (Path) -> FileType): PathNode {
+            return MutablePathNode.fromFilesystem(path, recursive, typeFactory)
+        }
+
+    }
+}
+
+/**
+ * A factory for creating [PathNode] instances.
+ */
+interface PathNodeFactory {
+    /**
+     * Constructs a new path node from the given [path] and its children.
+     *
+     * This method is a type-safe builder. It allows you to create a tree of path nodes of specified types. The
+     * [init] parameter accepts a lambda in which you can call builder methods like [file], [dir], [symlink] and
+     * [unknown] to create new path nodes as children of this node. Builder methods can be created for custom
+     * [FileType] classes using [pathNode].
+     *
+     * The whole tree of path nodes will be associated with the same filesystem as [path].
+     *
+     * Example:
+     * ```
+     * val path = Paths.get("/", "home", "user")
+     *
+     * val dirPath = MutablePathNode.of(path) {
+     *     file("Photo.png")
+     *     dir("Documents", "Reports") {
+     *         file("Monthly.odt")
+     *         file("Quarterly.odt")
+     *     }
+     * }
+     * ```
+     *
+     * @param [path] The path to construct the new path node from.
+     * @param [type] The initial type of the created node.
+     * @param [init] A function with receiver in which you can call builder methods to construct children.
+     *
+     * @return A new path node containing the given children.
+     */
+    fun of(
+        path: Path,
+        type: FileType = UnknownType(),
+        init: MutablePathNode.() -> Unit = {}
+    ): PathNode
+
+    /**
+     * Constructs a new path node from the given path segments.
+     *
+     * This is an overload of [of] that accepts strings that form a path when joined. The constructed file node is
+     * associated with the default filesystem.
+     *
+     * @see [Paths.get]
+     */
+    fun of(
+        firstSegment: String, vararg segments: String,
+        type: FileType = UnknownType(),
+        init: MutablePathNode.() -> Unit = {}
+    ): PathNode
+
+    /**
+     * Constructs a new path node from files in the filesystem.
+     *
+     * This method constructs a new node from the given [path] and gets the [type] of the node from the filesystem.
+     * If [recursive] is `true` it also gets all descendants of the given [path] from the filesystem and creates
+     * nodes for them, returning a tree of nodes.
+     *
+     * @param [path] The path to construct the new node from.
+     * @param [recursive] Create a tree of nodes recursively.
+     * @param [typeFactory] A function that determines which [FileType] to assign to each path node.
+     */
+    fun fromFilesystem(
+        path: Path,
+        recursive: Boolean = false,
+        typeFactory: (Path) -> FileType = ::fileTypeFromFilesystem
+    ): PathNode
 }

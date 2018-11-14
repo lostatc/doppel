@@ -173,7 +173,7 @@ data class CreateAction(
     }
 
     override fun applyFilesystem(dirPath: Path) {
-        val absolutePath = MutablePathNode.fromPath(dirPath).resolve(pathNode)
+        val absolutePath = PathNode.of(dirPath).resolve(pathNode)
         absolutePath.createFile(recursive = recursive, onError = onError)
     }
 }
