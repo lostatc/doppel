@@ -204,7 +204,9 @@ class MutablePathNode(
     }
 
     /**
-     * Adds the given [pathNode] as a descendant of this node, inserting it into the tree.
+     * Adds a copy of the given [pathNode] as a descendant of this node, inserting it into the tree.
+     *
+     * If [pathNode] is relative, then it is assumed to be relative to this path.
      *
      * @return `true` if the node was added or `false` if it already exists.
      */
@@ -212,14 +214,16 @@ class MutablePathNode(
         // Get the descendant of this node that will be the ancestor of the given node.
         val newAncestor = pathNode.path.fold(this) { node, segment -> node.children[segment] ?: node }
 
-        val relativeNewNode = newAncestor.relativize(pathNode)
+        val relativeNewNode = if (endsWith(pathNode)) newAncestor.relativize(pathNode) else pathNode
         val newNodeRoot = relativeNewNode.root
 
         return newAncestor._children.put(newNodeRoot.fileName, newNodeRoot) != null
     }
 
     /**
-     * Adds the given [pathNodes] as descendants of this node, inserting them into the tree.
+     * Adds copies of the given [pathNodes] as descendants of this node, inserting them into the tree.
+     *
+     * If a node in [pathNodes] is relative, then it is assumed to be relative to this path.
      *
      * @return `true` if any of the nodes were added or `false` if all of them already exist.
      */
