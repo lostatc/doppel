@@ -16,17 +16,19 @@ private class Entry(override val key: Path, override val value: MutablePathNode)
  * This [PathNode] implementation allows for modifying the tree of nodes in place using methods like [addDescendant],
  * [removeDescendant] and [clearChildren].
  *
+ * @param [fileName] The file name for this path node.
+ * @param [parent] The parent node for this path node.
  * @param [initialType] The initial type for this path node.
  */
 class MutablePathNode(
     override val fileName: Path,
-    override val parent: MutablePathNode? = null,
-    private val initialType: FileType = UnknownType()
+    parent: MutablePathNode? = null,
+    initialType: FileType = UnknownType()
 ) : PathNode {
     init {
         require(fileName.parent == null) { "The given file name must not have a parent." }
 
-        require(parent == null || fileName.fileSystem == parent.path.fileSystem) {
+        require(parent?.let { fileName.fileSystem == it.path.fileSystem } ?: true) {
             "The given file name must be associated with the same filesystem as the given parent."
         }
 
@@ -34,8 +36,11 @@ class MutablePathNode(
         parent?._children?.put(fileName, this)
     }
 
-    override val type: FileType
-        get() = initialType.getFileType(this)
+    override var parent: MutablePathNode? = parent
+        private set
+
+    override val type: FileType = initialType
+        get() = field.getFileType(this)
 
     override val root: MutablePathNode
         get() = walkAncestors().lastOrNull() ?: this
@@ -204,7 +209,7 @@ class MutablePathNode(
     }
 
     /**
-     * Adds a copy of the given [pathNode] as a descendant of this node, inserting it into the tree.
+     * Adds the given [pathNode] as a descendant of this node, inserting it into the tree.
      *
      * If [pathNode] is relative, then it is assumed to be relative to this path.
      *
@@ -216,12 +221,13 @@ class MutablePathNode(
 
         val relativeNewNode = if (endsWith(pathNode)) newAncestor.relativize(pathNode) else pathNode
         val newNodeRoot = relativeNewNode.root
+        newNodeRoot.parent = newAncestor
 
         return newAncestor._children.put(newNodeRoot.fileName, newNodeRoot) != null
     }
 
     /**
-     * Adds copies of the given [pathNodes] as descendants of this node, inserting them into the tree.
+     * Adds the given [pathNodes] as descendants of this node, inserting them into the tree.
      *
      * If a node in [pathNodes] is relative, then it is assumed to be relative to this path.
      *
