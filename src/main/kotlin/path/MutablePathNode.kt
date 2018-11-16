@@ -18,12 +18,12 @@ private class Entry(override val key: Path, override val value: MutablePathNode)
  *
  * @param [fileName] The file name for this path node.
  * @param [parent] The parent node for this path node.
- * @param [initialType] The initial type for this path node.
+ * @param [type] The initial type for this path node.
  */
 class MutablePathNode(
     override val fileName: Path,
     parent: MutablePathNode? = null,
-    initialType: FileType = UnknownType()
+    type: FileType = UnknownType()
 ) : PathNode {
     init {
         require(fileName.parent == null) { "The given file name must not have a parent." }
@@ -37,9 +37,17 @@ class MutablePathNode(
     }
 
     override var parent: MutablePathNode? = parent
-        private set
+        set(value) {
+            // Remove this node from the children of the old parent.
+            field?._children?.remove(fileName)
 
-    override val type: FileType = initialType
+            // Add this node to the children of the new parent.
+            value?._children?.put(fileName, this)
+
+            field = value
+        }
+
+    override var type: FileType = type
         get() = field.getFileType(this)
 
     override val root: MutablePathNode
@@ -107,23 +115,6 @@ class MutablePathNode(
 
     override fun hashCode(): Int = Objects.hash(path, type, children)
 
-    /**
-     * Returns a shallow copy of this node.
-     *
-     * @param [fileName] The new file name to assign to the copy.
-     * @param [parent] The new parent to assign to the copy.
-     * @param [type] The new file type to assign to the copy.
-     */
-    fun copy(
-        fileName: Path = this.fileName,
-        parent: MutablePathNode? = this.parent,
-        type: FileType = this.type
-    ): MutablePathNode {
-        val newNode = MutablePathNode(fileName, parent, type)
-        newNode.addAllDescendants(children.values)
-        return newNode
-    }
-
     override fun toPathNode(): PathNode = toMutablePathNode()
 
     override fun toMutablePathNode(): MutablePathNode {
@@ -156,8 +147,9 @@ class MutablePathNode(
         }
 
         // Copy the whole tree and set the parent to `null`.
-        val childOfThisNode = other.walkAncestors().find { it.parent == this } ?: other
-        val newRoot = childOfThisNode.toMutablePathNode().copy(parent = null)
+        val childOfThisNode = other.walkAncestors().find { it.parent?.path == path } ?: other
+        val newRoot = childOfThisNode.toMutablePathNode()
+        newRoot.parent = null
 
         // Get the node with the same path as the node that was passed in.
         val relativePath = path.relativize(other.path)
@@ -168,7 +160,8 @@ class MutablePathNode(
         if (other.path.isAbsolute) return other.toMutablePathNode()
 
         // Copy the whole tree and set the parent of the root node to this node.
-        val childOfThisNode = other.root.toMutablePathNode().copy(parent = this)
+        val childOfThisNode = other.root.toMutablePathNode()
+        childOfThisNode.parent = this
 
         // Get the node with the same path as the node that was passed in.
         val fullPath = path.resolve(other.path)
@@ -214,16 +207,30 @@ class MutablePathNode(
      * If [pathNode] is relative, then it is assumed to be relative to this path.
      *
      * @return `true` if the node was added or `false` if it already exists.
+     *
+     * @throws [IllegalArgumentException] The given path is not relative and does not start with this path.
      */
     fun addDescendant(pathNode: MutablePathNode): Boolean {
+        require(!pathNode.path.isAbsolute || pathNode.startsWith(this)) {
+            "The given path must be relative or start with this path."
+        }
+
+        val resolvedPath = path.resolve(pathNode.path)
+        if (resolvedPath in descendants) return false
+
         // Get the descendant of this node that will be the ancestor of the given node.
-        val newAncestor = pathNode.path.fold(this) { node, segment -> node.children[segment] ?: node }
+        val ancestorOfNewNode = resolvedPath.fold(this) { node, segment -> node.children[segment] ?: node }
 
-        val relativeNewNode = if (endsWith(pathNode)) newAncestor.relativize(pathNode) else pathNode
-        val newNodeRoot = relativeNewNode.root
-        newNodeRoot.parent = newAncestor
+        // Get the ancestor of the given node that will become an immediate child of [ancestorOfNewNode].
+        val newNodeRoot = if (pathNode.path.isAbsolute) {
+            pathNode.walkAncestors().find { it.path.parent == ancestorOfNewNode.path } ?: pathNode
+        } else {
+            pathNode.root
+        }
 
-        return newAncestor._children.put(newNodeRoot.fileName, newNodeRoot) != null
+        // Insert the new node into the tree.
+        newNodeRoot.parent = ancestorOfNewNode
+        return true
     }
 
     /**
@@ -232,6 +239,8 @@ class MutablePathNode(
      * If a node in [pathNodes] is relative, then it is assumed to be relative to this path.
      *
      * @return `true` if any of the nodes were added or `false` if all of them already exist.
+     *
+     * @throws [IllegalArgumentException] One of the given paths is not relative and does not start with this path.
      */
     fun addAllDescendants(pathNodes: Collection<MutablePathNode>): Boolean =
         pathNodes.filter { addDescendant(it) }.any()

@@ -281,9 +281,9 @@ interface PathNodeFactory {
     /**
      * Constructs a new path node from files in the filesystem.
      *
-     * This method constructs a new node from the given [path] and gets the [type] of the node from the filesystem.
-     * If [recursive] is `true` it also gets all descendants of the given [path] from the filesystem and creates
-     * nodes for them, returning a tree of nodes.
+     * This method constructs a new node from the given [path] and gets the [type][PathNode.type] of the node from the
+     * filesystem. If [recursive] is `true` it also gets all descendants of the given [path] from the filesystem and
+     * creates nodes for them, returning a tree of nodes.
      *
      * @param [path] The path to construct the new node from.
      * @param [recursive] Create a tree of nodes recursively.
