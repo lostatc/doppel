@@ -248,7 +248,17 @@ class MutablePathNode(
 
         if (pathNode.path in relativeDescendants) return false
 
-        pathNode.root.parent = this
+        // Get the descendant of this node that will be the ancestor of the given node.
+        val fullPath = path.resolve(pathNode.path)
+        val ancestorOfNewNode = fullPath.fold(this) { node, segment -> node.children[segment] ?: node }
+
+        // Get the ancestor of the given node that will become an immediate child of [ancestorOfNewNode].
+        val newNodeRoot = pathNode.walkAncestors().find {
+            path.resolve(it.parent?.path) == ancestorOfNewNode.path
+        } ?: pathNode
+
+        // Insert the new node into the tree.
+        newNodeRoot.parent = ancestorOfNewNode
         return true
     }
 
