@@ -17,7 +17,7 @@ fun MutablePathNode.pathNode(
 ): MutablePathNode {
     val newPath = path.fileSystem.getPath(firstSegment, *segments)
     val pathNode = MutablePathNode.of(newPath, type)
-    addDescendant(pathNode)
+    addRelativeDescendant(pathNode)
     return pathNode
 }
 

@@ -14,7 +14,7 @@ private class Entry(override val key: Path, override val value: MutablePathNode)
  * A mutable representation of a tree of file paths.
  *
  * This [PathNode] implementation allows for modifying the tree of nodes in place using methods like [addDescendant],
- * [removeDescendant] and [clearChildren].
+ * [addRelativeDescendant], [removeDescendant] and [clearChildren].
  *
  * @param [fileName] The file name for this path node.
  * @param [parent] The parent node for this path node.
@@ -204,29 +204,20 @@ class MutablePathNode(
     /**
      * Adds the given [pathNode] as a descendant of this node, inserting it into the tree.
      *
-     * If [pathNode] is relative, then it is assumed to be relative to this path.
-     *
      * @return `true` if the node was added or `false` if it already exists.
      *
-     * @throws [IllegalArgumentException] The given path is not relative and does not start with this path.
+     * @throws [IllegalArgumentException] The given path node does not start with this node.
      */
     fun addDescendant(pathNode: MutablePathNode): Boolean {
-        require(!pathNode.path.isAbsolute || pathNode.startsWith(this)) {
-            "The given path must be relative or start with this path."
-        }
+        require(pathNode.startsWith(this)) { "The given path must start with this path." }
 
-        val resolvedPath = path.resolve(pathNode.path)
-        if (resolvedPath in descendants) return false
+        if (pathNode.path in descendants) return false
 
         // Get the descendant of this node that will be the ancestor of the given node.
-        val ancestorOfNewNode = resolvedPath.fold(this) { node, segment -> node.children[segment] ?: node }
+        val ancestorOfNewNode = pathNode.path.fold(this) { node, segment -> node.children[segment] ?: node }
 
         // Get the ancestor of the given node that will become an immediate child of [ancestorOfNewNode].
-        val newNodeRoot = if (pathNode.path.isAbsolute) {
-            pathNode.walkAncestors().find { it.path.parent == ancestorOfNewNode.path } ?: pathNode
-        } else {
-            pathNode.root
-        }
+        val newNodeRoot = pathNode.walkAncestors().find { it.parent?.path == ancestorOfNewNode.path } ?: pathNode
 
         // Insert the new node into the tree.
         newNodeRoot.parent = ancestorOfNewNode
@@ -236,14 +227,42 @@ class MutablePathNode(
     /**
      * Adds the given [pathNodes] as descendants of this node, inserting them into the tree.
      *
-     * If a node in [pathNodes] is relative, then it is assumed to be relative to this path.
-     *
      * @return `true` if any of the nodes were added or `false` if all of them already exist.
      *
-     * @throws [IllegalArgumentException] One of the given paths is not relative and does not start with this path.
+     * @throws [IllegalArgumentException] One of the given path nodes does not start with this node.
      */
     fun addAllDescendants(pathNodes: Collection<MutablePathNode>): Boolean =
         pathNodes.filter { addDescendant(it) }.any()
+
+    /**
+     * Adds the given [pathNode] as a descendant of this node, inserting it into the tree.
+     *
+     * The given path node is assumed to be relative to this node.
+     *
+     * @return `true` if the node was added or `false` if it already exists.
+     *
+     * @throws [IllegalArgumentException] The given path node is absolute.
+     */
+    fun addRelativeDescendant(pathNode: MutablePathNode): Boolean {
+        require(!pathNode.path.isAbsolute) { "The given path node must not be absolute" }
+
+        if (pathNode.path in relativeDescendants) return false
+
+        pathNode.root.parent = this
+        return true
+    }
+
+    /**
+     * Adds the given [pathNodes] as descendants of this node, inserting them into the tree.
+     *
+     * The given path nodes are assumed to be relative to this node.
+     *
+     * @return `true` if any of the nodes were added or `false` if all of them already exist.
+     *
+     * @throws [IllegalArgumentException] One of the given path nodes is absolute.
+     */
+    fun addAllRelativeDescendants(pathNodes: Collection<MutablePathNode>): Boolean =
+        pathNodes.filter { addRelativeDescendant(it) }.any()
 
     /**
      * Removes the descendant with the given [path] from the tree.
