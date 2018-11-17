@@ -181,7 +181,7 @@ class MutablePathNode(
     }
 
     override fun sameContentsAs(other: PathNode): Boolean {
-        if (type != other.type) return false
+        if (type::class != other.type::class) return false
         return type.checkSame(path, other.path)
     }
 
