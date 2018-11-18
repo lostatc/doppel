@@ -1,7 +1,11 @@
-import diffir.DirPath
-import diffir.FilePath
-import diffir.MutableDirPath
-import io.kotlintest.*
+import diffir.path.MutablePathNode
+import diffir.path.PathNode
+import diffir.path.WalkDirection
+import diffir.path.dir
+import diffir.path.file
+import io.kotlintest.Description
+import io.kotlintest.Spec
+import io.kotlintest.TestResult
 import io.kotlintest.extensions.TestListener
 import java.nio.file.Files
 import java.nio.file.Path
@@ -41,15 +45,15 @@ class NonexistentFileListener : TestListener {
 /**
  * A test listener that creates a tree of files and directories in the filesystem.
  */
-class DirTreeListener : TestListener {
+class FileTreeListener : TestListener {
     /**
      * A directory path representing the tree of files and directories.
      */
-    lateinit var path: DirPath
+    lateinit var pathNode: PathNode
 
     override fun beforeTest(description: Description) {
         val tempPath = Files.createTempDirectory("")
-        path = MutableDirPath.of(tempPath) {
+        pathNode = MutablePathNode.of(tempPath) {
             file("b")
             dir("c", "d") {
                 file("e")
@@ -57,17 +61,13 @@ class DirTreeListener : TestListener {
             }
         }
 
-        for (descendant in path.descendants) {
-            when (descendant) {
-                is DirPath -> Files.createDirectories(descendant.path)
-                is FilePath -> Files.createFile(descendant.path)
-            }
-        }
+        pathNode.createFile(recursive = true)
     }
 
     override fun afterTest(description: Description, result: TestResult) {
-        for (descendant in path.walkChildren(path.WalkDirection.BOTTOM_UP)) {
-            Files.delete(descendant.path)
+        for (descendant in pathNode.walkChildren(WalkDirection.BOTTOM_UP)) {
+            Files.deleteIfExists(descendant.path)
         }
+        Files.deleteIfExists(pathNode.path)
     }
 }

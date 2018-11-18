@@ -1,347 +1,222 @@
-import diffir.path.WalkDirection
+
+import diffir.path.DirectoryType
 import diffir.path.MutablePathNode
-import io.kotlintest.data.forall
+import diffir.path.PathNode
+import diffir.path.RegularFileType
+import diffir.path.WalkDirection
+import diffir.path.dir
+import diffir.path.file
 import io.kotlintest.extensions.TestListener
-import io.kotlintest.matchers.collections.contain
-import io.kotlintest.matchers.maps.shouldContain
-import io.kotlintest.properties.Gen.Companion.file
+import io.kotlintest.matchers.boolean.shouldBeFalse
+import io.kotlintest.matchers.boolean.shouldBeTrue
+import io.kotlintest.matchers.collections.shouldBeEmpty
+import io.kotlintest.matchers.types.shouldBeInstanceOf
+import io.kotlintest.matchers.types.shouldNotBeSameInstanceAs
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldThrow
 import io.kotlintest.specs.WordSpec
-import io.kotlintest.tables.row
 import java.nio.file.Paths
 
 class MutablePathNodeTest : WordSpec() {
+
+    val nonexistentListener: NonexistentFileListener = NonexistentFileListener()
+
+    override fun listeners(): List<TestListener> = listOf(nonexistentListener)
+
     init {
         "MutablePathNode constructor" should {
             "throw if the given file name has a parent" {
                 shouldThrow<IllegalArgumentException> {
-                    MutablePathNode(Paths.get("a", "b"), null)
+                    MutablePathNode(Paths.get("a", "b"))
                 }
             }
-        }
 
-        "MutablePathNode.fromPath" should {
-            "make the last segment the file name" {
-                val testPath = Paths.get("parent", "fileName")
-                MutablePathNode.fromPath(testPath).fileName.shouldBe(Paths.get("fileName"))
-            }
-
-            "make the second-last segment the parent" {
-                val testPath = Paths.get("parent", "fileName")
-                MutablePathNode.fromPath(testPath).parent?.fileName.shouldBe(Paths.get("parent"))
-            }
-
-            "not create a parent from a single segment" {
-                val testPath = Paths.get("fileName")
-                MutablePathNode.fromPath(testPath).parent.shouldBe(null)
-            }
-
-            "make the path a child of its parent" {
-                val testPath = Paths.get("parent", "fileName")
-                val testNode = MutablePathNode(testPath)
-                testNode.parent?.children?.shouldContain(testPath, testNode)
+            "throw if the file name and parent filesystems are different" {
+                // TODO: Implement test
             }
         }
 
-        /*
-        "MutableFSPath.root" should {
+        "MutablePathNode.type" should {
+            "return the type passed to the constructor" {
+                val testNode = PathNode.of("a", type = RegularFileType())
+                testNode.type.shouldBeInstanceOf<RegularFileType>()
+            }
+
+            "change to a directory type when children are added" {
+                val testNode = MutablePathNode.of("a", type = RegularFileType())
+                val descendantNode = MutablePathNode.of("a", "b")
+                testNode.addDescendant(descendantNode)
+                testNode.type.shouldBeInstanceOf<DirectoryType>()
+            }
+        }
+
+        "MutablePathNode.root" should {
             "return the root node for absolute paths" {
-                MutableFilePath("/", "a", "b").root.shouldBe(MutableDirPath("/"))
+                val testPath = Paths.get("/", "a", "b")
+                PathNode.of(testPath).root.path.shouldBe(testPath.root)
             }
 
             "return the root node for relative paths" {
-                MutableFilePath("a", "b", "c").root.shouldBe(MutableDirPath("a"))
+                val testPath = Paths.get("a", "b", "c")
+                PathNode.of(testPath).root.path.shouldBe(Paths.get("a"))
             }
         }
 
-        "MutableFSPath.path" should {
+        "MutablePathNode.path" should {
             "work for multiple segments" {
-                MutableFilePath("/", "a", "b").path.shouldBe(Paths.get("/", "a", "b"))
+                PathNode.of("/", "a", "b").path.shouldBe(Paths.get("/", "a", "b"))
             }
 
             "work for a single segment" {
-                MutableFilePath("a").path.shouldBe(Paths.get("a"))
+                PathNode.of("a").path.shouldBe(Paths.get("a"))
             }
 
             "work for a root component" {
-                MutableFilePath("/").path.shouldBe(Paths.get("/"))
+                PathNode.of("/").path.shouldBe(Paths.get("/"))
             }
         }
 
-        "MutableFSPath.toString" should {
-            "return a string representation" {
-                MutableFilePath("/", "a", "b").toString().shouldBe("/a/b")
-            }
-        }
-
-        "MutableFSPath.equals" should {
-            "return whether two paths are equal" {
-                forall(
-                    row(MutableFilePath("/", "a", "b"), MutableFilePath("/", "a", "b"), true),
-                    row(MutableFilePath("/", "a", "b"), MutableFilePath("a", "b"), false),
-                    row(MutableFilePath("/", "a", "b"), MutableFilePath("/", "a", "c"), false),
-                    row(MutableFilePath("/", "a", "b"), MutableDirPath("/", "a", "b"), false)
-                ) { thisPath, otherPath, result ->
-                    (thisPath == otherPath).shouldBe(result)
+        "MutablePathNode.descendants" should {
+            "use full paths as keys" {
+                val testNode = PathNode.of("/", "a") {
+                    dir("b") {
+                        file("c")
+                    }
+                    file("d")
                 }
+
+                val expectedKeys = setOf(
+                    Paths.get("/", "a", "b"),
+                    Paths.get("/", "a", "b", "c"),
+                    Paths.get("/", "a", "d")
+                )
+
+                testNode.descendants.keys.shouldBe(expectedKeys)
+            }
+
+            "map paths to the correct nodes" {
+                val testNode = PathNode.of("/", "a") {
+                    dir("b") {
+                        file("c")
+                    }
+                    file("d")
+                }
+
+                val expectedPaths = testNode.descendants.values.map { it.path }.toSet()
+                testNode.descendants.keys.shouldBe(expectedPaths)
             }
         }
 
-        "MutableFSPath.hashCode" should {
+        "MutablePathNode.relativeDescendants" should {
+            "use relative paths as keys" {
+                val testNode = PathNode.of("/", "a") {
+                    dir("b") {
+                        file("c")
+                    }
+                    file("d")
+                }
+
+                val expectedKeys = setOf(Paths.get("b"), Paths.get("b", "c"), Paths.get("d"))
+
+                testNode.relativeDescendants.keys.shouldBe(expectedKeys)
+            }
+
+            "map paths to the correct nodes" {
+                val testNode = PathNode.of("/", "a") {
+                    dir("b") {
+                        file("c")
+                    }
+                    file("d")
+                }
+
+                val expectedPaths = testNode.descendants.values.map { it.path }.toSet()
+                testNode.descendants.keys.shouldBe(expectedPaths)
+            }
+        }
+
+        "MutablePathNode.toString" should {
+            "return a string representation" {
+                PathNode.of("/", "a", "b").toString().shouldBe("/a/b")
+            }
+        }
+
+        "MutablePathNode.equals" should {
+            "consider mutable and immutable path nodes equal" {
+                val testNode = MutablePathNode.of("a")
+                testNode.shouldBe(testNode as PathNode)
+            }
+
+            "consider different instances equal" {
+                PathNode.of("a", "b").shouldBe(PathNode.of("a", "b"))
+            }
+        }
+
+        "MutablePathNode.hashCode" should {
             "return the same hash code for equal instances" {
-                MutableFilePath("/", "a", "b").hashCode().shouldBe(MutableFilePath("/", "a", "b").hashCode())
+                val thisNode = PathNode.of("a", "b")
+                val otherNode = PathNode.of("a", "b")
+                thisNode.hashCode().shouldBe(otherNode.hashCode())
             }
         }
 
-        "MutableFSPath.walkAncestors" should {
+        "MutablePathNode.toPathNode" should {
+            "return a copy that is equal to the original" {
+                val testNode = PathNode.of("/", "a") {
+                    dir("b")
+                    file("c")
+                }
+
+                testNode.toPathNode().shouldBe(testNode)
+            }
+
+            "copy the parent" {
+                val testNode = PathNode.of("/", "a", "b")
+
+                testNode.toPathNode().parent.shouldNotBeSameInstanceAs(testNode.parent)
+            }
+        }
+
+        "MutablePathNode.toMutablePathNode" should {
+            "return a copy that is equal to the original" {
+                val testNode = PathNode.of("/", "a") {
+                    dir("b")
+                    file("c")
+                }
+
+                testNode.toMutablePathNode().shouldBe(testNode)
+            }
+
+            "copy the parent" {
+                val testNode = PathNode.of("/", "a", "b")
+
+                testNode.toMutablePathNode().parent.shouldNotBeSameInstanceAs(testNode.parent)
+            }
+        }
+
+        "MutablePathNode.walkAncestors" should {
             "return all ancestors" {
-                val testPath = MutableFilePath("/", "a", "b")
-                val ancestors = setOf(MutableDirPath("/", "a"), MutableDirPath("/"))
-                testPath.walkAncestors().toSet().shouldBe(ancestors)
+                val testNode = PathNode.of("/", "a", "b")
+                val ancestors = setOf(Paths.get("/", "a"), Paths.get("/"))
+                testNode.walkAncestors().map { it.path }.toSet().shouldBe(ancestors)
             }
 
             "iterate in the correct order" {
-                val testPath = MutableFilePath("/", "a", "b")
-                val expectedBottomUp = listOf(MutableDirPath("/", "a"), MutableDirPath("/"))
+                val testNode = PathNode.of("/", "a", "b")
+                val expectedBottomUp = listOf(Paths.get("/", "a"), Paths.get("/"))
                 val expectedTopDown = expectedBottomUp.reversed()
 
-                testPath.walkAncestors(WalkDirection.BOTTOM_UP).toList().shouldBe(expectedBottomUp)
-                testPath.walkAncestors(WalkDirection.TOP_DOWN).toList().shouldBe(expectedTopDown)
+                testNode.walkAncestors(WalkDirection.BOTTOM_UP).map { it.path }.toList().shouldBe(expectedBottomUp)
+                testNode.walkAncestors(WalkDirection.TOP_DOWN).map { it.path }.toList().shouldBe(expectedTopDown)
             }
 
             "return an empty list when there are no ancestors" {
-                MutableFilePath("a").walkAncestors().toList().shouldBe(emptyList())
+                PathNode.of("a").walkAncestors().toList().shouldBeEmpty()
             }
         }
 
-        "MutableFSPath.startsWith" should {
-            "return whether this path starts with another" {
-                forall(
-                    row(Paths.get("/", "a", "b"), Paths.get("/", "a"), true),
-                    row(Paths.get("/", "a", "b"), Paths.get("a", "b"), false),
-                    row(Paths.get("a", "b"), Paths.get("a", "b"), true),
-                    row(Paths.get("a", "b"), Paths.get("c"), false)
-                ) { thisPath, otherPath, result ->
-                    MutableFilePath(thisPath).startsWith(MutableFilePath(otherPath)).shouldBe(result)
-                }
-            }
-        }
-
-        "MutableFSPath.endsWith" should {
-            "return whether this path ends with another" {
-                forall(
-                    row(Paths.get("/", "a", "b"), Paths.get("a", "b"), true),
-                    row(Paths.get("/", "a", "b"), Paths.get("/", "a"), false),
-                    row(Paths.get("a", "b"), Paths.get("a", "b"), true),
-                    row(Paths.get("a", "b"), Paths.get("c"), false)
-                ) { thisPath, otherPath, result ->
-                    MutableFilePath(thisPath).endsWith(MutableFilePath(otherPath)).shouldBe(result)
-                }
-            }
-        }
-    }
-}
-
-class MutableFilePathTest : WordSpec() {
-
-    val nonexistentListener: NonexistentFileListener = NonexistentFileListener()
-
-    override fun listeners(): List<TestListener> = listOf(nonexistentListener)
-
-    init {
-        "MutableFilePath.exists" should {
-            "identify that an existing file exists" {
-                val newPath = MutableFilePath(nonexistentListener.existingFile)
-                newPath.exists(checkType = false).shouldBeTrue()
-                newPath.exists(checkType = true).shouldBeTrue()
-            }
-
-            "identify that a file is a different type" {
-                val newPath = MutableFilePath(nonexistentListener.existingDir)
-                newPath.exists(checkType = false).shouldBeTrue()
-                newPath.exists(checkType = true).shouldBeFalse()
-            }
-
-            "identify that a nonexistent file doesn't exist" {
-                val newPath = MutableFilePath(nonexistentListener.nonexistentFile)
-                newPath.exists(checkType = false).shouldBeFalse()
-                newPath.exists(checkType = true).shouldBeFalse()
-
-            }
-        }
-
-        "MutableFilePath.copy" should {
-            "return a copy that's equal to the original" {
-                val newPath = MutableFilePath("/", "a", "b")
-                newPath.shouldBe(newPath.copy())
-            }
-
-            "return a copy with a new file name" {
-                val newFileName = Paths.get("b")
-                val newPath = MutableFilePath(Paths.get("a"))
-                newPath.copy(fileName = newFileName).fileName.shouldBe(newFileName)
-            }
-
-            "return a copy with a new parent" {
-                val newParent = MutableDirPath("/", "a")
-                val newPath = MutableFilePath(Paths.get("/", "b", "c"))
-                newPath.copy(parent = newParent).parent.shouldBe(newParent)
-            }
-        }
-    }
-}
-
-class MutableDirPathTest : WordSpec() {
-
-    val nonexistentListener: NonexistentFileListener = NonexistentFileListener()
-
-    override fun listeners(): List<TestListener> = listOf(nonexistentListener)
-
-    init {
-        "MutableDirPath.exists" should {
-            "identify that an existing file exists" {
-                val newPath = MutableDirPath(nonexistentListener.existingDir)
-                newPath.exists(checkType = false).shouldBeTrue()
-                newPath.exists(checkType = true).shouldBeTrue()
-            }
-
-            "identify that a file is a different type" {
-                val newPath = MutableDirPath(nonexistentListener.existingFile)
-                newPath.exists(checkType = false).shouldBeTrue()
-                newPath.exists(checkType = true).shouldBeFalse()
-            }
-
-            "identify that a nonexistent file doesn't exist" {
-                val newPath = MutableDirPath(nonexistentListener.nonexistentFile)
-                newPath.exists(checkType = false).shouldBeFalse()
-                newPath.exists(checkType = true).shouldBeFalse()
-
-            }
-        }
-
-        "MutableDirPath.copy" should {
-            "return a copy that's equal to the original" {
-                val newPath = MutableDirPath("/", "a", "b")
-                newPath.shouldBe(newPath.copy())
-            }
-
-            "return a copy with a new file name" {
-                val newFileName = Paths.get("b")
-                val newPath = MutableDirPath(Paths.get("a"))
-                newPath.copy(fileName = newFileName).fileName.shouldBe(newFileName)
-            }
-
-            "return a copy with a new parent" {
-                val newParent = MutableDirPath("/", "a")
-                val newPath = MutableDirPath(Paths.get("/", "b", "c"))
-                newPath.copy(parent = newParent).parent.shouldBe(newParent)
-            }
-        }
-
-        "MutableDirPath.relativize" should {
-            "throw if the given path does not start with this path" {
-                val newPath = MutableDirPath("/", "a", "b")
-                shouldThrow<IllegalArgumentException> {
-                    newPath.relativize(MutableFilePath("/", "c"))
-                }
-            }
-
-            "throw if one path is absolute and one is relative" {
-                val newPath = MutableDirPath("/", "a", "b")
-                shouldThrow<IllegalArgumentException> {
-                    newPath.relativize(MutableFilePath("a", "b", "c"))
-                }
-            }
-
-            "return a relativized path from two absolute paths" {
-                val newPath = MutableDirPath("/", "a")
-                val otherPath = MutableDirPath("/", "a", "b", "c")
-
-                newPath.relativize(otherPath).shouldBe(MutableDirPath("b", "c"))
-            }
-
-            "return a relativized path from two relative paths" {
-                val newPath = MutableDirPath("a", "b")
-                val otherPath = MutableDirPath("a", "b", "c", "d")
-
-                newPath.relativize(otherPath).shouldBe(MutableDirPath("c", "d"))
-            }
-
-            "return a relativized path when one is the parent of the other" {
-                val newPath = MutableDirPath("a", "b")
-                val otherPath = MutableDirPath("a", "b", "c")
-
-                newPath.relativize(otherPath).shouldBe(MutableDirPath("c"))
-            }
-
-            "work with immutable paths" {
-                val newPath = MutableDirPath("a", "b") as DirPath
-                val otherPath = MutableDirPath("a", "b", "c", "d") as DirPath
-
-                newPath.relativize(otherPath).shouldBe(MutableDirPath("c", "d") as DirPath)
-            }
-
-            "work with file paths" {
-                val newPath = MutableDirPath("a", "b")
-                val otherPath = MutableFilePath("a", "b", "c", "d")
-
-                newPath.relativize(otherPath).shouldBe(MutableFilePath("c", "d"))
-            }
-        }
-
-        "MutableDirPath.resolve" should {
-            "return the given path if it is absolute" {
-                val newPath = MutableDirPath("/", "a")
-                val otherPath = MutableDirPath("/", "b")
-
-                newPath.resolve(otherPath).shouldBe(otherPath)
-            }
-
-            "resolve the given path against an absolute path" {
-                val newPath = MutableDirPath("/", "a")
-                val otherPath = MutableDirPath("b", "c")
-
-                newPath.resolve(otherPath).shouldBe(MutableDirPath("/", "a", "b", "c"))
-            }
-
-            "resolve the given path against a relative path" {
-                val newPath = MutableDirPath("a")
-                val otherPath = MutableDirPath("b", "c")
-
-                newPath.resolve(otherPath).shouldBe(MutableDirPath("a", "b", "c"))
-            }
-
-            "work with immutable paths" {
-                val newPath = MutableDirPath("a") as DirPath
-                val otherPath = MutableDirPath("b", "c") as DirPath
-
-                newPath.resolve(otherPath).shouldBe(MutableDirPath("a", "b", "c") as DirPath)
-            }
-
-            "work with file paths" {
-                val newPath = MutableDirPath("a")
-                val otherPath = MutableFilePath("b", "c")
-
-                newPath.resolve(otherPath).shouldBe(MutableFilePath("a", "b", "c"))
-            }
-        }
-
-        "MutableDirPath.walkChildren" should {
-            "return a sequence containing all descendants" {
-                val testPath = MutableDirPath.of(Paths.get("/", "a")) {
-                    file("b")
-                    dir("c", "d") {
-                        file("e")
-                        dir("f")
-                    }
-                }
-
-                testPath.walkChildren().toSet().shouldBe(testPath.descendants)
-            }
-
+        "MutablePathNode.walkChildren" should {
             "iterate in the correct order" {
-                val testPath = MutableDirPath.of(Paths.get("/", "a")) {
+                val testNode = PathNode.of(Paths.get("/", "a")) {
                     dir("b") {
                         dir("c") {
                             file("d")
@@ -350,58 +225,142 @@ class MutableDirPathTest : WordSpec() {
                 }
 
                 val expectedTopDown = listOf(
-                    MutableDirPath("/", "a", "b"),
-                    MutableDirPath("/", "a", "b", "c"),
-                    MutableFilePath("/", "a", "b", "c", "d")
+                    Paths.get("/", "a", "b"),
+                    Paths.get("/", "a", "b", "c"),
+                    Paths.get("/", "a", "b", "c", "d")
                 )
                 val expectedBottomUp = expectedTopDown.reversed()
 
-                testPath.walkChildren(WalkDirection.TOP_DOWN).toList().shouldBe(expectedTopDown)
-                testPath.walkChildren(WalkDirection.BOTTOM_UP).toList().shouldBe(expectedBottomUp)
+                testNode.walkChildren(WalkDirection.TOP_DOWN).map { it.path }.toList().shouldBe(expectedTopDown)
+                testNode.walkChildren(WalkDirection.BOTTOM_UP).map { it.path }.toList().shouldBe(expectedBottomUp)
             }
 
             "return an empty list when there are no children" {
-                MutableDirPath("a").walkChildren().toList().shouldBe(emptyList())
+                PathNode.of("a").walkChildren().toList().shouldBeEmpty()
             }
         }
 
-        "MutableDirPath.treeExists" should {
-            // TODO: Add tests
+        "MutablePathNode.relativize" should {
+            "throw if the given path does not start with this path" {
+                val testNode = PathNode.of("/", "a", "b")
+                shouldThrow<IllegalArgumentException> {
+                    testNode.relativize(PathNode.of("/", "c"))
+                }
+            }
+
+            "throw if one path is absolute and one is relative" {
+                val testNode = PathNode.of("/", "a", "b")
+                shouldThrow<IllegalArgumentException> {
+                    testNode.relativize(PathNode.of("a", "b", "c"))
+                }
+            }
+
+            "return a relativized path from two absolute paths" {
+                val testNode = PathNode.of("/", "a")
+                val otherNode = PathNode.of("/", "a", "b", "c")
+                val expectedPath = Paths.get("b", "c")
+
+                testNode.relativize(otherNode).path.shouldBe(expectedPath)
+            }
+
+            "return a relativized path from two relative paths" {
+                val testNode = PathNode.of("a", "b")
+                val otherNode = PathNode.of("a", "b", "c", "d")
+                val expectedPath = Paths.get("c", "d")
+
+                testNode.relativize(otherNode).path.shouldBe(expectedPath)
+            }
+
+            "return a relativized path when one is the parent of the other" {
+                val testNode = PathNode.of("a", "b")
+                val otherNode = PathNode.of("a", "b", "c")
+                val expectedPath = Paths.get("c")
+
+                testNode.relativize(otherNode).path.shouldBe(expectedPath)
+            }
+        }
+
+        "PathNode.resolve" should {
+            "return the given path if it is absolute" {
+                val testNode = PathNode.of("/", "a")
+                val otherNode = PathNode.of("/", "b")
+
+                testNode.resolve(otherNode).shouldBe(otherNode)
+            }
+
+            "resolve the given path against an absolute path" {
+                val testNode = PathNode.of("/", "a")
+                val otherNode = PathNode.of("b", "c")
+
+                testNode.resolve(otherNode).shouldBe(PathNode.of("/", "a", "b", "c"))
+            }
+
+            "resolve the given path against a relative path" {
+                val testNode = PathNode.of("a")
+                val otherNode = PathNode.of("b", "c")
+
+                testNode.resolve(otherNode).shouldBe(PathNode.of("a", "b", "c"))
+            }
         }
 
         "MutableDirPath.diff" should {
-            // TODO: Add tests
+            // TODO: Implement tests
         }
 
-        "MutableDirPath.findChildren" should {
-            // TODO: Add tests
-        }
+        "MutablePathNode.exists" should {
+            "identify that an existing file exists" {
+                val testNode = PathNode.of(nonexistentListener.existingFile, RegularFileType())
+                testNode.exists(checkType = false).shouldBeTrue()
+                testNode.exists(checkType = true).shouldBeTrue()
+            }
 
-        "MutableDirPath.findDescendants" should {
-            // TODO: Add tests
-        }
+            "identify that a file is a different type" {
+                val testNode = PathNode.of(nonexistentListener.existingDir, RegularFileType())
+                testNode.exists(checkType = false).shouldBeTrue()
+                testNode.exists(checkType = true).shouldBeFalse()
+            }
 
-        "MutableDirPath.of" should {
-            "create a file hierarchy containing all the given paths" {
-                val factoryPath = MutableDirPath.of(Paths.get("/", "a")) {
-                    file("b")
-                    dir("c", "d") {
-                        file("e")
-                        dir("f")
-                    }
-                }
-
-                val testDescendants = setOf(
-                    MutableFilePath("/", "a", "b"),
-                    MutableDirPath("/", "a", "c"),
-                    MutableDirPath("/", "a", "c", "d"),
-                    MutableFilePath("/", "a", "c", "d", "e"),
-                    MutableDirPath("/", "a", "c", "d", "f")
-                )
-
-                factoryPath.descendants.shouldBe(testDescendants)
+            "identify that a nonexistent file doesn't exist" {
+                val testNode = PathNode.of(nonexistentListener.nonexistentFile)
+                testNode.exists(checkType = false).shouldBeFalse()
+                testNode.exists(checkType = true).shouldBeFalse()
             }
         }
+
+        "MutablePathNode.sameContentsAs" should {
+            // TODO: Implement tests
+        }
+
+        "MutablePathNode.createFile" should {
+            // TODO: Implement tests
+        }
+
+        "MutablePathNode.addDescendant" should {
+            // TODO: Implement tests
+        }
+
+        "MutablePathNode.addAllDescendants" should {
+            // TODO: Implement tests
+        }
+
+        "MutablePathNode.addRelativeDescendant" should {
+            // TODO: Implement tests
+        }
+
+        "MutablePathNode.addAllRelativeDescendants" should {
+            // TODO: Implement tests
+        }
+
+        "MutablePathNode.removeDescendant" should {
+            // TODO: Implement tests
+        }
+
+        "MutablePathNode.removeAllDescendants" should {
+            // TODO: Implement tests
+        }
+
+        "MutablePathNode.clearChildren" should {
+            // TODO: Implement tests
+        }
     }
-        */
 }
