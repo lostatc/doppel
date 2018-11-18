@@ -298,6 +298,28 @@ class MutablePathNode(
     fun removeAllDescendants(paths: Collection<Path>): Boolean = paths.filter { removeDescendant(it) }.any()
 
     /**
+     * Removes the descendant with the given [path] from the tree.
+     *
+     * The give [path] is assumed to be relative to this node.
+     *
+     * @return `true` if the descendant was removed or `false` if it doesn't exist.
+     */
+    fun removeRelativeDescendant(path: Path): Boolean {
+        val nodeToRemove = relativeDescendants[path]
+        return nodeToRemove?.parent?._children?.remove(path) != null
+    }
+
+    /**
+     * Removes the descendants with the given [paths] from the tree.
+     *
+     * The give [paths] are assumed to be relative to this node.
+     *
+     * @return `true` any of the descendants were removed or `false` if none of them exist.
+     */
+    fun removeAllRelativeDescendants(paths: Collection<Path>): Boolean =
+        paths.filter { removeRelativeDescendant(it) }.any()
+
+    /**
      * Removes all children from this node.
      */
     fun clearChildren() {

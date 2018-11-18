@@ -19,8 +19,10 @@ import java.nio.file.Path
  * have the same relative path and the same contents.
  * @property [different] The relative paths of files that are different in both directory trees. Files are different if
  * they have the same relative path and different contents.
- * @property [leftNewer] The paths of files that were modified more recently in the left tree than in the right tree.
- * @property [rightNewer] The paths of files that were modified more recently in the right tree than in the left tree.
+ * @property [leftNewer] The relative paths of files that were modified more recently in the left tree than in the
+ * right tree.
+ * @property [rightNewer] The relative paths of files that were modified more recently in the right tree than in the
+ * left tree.
  *
  */
 data class PathDiff(
