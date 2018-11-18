@@ -99,14 +99,14 @@ interface PathNode {
     /**
      * Returns a copy of this object as a [PathNode] object.
      *
-     * Children are copied deeply.
+     * Children and ancestors are copied deeply.
      */
     fun toPathNode(): PathNode
 
     /**
      * Returns a copy of this object as a [MutablePathNode] object.
      *
-     * Children are copied deeply.
+     * Children and ancestors are copied deeply.
      */
     fun toMutablePathNode(): MutablePathNode
 
@@ -200,8 +200,6 @@ interface PathNode {
      *
      * @param [recursive] Create this file and all its descendants.
      * @param [onError] A function that is called for each I/O error that occurs and determines how to handle them.
-     *
-     * @throws [IOException] An I/O error occurred while creating the file.
      */
     fun createFile(recursive: Boolean = false, onError: ErrorHandler = ::skipOnError)
 
@@ -241,9 +239,7 @@ interface PathNodeFactory {
      *
      * Example:
      * ```
-     * val path = Paths.get("/", "home", "user")
-     *
-     * val dirPath = MutablePathNode.of(path) {
+     * val pathNode = PathNode.of("/", "home", "user") {
      *     file("Photo.png")
      *     dir("Documents", "Reports") {
      *         file("Monthly.odt")

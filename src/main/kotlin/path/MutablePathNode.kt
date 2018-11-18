@@ -118,10 +118,15 @@ class MutablePathNode(
     override fun toPathNode(): PathNode = toMutablePathNode()
 
     override fun toMutablePathNode(): MutablePathNode {
-        val newNode = MutablePathNode(fileName, parent, type)
-        val copyOfChildren = children.values.map { it.toMutablePathNode() }
-        newNode.addAllDescendants(copyOfChildren)
-        return newNode
+        fun deeplyCopy(node: MutablePathNode, newParent: MutablePathNode?): MutablePathNode {
+            val newNode = MutablePathNode(node.fileName, newParent, node.type)
+            node.children.values.map { deeplyCopy(it, newNode) }
+            return newNode
+        }
+
+        // We need to start at the root and work our way down the tree to copy ancestors while avoiding loops.
+        val newRoot = deeplyCopy(root, null)
+        return newRoot.descendants.getOrDefault(path, newRoot)
     }
 
     override fun walkAncestors(direction: WalkDirection): Sequence<MutablePathNode> = sequence {
