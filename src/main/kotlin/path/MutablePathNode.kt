@@ -14,7 +14,8 @@ private class Entry(override val key: Path, override val value: MutablePathNode)
  * A mutable representation of a tree of file paths.
  *
  * This [PathNode] implementation allows for modifying the tree of nodes in place using methods like [addDescendant],
- * [addRelativeDescendant], [removeDescendant] and [clearChildren].
+ * [addRelativeDescendant], [removeDescendant] and [clearChildren]. Any methods or property setters which modify this
+ * path node will ensure that each path node is always a child of its parent.
  *
  * @param [fileName] The file name for this path node.
  * @param [parent] The parent node for this path node.

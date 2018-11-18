@@ -35,6 +35,8 @@ enum class WalkDirection {
  * is provided through the constructor, but this type can change based on the state of the node. For example, if the
  * [type] of a node is a regular file, then it will change to a directory if children are added. Custom file types with
  * custom behavior can be created by implementing [FileType].
+ *
+ * *Warning:* This interface is not meant to be implemented. New members may be added in the future.
  */
 interface PathNode {
     /**
@@ -225,6 +227,8 @@ interface PathNode {
 
 /**
  * A factory for creating [PathNode] instances.
+ *
+ * *Warning:* This interface is not meant to be implemented. New members may be added in the future.
  */
 interface PathNodeFactory {
     /**
