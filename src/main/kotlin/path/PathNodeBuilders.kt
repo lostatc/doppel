@@ -1,4 +1,4 @@
-package diffir.path
+package doppel.path
 
 import java.nio.file.Path
 

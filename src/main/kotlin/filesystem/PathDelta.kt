@@ -1,7 +1,7 @@
-package diffir.filesystem
+package doppel.filesystem
 
-import diffir.error.ErrorHandler
-import diffir.path.PathNode
+import doppel.error.ErrorHandler
+import doppel.path.PathNode
 import java.nio.file.Path
 import java.util.Deque
 import java.util.LinkedList

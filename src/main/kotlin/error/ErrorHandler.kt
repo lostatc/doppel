@@ -1,4 +1,4 @@
-package diffir.error
+package doppel.error
 
 import java.io.IOException
 import java.nio.file.FileVisitResult

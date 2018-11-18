@@ -1,9 +1,9 @@
-package diffir.filesystem
+package doppel.filesystem
 
-import diffir.error.ErrorHandler
-import diffir.error.skipOnError
-import diffir.path.MutablePathNode
-import diffir.path.PathNode
+import doppel.error.ErrorHandler
+import doppel.error.skipOnError
+import doppel.path.MutablePathNode
+import doppel.path.PathNode
 import java.io.IOException
 import java.nio.file.FileSystemLoopException
 import java.nio.file.Path

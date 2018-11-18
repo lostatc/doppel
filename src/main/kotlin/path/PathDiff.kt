@@ -1,8 +1,8 @@
-package diffir.path
+package doppel.path
 
-import diffir.error.ErrorHandler
-import diffir.error.ErrorHandlerAction
-import diffir.error.skipOnError
+import doppel.error.ErrorHandler
+import doppel.error.ErrorHandlerAction
+import doppel.error.skipOnError
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path

@@ -1,6 +1,6 @@
-package diffir.path
+package doppel.path
 
-import diffir.filesystem.getFileChecksum
+import doppel.filesystem.getFileChecksum
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path

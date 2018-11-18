@@ -1,8 +1,8 @@
-import diffir.path.MutablePathNode
-import diffir.path.PathNode
-import diffir.path.WalkDirection
-import diffir.path.dir
-import diffir.path.file
+import doppel.path.MutablePathNode
+import doppel.path.PathNode
+import doppel.path.WalkDirection
+import doppel.path.dir
+import doppel.path.file
 import io.kotlintest.Description
 import io.kotlintest.Spec
 import io.kotlintest.TestResult

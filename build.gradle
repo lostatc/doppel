@@ -3,7 +3,7 @@ plugins {
     id 'application'
 }
 
-mainClassName = 'diffir.MainKt'
+mainClassName = 'doppel.MainKt'
 
 version '0.1'
 

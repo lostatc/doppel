@@ -1,11 +1,10 @@
-
-import diffir.path.DirectoryType
-import diffir.path.MutablePathNode
-import diffir.path.PathNode
-import diffir.path.RegularFileType
-import diffir.path.WalkDirection
-import diffir.path.dir
-import diffir.path.file
+import doppel.path.DirectoryType
+import doppel.path.MutablePathNode
+import doppel.path.PathNode
+import doppel.path.RegularFileType
+import doppel.path.WalkDirection
+import doppel.path.dir
+import doppel.path.file
 import io.kotlintest.extensions.TestListener
 import io.kotlintest.matchers.boolean.shouldBeFalse
 import io.kotlintest.matchers.boolean.shouldBeTrue

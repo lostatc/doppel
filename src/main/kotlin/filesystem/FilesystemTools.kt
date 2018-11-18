@@ -1,6 +1,6 @@
-package diffir.filesystem
+package doppel.filesystem
 
-import diffir.error.ErrorHandler
+import doppel.error.ErrorHandler
 import java.io.IOException
 import java.nio.file.CopyOption
 import java.nio.file.FileVisitOption

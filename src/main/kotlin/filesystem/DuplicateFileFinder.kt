@@ -1,4 +1,4 @@
-package diffir.filesystem
+package doppel.filesystem
 
 import java.nio.file.FileVisitOption
 import java.nio.file.Files

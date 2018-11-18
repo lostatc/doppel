@@ -1,8 +1,8 @@
-import diffir.path.DirectoryType
-import diffir.path.PathNode
-import diffir.path.RegularFileType
-import diffir.path.dir
-import diffir.path.file
+import doppel.path.DirectoryType
+import doppel.path.PathNode
+import doppel.path.RegularFileType
+import doppel.path.dir
+import doppel.path.file
 import io.kotlintest.matchers.maps.shouldContain
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.WordSpec
