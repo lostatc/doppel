@@ -1,17 +1,23 @@
-package diffir
+package diffir.filesystem
 
-import java.util.*
+import diffir.error.ErrorHandler
+import diffir.path.PathNode
+import java.nio.file.Path
+import java.util.Deque
+import java.util.LinkedList
+import java.util.Objects
 
 /**
  * A set of changes to apply to the filesystem.
  *
  * This class allows for creating a set of changes that can be applied to multiple directories. Changes are stored in a
- * queue and can be applied to the filesystem all at once. New changes can be queued up by passing instances of [FilesystemAction]
- * to the [add] method, but the filesystem is not modified until [apply] is called. There are actions for moving,
- * copying, creating and deleting files and directories. Custom actions can be created by subclassing [FilesystemAction].
+ * queue and can be applied to the filesystem all at once. New changes can be queued up by passing instances of
+ * [FilesystemAction] to the [add] method, but the filesystem is not modified until [apply] is called. There are actions
+ * for moving, copying, creating and deleting files and directories. Custom actions can be created by implementing
+ * [FilesystemAction].
  *
- * [FilesystemAction] classes accept both absolute paths and relative paths. If the paths are relative, they are resolved against
- * the path provided to [apply]. Using relative paths allows you to apply the changes to multiple directories.
+ * [FilesystemAction] classes accept both absolute and relative path nodes. If the paths are relative, they are resolved
+ * against the path provided to [apply]. Using relative paths allows you to apply the changes to multiple directories.
  *
  * The [view] method can be used to see what a directory will look like after all changes are applied. The [clear] and
  * [undo] methods can be used to undo changes before they're applied.
@@ -24,8 +30,7 @@ class PathDelta {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other == null || this::class != other::class) return false
-        other as PathDelta
+        if (other == null || other !is PathDelta) return false
         return actions == other.actions
     }
 
@@ -65,13 +70,13 @@ class PathDelta {
     }
 
     /**
-     * Returns what [dirPath] will look like after the [apply] method is called assuming there are no errors.
+     * Returns what [dirNode] will look like after the [apply] method is called assuming there are no errors.
      *
-     * Any relative paths that were passed to [FilesystemAction] classes are resolved against [dirPath]. This does not modify the
-     * filesystem.
+     * Any relative paths that were passed to [FilesystemAction] classes are resolved against [dirNode]. This does not
+     * modify the filesystem.
      */
-    fun view(dirPath: DirPath): DirPath {
-        val outputPath = dirPath.toMutableDirPath()
+    fun view(dirNode: PathNode): PathNode {
+        val outputPath = dirNode.toMutablePathNode()
         for (action in actions) {
             action.applyView(outputPath)
         }
@@ -81,11 +86,11 @@ class PathDelta {
     /**
      * Applies the changes in the queue to the filesystem in the order they were made.
      *
-     * Any relative paths that were passed to [FilesystemAction] classes are resolved against [dirPath]. Applying the changes does
-     * not consume them. If an [ErrorHandler] that was passed to an [FilesystemAction] class throws an exception, it will be
-     * thrown here.
+     * Any relative paths that were passed to [FilesystemAction] classes are resolved against [dirPath]. Applying the
+     * changes does not consume them. If an [ErrorHandler] that was passed to an [FilesystemAction] class throws an
+     * exception, it will be thrown here.
      */
-    fun apply(dirPath: DirPath) {
+    fun apply(dirPath: Path) {
         for (action in actions) {
             action.applyFilesystem(dirPath)
         }
