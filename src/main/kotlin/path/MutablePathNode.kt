@@ -210,14 +210,12 @@ class MutablePathNode(
     /**
      * Adds the given [pathNode] as a descendant of this node, inserting it into the tree.
      *
-     * @return `true` if the node was added or `false` if it already exists.
+     * If a node with the same path as the given node already exists, it is replaced.
      *
      * @throws [IllegalArgumentException] The given path node does not start with this node.
      */
-    fun addDescendant(pathNode: MutablePathNode): Boolean {
+    fun addDescendant(pathNode: MutablePathNode) {
         require(pathNode.startsWith(this)) { "The given path must start with this path." }
-
-        if (pathNode.path in descendants) return false
 
         // Get the descendant of this node that will be the ancestor of the given node.
         val ancestorOfNewNode = pathNode.path.fold(this) { node, segment -> node.children[segment] ?: node }
@@ -227,32 +225,18 @@ class MutablePathNode(
 
         // Insert the new node into the tree.
         newNodeRoot.parent = ancestorOfNewNode
-        return true
     }
-
-    /**
-     * Adds the given [pathNodes] as descendants of this node, inserting them into the tree.
-     *
-     * @return `true` if any of the nodes were added or `false` if all of them already exist.
-     *
-     * @throws [IllegalArgumentException] One of the given path nodes does not start with this node.
-     */
-    fun addAllDescendants(pathNodes: Collection<MutablePathNode>): Boolean =
-        pathNodes.filter { addDescendant(it) }.any()
 
     /**
      * Adds the given [pathNode] as a descendant of this node, inserting it into the tree.
      *
-     * The given path node is assumed to be relative to this node.
-     *
-     * @return `true` if the node was added or `false` if it already exists.
+     * The given path node is assumed to be relative to this node. If a node with the same path as the given node
+     * already exists, it is replaced.
      *
      * @throws [IllegalArgumentException] The given path node is absolute.
      */
-    fun addRelativeDescendant(pathNode: MutablePathNode): Boolean {
+    fun addRelativeDescendant(pathNode: MutablePathNode) {
         require(!pathNode.path.isAbsolute) { "The given path node must not be absolute" }
-
-        if (pathNode.path in relativeDescendants) return false
 
         // Get the descendant of this node that will be the ancestor of the given node.
         val fullPath = path.resolve(pathNode.path)
@@ -265,59 +249,31 @@ class MutablePathNode(
 
         // Insert the new node into the tree.
         newNodeRoot.parent = ancestorOfNewNode
-        return true
     }
-
-    /**
-     * Adds the given [pathNodes] as descendants of this node, inserting them into the tree.
-     *
-     * The given path nodes are assumed to be relative to this node.
-     *
-     * @return `true` if any of the nodes were added or `false` if all of them already exist.
-     *
-     * @throws [IllegalArgumentException] One of the given path nodes is absolute.
-     */
-    fun addAllRelativeDescendants(pathNodes: Collection<MutablePathNode>): Boolean =
-        pathNodes.filter { addRelativeDescendant(it) }.any()
 
     /**
      * Removes the descendant with the given [path] from the tree.
      *
-     * @return `true` if the descendant was removed or `false` if it doesn't exist.
+     * @return The path node that was removed or `null` if it doesn't exist.
      */
-    fun removeDescendant(path: Path): Boolean {
-        val nodeToRemove = descendants[path]
-        return nodeToRemove?.parent?._children?.remove(path) != null
+    fun removeDescendant(path: Path): MutablePathNode? {
+        val nodeToRemove = descendants[path] ?: return null
+        nodeToRemove.parent = null
+        return nodeToRemove
     }
-
-    /**
-     * Removes the descendants with the given [paths] from the tree.
-     *
-     * @return `true` any of the descendants were removed or `false` if none of them exist.
-     */
-    fun removeAllDescendants(paths: Collection<Path>): Boolean = paths.filter { removeDescendant(it) }.any()
 
     /**
      * Removes the descendant with the given [path] from the tree.
      *
-     * The give [path] is assumed to be relative to this node.
+     * The given [path] is assumed to be relative to this node.
      *
-     * @return `true` if the descendant was removed or `false` if it doesn't exist.
+     * @return The path node that was removed or `null` if it doesn't exist.
      */
-    fun removeRelativeDescendant(path: Path): Boolean {
-        val nodeToRemove = relativeDescendants[path]
-        return nodeToRemove?.parent?._children?.remove(path) != null
+    fun removeRelativeDescendant(path: Path): MutablePathNode? {
+        val nodeToRemove = relativeDescendants[path] ?: return null
+        nodeToRemove.parent = null
+        return nodeToRemove
     }
-
-    /**
-     * Removes the descendants with the given [paths] from the tree.
-     *
-     * The give [paths] are assumed to be relative to this node.
-     *
-     * @return `true` any of the descendants were removed or `false` if none of them exist.
-     */
-    fun removeAllRelativeDescendants(paths: Collection<Path>): Boolean =
-        paths.filter { removeRelativeDescendant(it) }.any()
 
     /**
      * Removes all children from this node.
