@@ -17,17 +17,14 @@
  * along with doppel.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import doppel.path.DirectoryType
-import doppel.path.PathNode
-import doppel.path.RegularFileType
-import doppel.path.dir
-import doppel.path.file
+package doppel.path
+
 import io.kotlintest.matchers.maps.shouldContain
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.WordSpec
 import java.nio.file.Paths
 
-class PathNodeFactory : WordSpec() {
+class PathNodeFactoryTest : WordSpec() {
     init {
         "MutablePathNode.of" should {
             "make the last segment the file name" {

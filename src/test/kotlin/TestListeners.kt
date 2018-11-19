@@ -17,6 +17,8 @@
  * along with doppel.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+package doppel.listeners
+
 import doppel.path.MutablePathNode
 import doppel.path.PathNode
 import doppel.path.WalkDirection

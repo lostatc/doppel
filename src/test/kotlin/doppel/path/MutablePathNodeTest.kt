@@ -17,13 +17,9 @@
  * along with doppel.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import doppel.path.DirectoryType
-import doppel.path.MutablePathNode
-import doppel.path.PathNode
-import doppel.path.RegularFileType
-import doppel.path.WalkDirection
-import doppel.path.dir
-import doppel.path.file
+package doppel.path
+
+import doppel.listeners.NonexistentFileListener
 import io.kotlintest.extensions.TestListener
 import io.kotlintest.matchers.boolean.shouldBeFalse
 import io.kotlintest.matchers.boolean.shouldBeTrue
