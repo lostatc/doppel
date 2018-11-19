@@ -19,18 +19,14 @@
 
 package doppel.listeners
 
-import doppel.path.MutablePathNode
-import doppel.path.PathNode
-import doppel.path.WalkDirection
-import doppel.path.dir
-import doppel.path.file
+import com.google.common.jimfs.Configuration
+import com.google.common.jimfs.Jimfs
 import io.kotlintest.Description
 import io.kotlintest.Spec
-import io.kotlintest.TestResult
 import io.kotlintest.extensions.TestListener
+import java.nio.file.FileSystem
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
 
 /**
  * A test listener that creates existing and a nonexistent files for testing.
@@ -52,43 +48,24 @@ class NonexistentFileListener : TestListener {
     lateinit var nonexistentFile: Path
 
     override fun beforeSpec(description: Description, spec: Spec) {
-        existingFile = Files.createTempFile("", ".tmp")
-        existingDir = Files.createTempDirectory("")
-        nonexistentFile = Paths.get("/", "nonexistent")
-    }
+        val filesystem = Jimfs.newFileSystem(Configuration.unix())
 
-    override fun afterSpec(description: Description, spec: Spec) {
-        Files.deleteIfExists(existingFile)
-        Files.deleteIfExists(existingDir)
+        existingFile = filesystem.getPath("/", "existingFile")
+        existingDir = filesystem.getPath("/", "existingDir")
+        nonexistentFile = filesystem.getPath("/", "nonexistent")
+
+        Files.createFile(existingFile)
+        Files.createDirectories(existingDir)
     }
 }
 
 /**
- * A test listener that creates a tree of files and directories in the filesystem.
+ * A test listener that creates a new in-memory filesystem for each test.
  */
-class FileTreeListener : TestListener {
-    /**
-     * A directory path representing the tree of files and directories.
-     */
-    lateinit var pathNode: PathNode
+class FilesystemListener : TestListener {
+    lateinit var filesystem: FileSystem
 
     override fun beforeTest(description: Description) {
-        val tempPath = Files.createTempDirectory("")
-        pathNode = MutablePathNode.of(tempPath) {
-            file("b")
-            dir("c", "d") {
-                file("e")
-                dir("f")
-            }
-        }
-
-        pathNode.createFile(recursive = true)
-    }
-
-    override fun afterTest(description: Description, result: TestResult) {
-        for (descendant in pathNode.walkChildren(WalkDirection.BOTTOM_UP)) {
-            Files.deleteIfExists(descendant.path)
-        }
-        Files.deleteIfExists(pathNode.path)
+        filesystem = Jimfs.newFileSystem(Configuration.unix())
     }
 }

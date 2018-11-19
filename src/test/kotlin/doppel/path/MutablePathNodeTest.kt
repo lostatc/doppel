@@ -19,6 +19,7 @@
 
 package doppel.path
 
+import doppel.listeners.FilesystemListener
 import doppel.listeners.NonexistentFileListener
 import io.kotlintest.extensions.TestListener
 import io.kotlintest.matchers.boolean.shouldBeFalse
@@ -29,13 +30,19 @@ import io.kotlintest.matchers.types.shouldNotBeSameInstanceAs
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldThrow
 import io.kotlintest.specs.WordSpec
+import java.nio.file.FileSystem
 import java.nio.file.Paths
 
 class MutablePathNodeTest : WordSpec() {
 
     val nonexistentListener: NonexistentFileListener = NonexistentFileListener()
 
-    override fun listeners(): List<TestListener> = listOf(nonexistentListener)
+    val filesystemListener: FilesystemListener = FilesystemListener()
+
+    val fs: FileSystem
+        get() = filesystemListener.filesystem
+
+    override fun listeners(): List<TestListener> = listOf(nonexistentListener, filesystemListener)
 
     init {
         "MutablePathNode constructor" should {
@@ -294,7 +301,7 @@ class MutablePathNodeTest : WordSpec() {
             }
         }
 
-        "PathNode.resolve" should {
+        "MutablePathNode.resolve" should {
             "return the given path if it is absolute" {
                 val testNode = PathNode.of("/", "a")
                 val otherNode = PathNode.of("/", "b")
@@ -315,10 +322,6 @@ class MutablePathNodeTest : WordSpec() {
 
                 testNode.resolve(otherNode).shouldBe(PathNode.of("a", "b", "c"))
             }
-        }
-
-        "MutableDirPath.diff" should {
-            // TODO: Implement tests
         }
 
         "MutablePathNode.exists" should {
@@ -342,18 +345,36 @@ class MutablePathNodeTest : WordSpec() {
         }
 
         "MutablePathNode.sameContentsAs" should {
-            // TODO: Implement tests
+            "return false if the nodes have different types" {
+                val thisNode = PathNode.of("a", type = RegularFileType())
+                val otherNode = PathNode.of("b", type = DirectoryType())
+
+                thisNode.sameContentsAs(otherNode).shouldBeFalse()
+            }
         }
 
         "MutablePathNode.createFile" should {
-            // TODO: Implement tests
+            "create a single file" {
+                val testNode = PathNode.of(fs.getPath("a"), type = RegularFileType())
+                testNode.createFile()
+
+                testNode.exists().shouldBeTrue()
+            }
+
+            "recursively create files" {
+                val testNode = PathNode.of(fs.getPath("a")) {
+                    file("b")
+                    dir("c") {
+                        file("d")
+                    }
+                }
+                testNode.createFile(recursive = true)
+
+                testNode.exists(recursive = true).shouldBeTrue()
+            }
         }
 
         "MutablePathNode.addDescendant" should {
-            // TODO: Implement tests
-        }
-
-        "MutablePathNode.addAllDescendants" should {
             // TODO: Implement tests
         }
 
@@ -361,15 +382,11 @@ class MutablePathNodeTest : WordSpec() {
             // TODO: Implement tests
         }
 
-        "MutablePathNode.addAllRelativeDescendants" should {
-            // TODO: Implement tests
-        }
-
         "MutablePathNode.removeDescendant" should {
             // TODO: Implement tests
         }
 
-        "MutablePathNode.removeAllDescendants" should {
+        "MutablePathNode.removeRelativeDescendant" should {
             // TODO: Implement tests
         }
 

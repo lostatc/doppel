@@ -134,6 +134,8 @@ interface PathNode {
     /**
      * Returns a sequence of all the ancestors of this node.
      *
+     * This node is not included in the sequence.
+     *
      * @param [direction] The direction in which to iterate over ancestors.
      */
     fun walkAncestors(direction: WalkDirection = WalkDirection.BOTTOM_UP): Sequence<PathNode>
@@ -207,7 +209,8 @@ interface PathNode {
     /**
      * Returns whether the files represented by this path node and [other] have the same contents.
      *
-     * How files are compared is determined by the [type].
+     * How files are compared is determined by the [type]. If the [type] of each node is different, this returns
+     * `false`.
      */
     fun sameContentsAs(other: PathNode): Boolean
 
@@ -262,7 +265,9 @@ interface PathNodeFactory {
      *
      * Example:
      * ```
-     * val pathNode = PathNode.of("/", "home", "user") {
+     * val path = Paths.get("/", "home", "user")
+     *
+     * val pathNode = PathNode.of(path) {
      *     file("Photo.png")
      *     dir("Documents", "Reports") {
      *         file("Monthly.odt")
