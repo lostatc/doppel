@@ -19,6 +19,8 @@
 
 package doppel.path
 
+import com.google.common.jimfs.Configuration
+import com.google.common.jimfs.Jimfs
 import io.kotlintest.matchers.maps.shouldContain
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.WordSpec
@@ -26,7 +28,7 @@ import java.nio.file.Paths
 
 class PathNodeFactoryTest : WordSpec() {
     init {
-        "MutablePathNode.of" should {
+        "PathNodeFactory.of" should {
             "make the last segment the file name" {
                 val testPath = Paths.get("parent", "fileName")
                 PathNode.of(testPath).fileName.shouldBe(Paths.get("fileName"))
@@ -68,8 +70,22 @@ class PathNodeFactoryTest : WordSpec() {
             }
         }
 
-        "MutablePathNode.fromFilesystem" should {
-            // TODO: Implement tests
+        "PathNodeFactory.fromFilesystem" should {
+            "create a tree of nodes from the filesystem" {
+                val fs = Jimfs.newFileSystem(Configuration.unix())
+                val testPath = fs.getPath("a")
+
+                val expectedNode = PathNode.of(testPath, type = DirectoryType()) {
+                    dir("b") {
+                        file("c")
+                    }
+                    file("d")
+                }
+                expectedNode.createFile(recursive = true)
+
+                val testNode = PathNode.fromFilesystem(testPath, recursive = true)
+                testNode.shouldBe(expectedNode)
+            }
         }
     }
 }

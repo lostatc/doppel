@@ -235,9 +235,12 @@ class MutablePathNode(
      */
     fun addDescendant(pathNode: MutablePathNode) {
         require(pathNode.startsWith(this)) { "The given path must start with this path." }
+        require(pathNode.path != path) { "The given path must not be equal to this path." }
 
         // Get the descendant of this node that will be the ancestor of the given node.
-        val ancestorOfNewNode = pathNode.path.fold(this) { node, segment -> node.children[segment] ?: node }
+        val ancestorOfNewNode = pathNode.parent?.path?.fold(this) { node, segment ->
+            node.children.getOrDefault(segment, node)
+        } ?: this
 
         // Get the ancestor of the given node that will become an immediate child of [ancestorOfNewNode].
         val newNodeRoot = pathNode.walkAncestors().find { it.parent?.path == ancestorOfNewNode.path } ?: pathNode
@@ -259,7 +262,9 @@ class MutablePathNode(
 
         // Get the descendant of this node that will be the ancestor of the given node.
         val fullPath = path.resolve(pathNode.path)
-        val ancestorOfNewNode = fullPath.fold(this) { node, segment -> node.children[segment] ?: node }
+        val ancestorOfNewNode = fullPath.parent?.fold(this) { node, segment ->
+            node.children.getOrDefault(segment, node)
+        } ?: this
 
         // Get the ancestor of the given node that will become an immediate child of [ancestorOfNewNode].
         val newNodeRoot = pathNode.walkAncestors().find {
@@ -323,7 +328,8 @@ class MutablePathNode(
             val newNode = MutablePathNode.of(path, type = typeFactory(path))
 
             if (recursive) {
-                for (descendantPath in Files.walk(path)) {
+                // Skip the path itself. We only want its descendants.
+                for (descendantPath in Files.walk(path).skip(1)) {
                     val newDescendant = MutablePathNode.of(descendantPath, type = typeFactory(descendantPath))
                     newNode.addDescendant(newDescendant)
                 }

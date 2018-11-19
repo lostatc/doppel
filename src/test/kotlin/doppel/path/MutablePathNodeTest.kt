@@ -19,30 +19,29 @@
 
 package doppel.path
 
-import doppel.listeners.FilesystemListener
+import com.google.common.jimfs.Configuration
+import com.google.common.jimfs.Jimfs
 import doppel.listeners.NonexistentFileListener
+import io.kotlintest.assertSoftly
 import io.kotlintest.extensions.TestListener
 import io.kotlintest.matchers.boolean.shouldBeFalse
 import io.kotlintest.matchers.boolean.shouldBeTrue
 import io.kotlintest.matchers.collections.shouldBeEmpty
+import io.kotlintest.matchers.maps.shouldContain
+import io.kotlintest.matchers.maps.shouldNotContainKey
 import io.kotlintest.matchers.types.shouldBeInstanceOf
+import io.kotlintest.matchers.types.shouldBeSameInstanceAs
 import io.kotlintest.matchers.types.shouldNotBeSameInstanceAs
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldThrow
 import io.kotlintest.specs.WordSpec
-import java.nio.file.FileSystem
 import java.nio.file.Paths
 
 class MutablePathNodeTest : WordSpec() {
 
     val nonexistentListener: NonexistentFileListener = NonexistentFileListener()
 
-    val filesystemListener: FilesystemListener = FilesystemListener()
-
-    val fs: FileSystem
-        get() = filesystemListener.filesystem
-
-    override fun listeners(): List<TestListener> = listOf(nonexistentListener, filesystemListener)
+    override fun listeners(): List<TestListener> = listOf(nonexistentListener)
 
     init {
         "MutablePathNode constructor" should {
@@ -355,6 +354,7 @@ class MutablePathNodeTest : WordSpec() {
 
         "MutablePathNode.createFile" should {
             "create a single file" {
+                val fs = Jimfs.newFileSystem(Configuration.unix())
                 val testNode = PathNode.of(fs.getPath("a"), type = RegularFileType())
                 testNode.createFile()
 
@@ -362,6 +362,7 @@ class MutablePathNodeTest : WordSpec() {
             }
 
             "recursively create files" {
+                val fs = Jimfs.newFileSystem(Configuration.unix())
                 val testNode = PathNode.of(fs.getPath("a")) {
                     file("b")
                     dir("c") {
@@ -375,23 +376,178 @@ class MutablePathNodeTest : WordSpec() {
         }
 
         "MutablePathNode.addDescendant" should {
-            // TODO: Implement tests
+            "throw if the given node does not start with this node" {
+                val thisNode = MutablePathNode.of("a", "b")
+                val otherNode = MutablePathNode.of("a", "c")
+
+                shouldThrow<IllegalArgumentException> {
+                    thisNode.addDescendant(otherNode)
+                }
+            }
+
+            "throw if the given node has the same path as this node" {
+                val thisNode = MutablePathNode.of("/", "a")
+                val otherNode = MutablePathNode.of("/", "a")
+
+                shouldThrow<IllegalArgumentException> {
+                    thisNode.addDescendant(otherNode)
+                }
+            }
+
+            "add an immediate child of this node" {
+                val thisNode = MutablePathNode.of("/")
+                val otherNode = MutablePathNode.of("/", "a")
+
+                thisNode.addDescendant(otherNode)
+                thisNode.children.shouldContain(otherNode.fileName, otherNode)
+            }
+
+            "add a descendant of this node" {
+                val thisNode = MutablePathNode.of("/") {
+                    dir("a") {
+                        file("b")
+                    }
+                }
+                val otherNode = MutablePathNode.of("/", "a", "c", "d")
+
+                thisNode.addDescendant(otherNode)
+                thisNode.descendants.shouldContain(otherNode.path, otherNode)
+            }
+
+            "replace an existing node" {
+                val thisNode = MutablePathNode.of("/") {
+                    file("a")
+                }
+                val otherNode = MutablePathNode.of("/", "a", type = DirectoryType())
+
+                thisNode.addDescendant(otherNode)
+                thisNode.children.shouldContain(otherNode.fileName, otherNode)
+            }
+
+            "not copy the given node" {
+                val thisNode = MutablePathNode.of("/")
+                val otherNode = MutablePathNode.of("/", "a")
+
+                thisNode.addDescendant(otherNode)
+                thisNode.children[otherNode.fileName].shouldBeSameInstanceAs(otherNode)
+            }
         }
 
         "MutablePathNode.addRelativeDescendant" should {
-            // TODO: Implement tests
+            "throw if the given node is absolute" {
+                val thisNode = MutablePathNode.of("a")
+                val otherNode = MutablePathNode.of("/", "a", "b")
+
+                shouldThrow<IllegalArgumentException> {
+                    thisNode.addRelativeDescendant(otherNode)
+                }
+            }
+
+            "add an immediate child of this node" {
+                val thisNode = MutablePathNode.of("/")
+                val otherNode = MutablePathNode.of("a")
+
+                thisNode.addRelativeDescendant(otherNode)
+                thisNode.children.shouldContain(otherNode.fileName, otherNode)
+            }
+
+            "add a descendant of this node" {
+                val thisNode = MutablePathNode.of("/") {
+                    dir("a") {
+                        file("b")
+                    }
+                }
+                val otherNode = MutablePathNode.of("a", "c", "d")
+
+                thisNode.addRelativeDescendant(otherNode)
+                thisNode.descendants.shouldContain(otherNode.path, otherNode)
+            }
+
+            "replace an existing node" {
+                val thisNode = MutablePathNode.of("/") {
+                    file("a")
+                }
+                val otherNode = MutablePathNode.of("a", type = DirectoryType())
+
+                thisNode.addRelativeDescendant(otherNode)
+                thisNode.children.shouldContain(otherNode.fileName, otherNode)
+            }
+
+            "not copy the given node" {
+                val thisNode = MutablePathNode.of("/")
+                val otherNode = MutablePathNode.of("a")
+
+                thisNode.addRelativeDescendant(otherNode)
+                thisNode.children[otherNode.fileName].shouldBeSameInstanceAs(otherNode)
+            }
         }
 
         "MutablePathNode.removeDescendant" should {
-            // TODO: Implement tests
+            "remove the descendant from the tree" {
+                val thisNode = MutablePathNode.of("/") {
+                    dir("a") {
+                        file("b")
+                    }
+                }
+                val otherPath = Paths.get("/", "a", "b")
+                val otherNode = thisNode.removeDescendant(otherPath)
+
+                assertSoftly {
+                    thisNode.descendants.shouldNotContainKey(otherPath)
+                    otherNode?.fileName.shouldBe(otherPath.fileName)
+                }
+            }
+
+            "return null if the descendant doesn't exist." {
+                val thisNode = MutablePathNode.of("/") {
+                    file("a")
+                }
+                val otherPath = Paths.get("/", "a", "b")
+
+                val otherNode = thisNode.removeDescendant(otherPath)
+                otherNode.shouldBe(null)
+            }
         }
 
         "MutablePathNode.removeRelativeDescendant" should {
-            // TODO: Implement tests
+            "remove the descendant from the tree" {
+                val thisNode = MutablePathNode.of("/") {
+                    dir("a") {
+                        file("b")
+                    }
+                }
+                val otherPath = Paths.get("a", "b")
+                val otherNode = thisNode.removeRelativeDescendant(otherPath)
+
+                assertSoftly {
+                    thisNode.relativeDescendants.shouldNotContainKey(otherPath)
+                    otherNode?.fileName.shouldBe(otherPath.fileName)
+                }
+            }
+
+            "return null if the descendant doesn't exist." {
+                val thisNode = MutablePathNode.of("/") {
+                    file("a")
+                }
+                val otherPath = Paths.get("a", "b")
+
+                val otherNode = thisNode.removeRelativeDescendant(otherPath)
+                otherNode.shouldBe(null)
+            }
         }
 
         "MutablePathNode.clearChildren" should {
-            // TODO: Implement tests
+            "remove all children from the node" {
+                val testNode = MutablePathNode.of("/") {
+                    file("a")
+                    dir("b") {
+                        file("c")
+                    }
+                }
+                testNode.clearChildren()
+
+                testNode.children.entries.shouldBeEmpty()
+            }
         }
     }
 }

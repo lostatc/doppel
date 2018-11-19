@@ -24,7 +24,6 @@ import com.google.common.jimfs.Jimfs
 import io.kotlintest.Description
 import io.kotlintest.Spec
 import io.kotlintest.extensions.TestListener
-import java.nio.file.FileSystem
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -56,16 +55,5 @@ class NonexistentFileListener : TestListener {
 
         Files.createFile(existingFile)
         Files.createDirectories(existingDir)
-    }
-}
-
-/**
- * A test listener that creates a new in-memory filesystem for each test.
- */
-class FilesystemListener : TestListener {
-    lateinit var filesystem: FileSystem
-
-    override fun beforeTest(description: Description) {
-        filesystem = Jimfs.newFileSystem(Configuration.unix())
     }
 }
