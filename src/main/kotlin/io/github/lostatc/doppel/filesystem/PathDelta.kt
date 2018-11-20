@@ -17,10 +17,10 @@
  * along with doppel.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package doppel.filesystem
+package io.github.lostatc.doppel.filesystem
 
-import doppel.error.ErrorHandler
-import doppel.path.PathNode
+import io.github.lostatc.doppel.error.ErrorHandler
+import io.github.lostatc.doppel.path.PathNode
 import java.nio.file.Path
 import java.util.Deque
 import java.util.LinkedList

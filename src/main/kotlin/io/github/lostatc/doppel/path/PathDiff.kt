@@ -17,11 +17,11 @@
  * along with doppel.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package doppel.path
+package io.github.lostatc.doppel.path
 
-import doppel.error.ErrorHandler
-import doppel.error.ErrorHandlerAction
-import doppel.error.skipOnError
+import io.github.lostatc.doppel.error.ErrorHandler
+import io.github.lostatc.doppel.error.ErrorHandlerAction
+import io.github.lostatc.doppel.error.skipOnError
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path

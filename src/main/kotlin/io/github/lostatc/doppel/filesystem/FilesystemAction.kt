@@ -17,12 +17,12 @@
  * along with doppel.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package doppel.filesystem
+package io.github.lostatc.doppel.filesystem
 
-import doppel.error.ErrorHandler
-import doppel.error.skipOnError
-import doppel.path.MutablePathNode
-import doppel.path.PathNode
+import io.github.lostatc.doppel.error.ErrorHandler
+import io.github.lostatc.doppel.error.skipOnError
+import io.github.lostatc.doppel.path.MutablePathNode
+import io.github.lostatc.doppel.path.PathNode
 import java.io.IOException
 import java.nio.file.FileSystemLoopException
 import java.nio.file.Path
@@ -224,6 +224,10 @@ data class DeleteAction(
 
     override fun applyFilesystem(dirPath: Path) {
         val absolutePath = dirPath.resolve(pathNode.path)
-        deleteRecursively(absolutePath, followLinks = followLinks, onError = onError)
+        deleteRecursively(
+            absolutePath,
+            followLinks = followLinks,
+            onError = onError
+        )
     }
 }

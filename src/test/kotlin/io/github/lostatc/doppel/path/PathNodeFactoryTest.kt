@@ -17,7 +17,7 @@
  * along with doppel.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package doppel.path
+package io.github.lostatc.doppel.path
 
 import com.google.common.jimfs.Configuration
 import com.google.common.jimfs.Jimfs
@@ -62,8 +62,18 @@ class PathNodeFactoryTest : WordSpec() {
                 }
 
                 val children = mapOf(
-                    Paths.get("b") to PathNode.of("/", "a", "b", type = RegularFileType()),
-                    Paths.get("c") to PathNode.of("/", "a", "c", type = DirectoryType())
+                    Paths.get("b") to PathNode.of(
+                        "/",
+                        "a",
+                        "b",
+                        type = RegularFileType()
+                    ),
+                    Paths.get("c") to PathNode.of(
+                        "/",
+                        "a",
+                        "c",
+                        type = DirectoryType()
+                    )
                 )
 
                 testNode.children.shouldBe(children)
@@ -75,7 +85,10 @@ class PathNodeFactoryTest : WordSpec() {
                 val fs = Jimfs.newFileSystem(Configuration.unix())
                 val testPath = fs.getPath("a")
 
-                val expectedNode = PathNode.of(testPath, type = DirectoryType()) {
+                val expectedNode = PathNode.of(
+                    testPath,
+                    type = DirectoryType()
+                ) {
                     dir("b") {
                         file("c")
                     }
@@ -83,7 +96,8 @@ class PathNodeFactoryTest : WordSpec() {
                 }
                 expectedNode.createFile(recursive = true)
 
-                val testNode = PathNode.fromFilesystem(testPath, recursive = true)
+                val testNode =
+                    PathNode.fromFilesystem(testPath, recursive = true)
                 testNode.shouldBe(expectedNode)
             }
         }

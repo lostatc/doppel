@@ -17,10 +17,10 @@
  * along with doppel.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package doppel.path
+package io.github.lostatc.doppel.path
 
-import doppel.error.ErrorHandler
-import doppel.error.ErrorHandlerAction
+import io.github.lostatc.doppel.error.ErrorHandler
+import io.github.lostatc.doppel.error.ErrorHandlerAction
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
@@ -193,7 +193,8 @@ class MutablePathNode(
         return childOfThisNode.descendants[fullPath] ?: childOfThisNode
     }
 
-    override fun diff(other: PathNode, onError: ErrorHandler): PathDiff = PathDiff.fromPathNodes(this, other, onError)
+    override fun diff(other: PathNode, onError: ErrorHandler): PathDiff =
+        PathDiff.fromPathNodes(this, other, onError)
 
     override fun exists(checkType: Boolean, recursive: Boolean): Boolean {
         val fileExists = if (checkType) type.checkType(path) else Files.exists(path)
@@ -309,7 +310,9 @@ class MutablePathNode(
     companion object : PathNodeFactory {
         override fun of(path: Path, type: FileType, init: MutablePathNode.() -> Unit): MutablePathNode {
             val fileName = path.fileName ?: path
-            val parent = if (path.parent == null) null else MutablePathNode.of(path.parent)
+            val parent = if (path.parent == null) null else of(
+                path.parent
+            )
             val pathNode = MutablePathNode(fileName, parent, type)
             pathNode.init()
             return pathNode
@@ -321,16 +324,19 @@ class MutablePathNode(
             init: MutablePathNode.() -> Unit
         ): MutablePathNode {
             val path = Paths.get(firstSegment, *segments)
-            return MutablePathNode.of(path, type = type, init = init)
+            return of(path, type = type, init = init)
         }
 
         override fun fromFilesystem(path: Path, recursive: Boolean, typeFactory: (Path) -> FileType): MutablePathNode {
-            val newNode = MutablePathNode.of(path, type = typeFactory(path))
+            val newNode = of(path, type = typeFactory(path))
 
             if (recursive) {
                 // Skip the path itself. We only want its descendants.
                 for (descendantPath in Files.walk(path).skip(1)) {
-                    val newDescendant = MutablePathNode.of(descendantPath, type = typeFactory(descendantPath))
+                    val newDescendant = of(
+                        descendantPath,
+                        type = typeFactory(descendantPath)
+                    )
                     newNode.addDescendant(newDescendant)
                 }
             }

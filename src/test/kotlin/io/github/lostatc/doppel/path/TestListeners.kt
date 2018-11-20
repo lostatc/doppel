@@ -17,7 +17,7 @@
  * along with doppel.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package doppel.listeners
+package io.github.lostatc.doppel.path
 
 import com.google.common.jimfs.Configuration
 import com.google.common.jimfs.Jimfs

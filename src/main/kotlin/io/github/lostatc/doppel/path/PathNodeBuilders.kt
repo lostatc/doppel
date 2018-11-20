@@ -17,7 +17,7 @@
  * along with doppel.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package doppel.path
+package io.github.lostatc.doppel.path
 
 import java.nio.file.Path
 

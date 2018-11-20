@@ -17,9 +17,9 @@
  * along with doppel.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package doppel.path
+package io.github.lostatc.doppel.path
 
-import doppel.filesystem.getFileChecksum
+import io.github.lostatc.doppel.filesystem.getFileChecksum
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
@@ -75,7 +75,9 @@ class RegularFileType : FileType {
     override fun checkSame(left: Path, right: Path): Boolean {
         if (Files.isSameFile(left, right)) return true
         if (Files.size(left) != Files.size(right)) return false
-        return getFileChecksum(left) contentEquals getFileChecksum(right)
+        return getFileChecksum(left) contentEquals getFileChecksum(
+            right
+        )
     }
 
     override fun createFile(path: Path) {

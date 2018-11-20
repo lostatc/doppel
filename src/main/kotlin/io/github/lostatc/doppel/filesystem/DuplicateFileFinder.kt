@@ -17,7 +17,7 @@
  * along with doppel.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package doppel.filesystem
+package io.github.lostatc.doppel.filesystem
 
 import java.nio.file.FileVisitOption
 import java.nio.file.Files

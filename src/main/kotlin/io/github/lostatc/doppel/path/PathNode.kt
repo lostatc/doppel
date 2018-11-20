@@ -17,10 +17,10 @@
  * along with doppel.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package doppel.path
+package io.github.lostatc.doppel.path
 
-import doppel.error.ErrorHandler
-import doppel.error.skipOnError
+import io.github.lostatc.doppel.error.ErrorHandler
+import io.github.lostatc.doppel.error.skipOnError
 import java.io.IOException
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -237,7 +237,12 @@ interface PathNode {
             type: FileType,
             init: MutablePathNode.() -> Unit
         ): PathNode {
-            return MutablePathNode.of(firstSegment, *segments, type = type, init = init)
+            return MutablePathNode.of(
+                firstSegment,
+                *segments,
+                type = type,
+                init = init
+            )
         }
 
         override fun fromFilesystem(path: Path, recursive: Boolean, typeFactory: (Path) -> FileType): PathNode {

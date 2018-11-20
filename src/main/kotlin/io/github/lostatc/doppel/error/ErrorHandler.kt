@@ -17,7 +17,7 @@
  * along with doppel.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package doppel.error
+package io.github.lostatc.doppel.error
 
 import java.io.IOException
 import java.nio.file.FileVisitResult
@@ -51,13 +51,15 @@ typealias ErrorHandler = (Path, IOException) -> ErrorHandlerAction
  * Handles filesystem errors by always skipping the file that caused the error.
  */
 @Suppress("UNUSED_PARAMETER")
-fun skipOnError(file: Path, exception: IOException): ErrorHandlerAction = ErrorHandlerAction.SKIP
+fun skipOnError(file: Path, exception: IOException): ErrorHandlerAction =
+    ErrorHandlerAction.SKIP
 
 /**
  * Handles filesystem errors by always terminating the operation when there is an error.
  */
 @Suppress("UNUSED_PARAMETER")
-fun terminateOnError(file: Path, exception: IOException): ErrorHandlerAction = ErrorHandlerAction.TERMINATE
+fun terminateOnError(file: Path, exception: IOException): ErrorHandlerAction =
+    ErrorHandlerAction.TERMINATE
 
 /**
  * Handles filesystem errors by always throwing the exception.

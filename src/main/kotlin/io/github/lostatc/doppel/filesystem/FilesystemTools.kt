@@ -17,9 +17,9 @@
  * along with doppel.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package doppel.filesystem
+package io.github.lostatc.doppel.filesystem
 
-import doppel.error.ErrorHandler
+import io.github.lostatc.doppel.error.ErrorHandler
 import java.io.IOException
 import java.nio.file.CopyOption
 import java.nio.file.FileVisitOption
@@ -130,7 +130,11 @@ internal fun moveRecursively(
 
             return handleWalkErrors(onError, file) {
                 // [Files.move] will not replace a non-empty directory. You need to delete it recursively.
-                if (overwrite) deleteRecursively(destFile, followLinks = followLinks, onError = onError)
+                if (overwrite) deleteRecursively(
+                    destFile,
+                    followLinks = followLinks,
+                    onError = onError
+                )
                 Files.move(file, destFile, *copyOptions.toTypedArray())
             }
         }
@@ -147,7 +151,11 @@ internal fun moveRecursively(
             } catch (e: IOException) {
                 handleWalkErrors(onError, dir) {
                     // [Files.copy] will not replace a non-empty directory. You need to delete it recursively.
-                    if (overwrite) deleteRecursively(destDir, followLinks = followLinks, onError = onError)
+                    if (overwrite) deleteRecursively(
+                        destDir,
+                        followLinks = followLinks,
+                        onError = onError
+                    )
                     Files.copy(dir, destDir, *copyOptions.toTypedArray())
                 }
             }
@@ -193,7 +201,11 @@ internal fun copyRecursively(
 
             return handleWalkErrors(onError, file) {
                 // [Files.copy] will not replace a non-empty directory. You need to delete it recursively.
-                if (overwrite) deleteRecursively(destFile, followLinks = followLinks, onError = onError)
+                if (overwrite) deleteRecursively(
+                    destFile,
+                    followLinks = followLinks,
+                    onError = onError
+                )
                 Files.copy(file, destFile, *copyOptions.toTypedArray())
             }
         }
@@ -204,7 +216,11 @@ internal fun copyRecursively(
             // Copy the directory itself with its attributes if necessary.
             return handleWalkErrors(onError, dir) {
                 // [Files.copy] will not replace a non-empty directory. You need to delete it recursively.
-                if (overwrite) deleteRecursively(destDir, followLinks = followLinks, onError = onError)
+                if (overwrite) deleteRecursively(
+                    destDir,
+                    followLinks = followLinks,
+                    onError = onError
+                )
                 Files.copy(dir, destDir, *copyOptions.toTypedArray())
             }
         }

@@ -17,11 +17,10 @@
  * along with doppel.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package doppel.path
+package io.github.lostatc.doppel.path
 
 import com.google.common.jimfs.Configuration
 import com.google.common.jimfs.Jimfs
-import doppel.listeners.NonexistentFileListener
 import io.kotlintest.assertSoftly
 import io.kotlintest.extensions.TestListener
 import io.kotlintest.matchers.boolean.shouldBeFalse
@@ -58,12 +57,18 @@ class MutablePathNodeTest : WordSpec() {
 
         "MutablePathNode.type" should {
             "return the type passed to the constructor" {
-                val testNode = PathNode.of("a", type = RegularFileType())
+                val testNode = PathNode.of(
+                    "a",
+                    type = RegularFileType()
+                )
                 testNode.type.shouldBeInstanceOf<RegularFileType>()
             }
 
             "change to a directory type when children are added" {
-                val testNode = MutablePathNode.of("a", type = RegularFileType())
+                val testNode = MutablePathNode.of(
+                    "a",
+                    type = RegularFileType()
+                )
                 val descendantNode = MutablePathNode.of("a", "b")
                 testNode.addDescendant(descendantNode)
                 testNode.type.shouldBeInstanceOf<DirectoryType>()
@@ -167,7 +172,8 @@ class MutablePathNodeTest : WordSpec() {
             }
 
             "consider different instances equal" {
-                PathNode.of("a", "b").shouldBe(PathNode.of("a", "b"))
+                PathNode.of("a", "b")
+                    .shouldBe(PathNode.of("a", "b"))
             }
         }
 
@@ -312,7 +318,14 @@ class MutablePathNodeTest : WordSpec() {
                 val testNode = PathNode.of("/", "a")
                 val otherNode = PathNode.of("b", "c")
 
-                testNode.resolve(otherNode).shouldBe(PathNode.of("/", "a", "b", "c"))
+                testNode.resolve(otherNode).shouldBe(
+                    PathNode.of(
+                        "/",
+                        "a",
+                        "b",
+                        "c"
+                    )
+                )
             }
 
             "resolve the given path against a relative path" {
@@ -325,13 +338,19 @@ class MutablePathNodeTest : WordSpec() {
 
         "MutablePathNode.exists" should {
             "identify that an existing file exists" {
-                val testNode = PathNode.of(nonexistentListener.existingFile, RegularFileType())
+                val testNode = PathNode.of(
+                    nonexistentListener.existingFile,
+                    RegularFileType()
+                )
                 testNode.exists(checkType = false).shouldBeTrue()
                 testNode.exists(checkType = true).shouldBeTrue()
             }
 
             "identify that a file is a different type" {
-                val testNode = PathNode.of(nonexistentListener.existingDir, RegularFileType())
+                val testNode = PathNode.of(
+                    nonexistentListener.existingDir,
+                    RegularFileType()
+                )
                 testNode.exists(checkType = false).shouldBeTrue()
                 testNode.exists(checkType = true).shouldBeFalse()
             }
@@ -345,8 +364,14 @@ class MutablePathNodeTest : WordSpec() {
 
         "MutablePathNode.sameContentsAs" should {
             "return false if the nodes have different types" {
-                val thisNode = PathNode.of("a", type = RegularFileType())
-                val otherNode = PathNode.of("b", type = DirectoryType())
+                val thisNode = PathNode.of(
+                    "a",
+                    type = RegularFileType()
+                )
+                val otherNode = PathNode.of(
+                    "b",
+                    type = DirectoryType()
+                )
 
                 thisNode.sameContentsAs(otherNode).shouldBeFalse()
             }
@@ -355,7 +380,10 @@ class MutablePathNodeTest : WordSpec() {
         "MutablePathNode.createFile" should {
             "create a single file" {
                 val fs = Jimfs.newFileSystem(Configuration.unix())
-                val testNode = PathNode.of(fs.getPath("a"), type = RegularFileType())
+                val testNode = PathNode.of(
+                    fs.getPath("a"),
+                    type = RegularFileType()
+                )
                 testNode.createFile()
 
                 testNode.exists().shouldBeTrue()
@@ -418,7 +446,11 @@ class MutablePathNodeTest : WordSpec() {
                 val thisNode = MutablePathNode.of("/") {
                     file("a")
                 }
-                val otherNode = MutablePathNode.of("/", "a", type = DirectoryType())
+                val otherNode = MutablePathNode.of(
+                    "/",
+                    "a",
+                    type = DirectoryType()
+                )
 
                 thisNode.addDescendant(otherNode)
                 thisNode.children.shouldContain(otherNode.fileName, otherNode)
@@ -467,7 +499,10 @@ class MutablePathNodeTest : WordSpec() {
                 val thisNode = MutablePathNode.of("/") {
                     file("a")
                 }
-                val otherNode = MutablePathNode.of("a", type = DirectoryType())
+                val otherNode = MutablePathNode.of(
+                    "a",
+                    type = DirectoryType()
+                )
 
                 thisNode.addRelativeDescendant(otherNode)
                 thisNode.children.shouldContain(otherNode.fileName, otherNode)
