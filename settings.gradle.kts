@@ -17,32 +17,4 @@
  * along with doppel.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.3.0'
-    id 'application'
-}
-
-mainClassName = 'doppel.MainKt'
-
-version '0.1'
-
-repositories {
-    mavenCentral()
-}
-
-test {
-    useJUnitPlatform()
-}
-
-dependencies {
-    compile 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
-    testCompile 'io.kotlintest:kotlintest-runner-junit5:3.1.10'
-    testCompile 'com.google.jimfs:jimfs:1.1'
-}
-
-compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
-}
-compileTestKotlin {
-    kotlinOptions.jvmTarget = "1.8"
-}
+rootProject.name = "doppel"
