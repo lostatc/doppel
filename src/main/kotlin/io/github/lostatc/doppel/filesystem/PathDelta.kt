@@ -49,7 +49,7 @@ class PathDelta {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other == null || other !is PathDelta) return false
+        if (other !is PathDelta) return false
         return actions == other.actions
     }
 

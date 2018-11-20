@@ -109,6 +109,8 @@ interface PathNode {
 
     /**
      * Indicates wither the object [other] is equal to this one.
+     *
+     * Two [PathNode] objects are equal if they have the same [path], [type] and [children].
      */
     override operator fun equals(other: Any?): Boolean
 

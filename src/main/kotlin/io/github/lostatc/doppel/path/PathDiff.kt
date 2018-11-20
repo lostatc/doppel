@@ -62,8 +62,8 @@ data class PathDiff(
          * @param [onError] A function that is called for each I/O error that occurs and determines how to handle them.
          */
         fun fromPathNodes(left: PathNode, right: PathNode, onError: ErrorHandler = ::skipOnError): PathDiff {
-            val leftDescendants = left.relativize(left).descendants.keys
-            val rightDescendants = right.relativize(right).descendants.keys
+            val leftDescendants = left.descendants.keys.map { left.path.relativize(it) }.toSet()
+            val rightDescendants = right.descendants.keys.map { right.path.relativize(it) }.toSet()
 
             // Compare file paths.
             val common = leftDescendants intersect rightDescendants

@@ -43,7 +43,7 @@ class DuplicateFileFinder(val dirPath: Path, val followLinks: Boolean = false) {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other == null || other !is DuplicateFileFinder) return false
+        if (other !is DuplicateFileFinder) return false
         return dirPath == other.dirPath && followLinks == other.followLinks && duplicates == other.duplicates
     }
 
