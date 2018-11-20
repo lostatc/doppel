@@ -71,7 +71,7 @@ class DuplicateFileFinder(val dirPath: Path, val followLinks: Boolean = false, v
 
         // Group files that are identical.
         val fileGroups = mutableSetOf<MutableSet<Path>>()
-        val fileChecksums = mutableMapOf<ByteArray, MutableSet<Path>>()
+        val fileChecksums = mutableMapOf<List<Byte>, MutableSet<Path>>()
         for ((_, group) in fileSizes) {
             if (group.size == 1) {
                 // This file is unique. Add it to its own group.
@@ -79,11 +79,12 @@ class DuplicateFileFinder(val dirPath: Path, val followLinks: Boolean = false, v
                 continue
             }
 
-            // There are multiple files of the same size. Confirm they're identical by comparing checksums.
+            // There are multiple files of the same size. Confirm they're identical by comparing checksums. Use a list
+            // for storing checksums instead of an array because arrays use object identity for the hash code.
             fileChecksums.clear()
             for (file in group) {
                 fileChecksums
-                    .getOrPut(getFileChecksum(file)) { mutableSetOf() }
+                    .getOrPut(getFileChecksum(file).toList()) { mutableSetOf() }
                     .add(file)
             }
 
