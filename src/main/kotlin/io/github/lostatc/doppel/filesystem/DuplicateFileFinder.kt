@@ -31,12 +31,13 @@ import java.util.Objects
  *
  * @property [dirPath] The path of the directory to search for duplicate files.
  * @property [followLinks] Follow symbolic links when walking the directory tree.
+ * @property [recursive] Search [dirPath] recursively instead of just finding immediate children.
  */
-class DuplicateFileFinder(val dirPath: Path, val followLinks: Boolean = false) {
+class DuplicateFileFinder(val dirPath: Path, val followLinks: Boolean = false, val recursive: Boolean = false) {
     /**
-     * A map that maps each file path to a set of duplicates.
+     * A map that maps each file path to a set of paths of duplicate files.
      *
-     * Each key is included in its own set of duplicates. To populate this map, call the [find] method.
+     * Keys are included in their own set of duplicates. To populate this map, call the [find] method.
      */
     var duplicates: Map<Path, Set<Path>> = mapOf()
         private set
@@ -56,9 +57,11 @@ class DuplicateFileFinder(val dirPath: Path, val followLinks: Boolean = false) {
         val walkOptions = mutableSetOf<FileVisitOption>()
         if (followLinks) walkOptions.add(FileVisitOption.FOLLOW_LINKS)
 
+        val pathsToScan = if (recursive) Files.walk(dirPath) else Files.list(dirPath)
+
         // Group files based on their size.
         val fileSizes = mutableMapOf<Long, MutableSet<Path>>()
-        for (file in Files.walk(dirPath)) {
+        for (file in pathsToScan) {
             if (Files.isDirectory(file)) continue
 
             fileSizes
