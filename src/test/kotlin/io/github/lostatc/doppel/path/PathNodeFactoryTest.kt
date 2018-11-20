@@ -19,8 +19,8 @@
 
 package io.github.lostatc.doppel.path
 
-import com.google.common.jimfs.Configuration
 import com.google.common.jimfs.Jimfs
+import io.github.lostatc.doppel.testing.DEFAULT_JIMFS_CONFIG
 import io.kotlintest.matchers.maps.shouldContain
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.WordSpec
@@ -82,7 +82,7 @@ class PathNodeFactoryTest : WordSpec() {
 
         "PathNodeFactory.fromFilesystem" should {
             "create a tree of nodes from the filesystem" {
-                val fs = Jimfs.newFileSystem(Configuration.unix())
+                val fs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
                 val testPath = fs.getPath("a")
 
                 val expectedNode = PathNode.of(

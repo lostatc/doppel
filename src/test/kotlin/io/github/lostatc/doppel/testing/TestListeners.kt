@@ -17,7 +17,7 @@
  * along with doppel.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.lostatc.doppel.path
+package io.github.lostatc.doppel.testing
 
 import com.google.common.jimfs.Configuration
 import com.google.common.jimfs.Jimfs
@@ -26,6 +26,13 @@ import io.kotlintest.Spec
 import io.kotlintest.extensions.TestListener
 import java.nio.file.Files
 import java.nio.file.Path
+
+/**
+ * The default configuration to use for in-memory filesystems used for testing.
+ */
+val DEFAULT_JIMFS_CONFIG: Configuration = Configuration.unix().toBuilder()
+    .setWorkingDirectory("/")
+    .build()
 
 /**
  * A test listener that creates existing and a nonexistent files for testing.
@@ -47,11 +54,11 @@ class NonexistentFileListener : TestListener {
     lateinit var nonexistentFile: Path
 
     override fun beforeSpec(description: Description, spec: Spec) {
-        val filesystem = Jimfs.newFileSystem(Configuration.unix())
+        val fs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
 
-        existingFile = filesystem.getPath("/", "existingFile")
-        existingDir = filesystem.getPath("/", "existingDir")
-        nonexistentFile = filesystem.getPath("/", "nonexistent")
+        existingFile = fs.getPath("/", "existingFile")
+        existingDir = fs.getPath("/", "existingDir")
+        nonexistentFile = fs.getPath("/", "nonexistent")
 
         Files.createFile(existingFile)
         Files.createDirectories(existingDir)

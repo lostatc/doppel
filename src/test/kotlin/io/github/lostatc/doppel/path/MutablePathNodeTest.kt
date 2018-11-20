@@ -19,8 +19,9 @@
 
 package io.github.lostatc.doppel.path
 
-import com.google.common.jimfs.Configuration
 import com.google.common.jimfs.Jimfs
+import io.github.lostatc.doppel.testing.DEFAULT_JIMFS_CONFIG
+import io.github.lostatc.doppel.testing.NonexistentFileListener
 import io.kotlintest.assertSoftly
 import io.kotlintest.extensions.TestListener
 import io.kotlintest.matchers.boolean.shouldBeFalse
@@ -38,7 +39,8 @@ import java.nio.file.Paths
 
 class MutablePathNodeTest : WordSpec() {
 
-    val nonexistentListener: NonexistentFileListener = NonexistentFileListener()
+    val nonexistentListener: NonexistentFileListener =
+        NonexistentFileListener()
 
     override fun listeners(): List<TestListener> = listOf(nonexistentListener)
 
@@ -379,7 +381,7 @@ class MutablePathNodeTest : WordSpec() {
 
         "MutablePathNode.createFile" should {
             "create a single file" {
-                val fs = Jimfs.newFileSystem(Configuration.unix())
+                val fs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
                 val testNode = PathNode.of(
                     fs.getPath("a"),
                     type = RegularFileType()
@@ -390,7 +392,7 @@ class MutablePathNodeTest : WordSpec() {
             }
 
             "recursively create files" {
-                val fs = Jimfs.newFileSystem(Configuration.unix())
+                val fs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
                 val testNode = PathNode.of(fs.getPath("a")) {
                     file("b")
                     dir("c") {

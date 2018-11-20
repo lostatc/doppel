@@ -19,8 +19,8 @@
 
 package io.github.lostatc.doppel.path
 
-import com.google.common.jimfs.Configuration
 import com.google.common.jimfs.Jimfs
+import io.github.lostatc.doppel.testing.DEFAULT_JIMFS_CONFIG
 import io.kotlintest.assertSoftly
 import io.kotlintest.matchers.collections.shouldContainExactly
 import io.kotlintest.specs.WordSpec
@@ -55,7 +55,7 @@ class PathDiffTest : WordSpec() {
             }
 
             "correctly compare file contents" {
-                val fs = Jimfs.newFileSystem(Configuration.unix())
+                val fs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
 
                 val leftNode = PathNode.of(fs.getPath("left")) {
                     file("same")
@@ -83,7 +83,7 @@ class PathDiffTest : WordSpec() {
             }
 
             "correctly compare file times" {
-                val fs = Jimfs.newFileSystem(Configuration.unix())
+                val fs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
 
                 val leftNode = PathNode.of(fs.getPath("left")) {
                     file("leftNewer")

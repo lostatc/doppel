@@ -19,8 +19,8 @@
 
 package io.github.lostatc.doppel.filesystem
 
-import com.google.common.jimfs.Configuration
 import com.google.common.jimfs.Jimfs
+import io.github.lostatc.doppel.testing.DEFAULT_JIMFS_CONFIG
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.WordSpec
 import java.nio.file.Files
@@ -29,7 +29,7 @@ class DuplicateFileFinderTest : WordSpec() {
     init {
         "DuplicateFileFinder.find" should {
             "identify identical files" {
-                val fs = Jimfs.newFileSystem(Configuration.unix())
+                val fs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
 
                 val root = fs.getPath("root")
                 val duplicateA = fs.getPath("root", "duplicateA")
