@@ -25,6 +25,7 @@ import io.github.lostatc.doppel.path.MutablePathNode
 import io.github.lostatc.doppel.path.PathNode
 import java.io.IOException
 import java.nio.file.FileSystemLoopException
+import java.nio.file.Path
 
 /**
  * The default error handler to use for [FilesystemAction] implementations.
@@ -32,21 +33,23 @@ import java.nio.file.FileSystemLoopException
 private val DEFAULT_ERROR_HANDLER: ErrorHandler = ::skipOnError
 
 /**
- * Adds a copy of [pathNode] to [viewNode] if [pathNode] a descendant of [viewNode].
+ * Adds [path] to [viewNode] if [path] is relative or a descendant of [viewNode].
  *
  * This function can be used to implement [FilesystemAction.applyView].
  */
-fun addNodeToView(viewNode: MutablePathNode, pathNode: PathNode) {
-    if (pathNode.startsWith(viewNode)) viewNode.addDescendant(pathNode.toMutablePathNode())
+fun addNodeToView(viewNode: MutablePathNode, path: PathNode) {
+    val absolutePath = viewNode.resolve(path)
+    if (absolutePath.startsWith(viewNode)) viewNode.addDescendant(path.toMutablePathNode())
 }
 
 /**
- * Removes [pathNode] from [viewNode] if [pathNode] a descendant of [viewNode].
+ * Removes [path] from [viewNode] if [path] is relative or a descendant of [viewNode].
  *
  * This function can be used to implement [FilesystemAction.applyView].
  */
-fun removeNodeFromView(viewNode: MutablePathNode, pathNode: PathNode) {
-    if (pathNode.startsWith(viewNode)) viewNode.removeDescendant(pathNode.path)
+fun removeNodeFromView(viewNode: MutablePathNode, path: PathNode) {
+    val absolutePath = viewNode.resolve(path)
+    if (absolutePath.startsWith(viewNode)) viewNode.removeDescendant(path.path)
 }
 
 /**
@@ -62,8 +65,8 @@ interface FilesystemAction {
     /**
      * Modifies [viewNode] to provide a view of what the filesystem will look like after [applyView] is called.
      *
-     * After this is called, [viewNode] should match what the filesystem would look like if [applyFilesystem] were
-     * called assuming there are no errors.
+     * After this is called, [viewNode] should match what the filesystem would look like if [applyFilesystem] were called
+     * assuming there are no errors. Relative paths passed to [FilesystemAction] instances are resolved against [viewNode].
      *
      * The functions [addNodeToView] and [removeNodeFromView] can be useful in implementing this method.
      */
@@ -71,8 +74,10 @@ interface FilesystemAction {
 
     /**
      * Applies the change to the filesystem.
+     *
+     * Relative paths passed to [FilesystemAction] instances are resolved against [dirPath].
      */
-    fun applyFilesystem()
+    fun applyFilesystem(dirPath: Path)
 }
 
 /**
@@ -111,9 +116,11 @@ data class MoveAction(
         addNodeToView(viewNode, target)
     }
 
-    override fun applyFilesystem() {
+    override fun applyFilesystem(dirPath: Path) {
+        val absoluteSource = dirPath.resolve(source.path)
+        val absoluteTarget = dirPath.resolve(target.path)
         moveRecursively(
-            source.path, target.path,
+            absoluteSource, absoluteTarget,
             overwrite = overwrite, followLinks = followLinks, onError = onError
         )
     }
@@ -155,9 +162,12 @@ data class CopyAction(
         addNodeToView(viewNode, target)
     }
 
-    override fun applyFilesystem() {
+    override fun applyFilesystem(dirPath: Path) {
+        val absoluteSource = dirPath.resolve(source.path)
+        val absoluteTarget = dirPath.resolve(target.path)
+
         copyRecursively(
-            source.path, target.path,
+            absoluteSource, absoluteTarget,
             overwrite = overwrite, copyAttributes = copyAttributes, followLinks = followLinks, onError = onError
         )
     }
@@ -181,8 +191,9 @@ data class CreateAction(
         addNodeToView(viewNode, pathNode)
     }
 
-    override fun applyFilesystem() {
-        pathNode.createFile(recursive = recursive, onError = onError)
+    override fun applyFilesystem(dirPath: Path) {
+        val absolutePath = PathNode.of(dirPath).resolve(pathNode)
+        absolutePath.createFile(recursive = recursive, onError = onError)
     }
 }
 
@@ -211,7 +222,12 @@ data class DeleteAction(
         removeNodeFromView(viewNode, pathNode)
     }
 
-    override fun applyFilesystem() {
-        deleteRecursively(pathNode.path, followLinks = followLinks, onError = onError)
+    override fun applyFilesystem(dirPath: Path) {
+        val absolutePath = dirPath.resolve(pathNode.path)
+        deleteRecursively(
+            absolutePath,
+            followLinks = followLinks,
+            onError = onError
+        )
     }
 }
