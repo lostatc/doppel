@@ -26,6 +26,7 @@ import io.github.lostatc.doppel.path.PathNode
 import java.io.IOException
 import java.nio.file.FileSystemLoopException
 import java.nio.file.Path
+import java.nio.file.ProviderMismatchException
 
 /**
  * The default error handler to use for [FilesystemAction] implementations.
@@ -33,23 +34,23 @@ import java.nio.file.Path
 private val DEFAULT_ERROR_HANDLER: ErrorHandler = ::skipOnError
 
 /**
- * Adds [path] to [viewNode] if [path] is relative or a descendant of [viewNode].
+ * Adds [pathNode] to [viewNode] if [pathNode] is relative or a descendant of [viewNode].
  *
  * This function can be used to implement [FilesystemAction.applyView].
  */
-fun addNodeToView(viewNode: MutablePathNode, path: PathNode) {
-    val absolutePath = viewNode.resolve(path)
-    if (absolutePath.startsWith(viewNode)) viewNode.addDescendant(path.toMutablePathNode())
+fun addNodeToView(viewNode: MutablePathNode, pathNode: PathNode) {
+    val absolutePath = viewNode.resolve(pathNode)
+    if (absolutePath.startsWith(viewNode)) viewNode.addDescendant(pathNode.toMutablePathNode())
 }
 
 /**
- * Removes [path] from [viewNode] if [path] is relative or a descendant of [viewNode].
+ * Removes [pathNode] from [viewNode] if [pathNode] is relative or a descendant of [viewNode].
  *
  * This function can be used to implement [FilesystemAction.applyView].
  */
-fun removeNodeFromView(viewNode: MutablePathNode, path: PathNode) {
-    val absolutePath = viewNode.resolve(path)
-    if (absolutePath.startsWith(viewNode)) viewNode.removeDescendant(path.path)
+fun removeNodeFromView(viewNode: MutablePathNode, pathNode: PathNode) {
+    val absolutePath = viewNode.resolve(pathNode)
+    if (absolutePath.startsWith(viewNode)) viewNode.removeDescendant(pathNode.path)
 }
 
 /**
@@ -82,6 +83,8 @@ interface FilesystemAction {
 
 /**
  * An action that recursively moves a file or directory from [source] to [target].
+ *
+ * The files represented by [source] and [target] must belong to the same filesystem.
  *
  * If [source] and [target] represent the same file, then nothing is moved.
  *
@@ -117,8 +120,16 @@ data class MoveAction(
     }
 
     override fun applyFilesystem(dirPath: Path) {
+        if (source.path.fileSystem != target.path.fileSystem)
+            throw ProviderMismatchException("The source and target paths must belong to the same filesystem.")
+        if (dirPath.fileSystem != source.path.fileSystem)
+            throw ProviderMismatchException(
+                "The given path must belong to the same filesystem as the source and target paths."
+            )
+
         val absoluteSource = dirPath.resolve(source.path)
         val absoluteTarget = dirPath.resolve(target.path)
+
         moveRecursively(
             absoluteSource, absoluteTarget,
             overwrite = overwrite, followLinks = followLinks, onError = onError
@@ -128,6 +139,8 @@ data class MoveAction(
 
 /**
  * An action that recursively copies a file or directory from [source] to [target].
+ *
+ * The files represented by [source] and [target] must belong to the same filesystem.
  *
  * If [source] and [target] represent the same file, then nothing is copied.
  *
@@ -163,6 +176,13 @@ data class CopyAction(
     }
 
     override fun applyFilesystem(dirPath: Path) {
+        if (source.path.fileSystem != target.path.fileSystem)
+            throw ProviderMismatchException("The source and target paths must belong to the same filesystem.")
+        if (dirPath.fileSystem != source.path.fileSystem)
+            throw ProviderMismatchException(
+                "The given path must belong to the same filesystem as the source and target paths."
+            )
+
         val absoluteSource = dirPath.resolve(source.path)
         val absoluteTarget = dirPath.resolve(target.path)
 
@@ -174,31 +194,35 @@ data class CopyAction(
 }
 
 /**
- * An action that creates the file represented by [pathNode].
+ * An action that creates the file represented by [target].
  *
  * The following exceptions can be passed to [onError]:
  * - [IOException]: Some problem occurred while creating the file.
  *
- * @property [pathNode] The path node representing the file to create.
+ * @property [target] The path node representing the file to create.
  * @property [recursive] Create this file and all its descendants.
  */
 data class CreateAction(
-    val pathNode: PathNode,
+    val target: PathNode,
     val recursive: Boolean = false,
     override val onError: ErrorHandler = DEFAULT_ERROR_HANDLER
 ) : FilesystemAction {
     override fun applyView(viewNode: MutablePathNode) {
-        addNodeToView(viewNode, pathNode)
+        addNodeToView(viewNode, target)
     }
 
     override fun applyFilesystem(dirPath: Path) {
-        val absolutePath = PathNode.of(dirPath).resolve(pathNode)
+        if (dirPath.fileSystem != target.path.fileSystem)
+            throw ProviderMismatchException("The given path must belong to the same filesystem as the target path.")
+
+        val absolutePath = PathNode.of(dirPath).resolve(target)
+
         absolutePath.createFile(recursive = recursive, onError = onError)
     }
 }
 
 /**
- * An action that recursively deletes a file or directory represented by [pathNode].
+ * An action that recursively deletes a file or directory represented by [target].
  *
  * This operation is not atomic. Deleting an individual file or directory may not be atomic either.
  *
@@ -210,24 +234,24 @@ data class CreateAction(
  * - [FileSystemLoopException]: [followLinks] is `true` and a cycle of symbolic links was detected.
  * - [IOException]: Some other problem occurred while deleting.
  *
- * @property [pathNode] A path node representing the file or directory to delete.
+ * @property [target] A path node representing the file or directory to delete.
  * @property [followLinks] Follow symbolic links when walking the directory tree.
  */
 data class DeleteAction(
-    val pathNode: PathNode,
+    val target: PathNode,
     val followLinks: Boolean = false,
     override val onError: ErrorHandler = DEFAULT_ERROR_HANDLER
 ) : FilesystemAction {
     override fun applyView(viewNode: MutablePathNode) {
-        removeNodeFromView(viewNode, pathNode)
+        removeNodeFromView(viewNode, target)
     }
 
     override fun applyFilesystem(dirPath: Path) {
-        val absolutePath = dirPath.resolve(pathNode.path)
-        deleteRecursively(
-            absolutePath,
-            followLinks = followLinks,
-            onError = onError
-        )
+        if (dirPath.fileSystem != target.path.fileSystem)
+            throw ProviderMismatchException("The given path must belong to the same filesystem as the target path.")
+
+        val absolutePath = dirPath.resolve(target.path)
+
+        deleteRecursively(absolutePath, followLinks = followLinks, onError = onError)
     }
 }
