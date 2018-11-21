@@ -21,7 +21,6 @@ package io.github.lostatc.doppel.filesystem
 
 import io.github.lostatc.doppel.error.ErrorHandler
 import io.github.lostatc.doppel.path.PathNode
-import java.nio.file.Path
 import java.util.Deque
 import java.util.LinkedList
 import java.util.Objects
@@ -29,14 +28,11 @@ import java.util.Objects
 /**
  * A set of changes to apply to the filesystem.
  *
- * This class allows for creating a set of changes that can be applied to multiple directories. Changes are stored in a
- * queue and can be applied to the filesystem all at once. New changes can be queued up by passing instances of
+ * This class allows for creating a set of changes that can be applied to the filesystem. Changes are stored in a queue
+ * and can be applied to the filesystem all at once. New changes can be queued up by passing instances of
  * [FilesystemAction] to the [add] method, but the filesystem is not modified until [apply] is called. There are actions
  * for moving, copying, creating and deleting files and directories. Custom actions can be created by implementing
  * [FilesystemAction].
- *
- * [FilesystemAction] classes accept both absolute and relative path nodes. If the paths are relative, they are resolved
- * against the path provided to [apply]. Using relative paths allows you to apply the changes to multiple directories.
  *
  * The [view] method can be used to see what a directory will look like after all changes are applied. The [clear] and
  * [undo] methods can be used to undo changes before they're applied.
@@ -91,8 +87,7 @@ class PathDelta {
     /**
      * Returns what [dirNode] will look like after the [apply] method is called assuming there are no errors.
      *
-     * Any relative paths that were passed to [FilesystemAction] classes are resolved against [dirNode]. This does not
-     * modify the filesystem.
+     * This does not modify the filesystem.
      */
     fun view(dirNode: PathNode): PathNode {
         val outputPath = dirNode.toMutablePathNode()
@@ -105,13 +100,12 @@ class PathDelta {
     /**
      * Applies the changes in the queue to the filesystem in the order they were made.
      *
-     * Any relative paths that were passed to [FilesystemAction] classes are resolved against [dirPath]. Applying the
-     * changes does not consume them. If an [ErrorHandler] that was passed to an [FilesystemAction] class throws an
-     * exception, it will be thrown here.
+     * Applying the changes does not consume them. If an [ErrorHandler] that was passed to an [FilesystemAction] class
+     * throws an exception, it will be thrown here.
      */
-    fun apply(dirPath: Path) {
+    fun apply() {
         for (action in actions) {
-            action.applyFilesystem(dirPath)
+            action.applyFilesystem()
         }
     }
 }
