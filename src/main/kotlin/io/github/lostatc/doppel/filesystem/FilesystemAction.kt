@@ -76,9 +76,13 @@ interface FilesystemAction {
     /**
      * Applies the change to the filesystem.
      *
-     * Relative paths passed to [FilesystemAction] instances are resolved against [dirPath].
+     * If [dirPath] is not `null`, relative paths passed to this [FilesystemAction] instance are resolved against it. If
+     * [onError] throws an exception, it will be thrown here.
+     *
+     * @throws [ProviderMismatchException] The given [dirPath] doesn't belong to the same filesystem as the paths passed
+     * to this [FilesystemAction] instance.
      */
-    fun applyFilesystem(dirPath: Path)
+    fun applyFilesystem(dirPath: Path? = null)
 }
 
 /**
@@ -119,16 +123,16 @@ data class MoveAction(
         addNodeToView(viewNode, target)
     }
 
-    override fun applyFilesystem(dirPath: Path) {
+    override fun applyFilesystem(dirPath: Path?) {
         if (source.path.fileSystem != target.path.fileSystem)
             throw ProviderMismatchException("The source and target paths must belong to the same filesystem.")
-        if (dirPath.fileSystem != source.path.fileSystem)
+        if (dirPath != null && dirPath.fileSystem != source.path.fileSystem)
             throw ProviderMismatchException(
                 "The given path must belong to the same filesystem as the source and target paths."
             )
 
-        val absoluteSource = dirPath.resolve(source.path)
-        val absoluteTarget = dirPath.resolve(target.path)
+        val absoluteSource = dirPath?.resolve(source.path) ?: source.path
+        val absoluteTarget = dirPath?.resolve(target.path) ?: target.path
 
         moveRecursively(
             absoluteSource, absoluteTarget,
@@ -175,16 +179,16 @@ data class CopyAction(
         addNodeToView(viewNode, target)
     }
 
-    override fun applyFilesystem(dirPath: Path) {
+    override fun applyFilesystem(dirPath: Path?) {
         if (source.path.fileSystem != target.path.fileSystem)
             throw ProviderMismatchException("The source and target paths must belong to the same filesystem.")
-        if (dirPath.fileSystem != source.path.fileSystem)
+        if (dirPath != null && dirPath.fileSystem != source.path.fileSystem)
             throw ProviderMismatchException(
                 "The given path must belong to the same filesystem as the source and target paths."
             )
 
-        val absoluteSource = dirPath.resolve(source.path)
-        val absoluteTarget = dirPath.resolve(target.path)
+        val absoluteSource = dirPath?.resolve(source.path) ?: source.path
+        val absoluteTarget = dirPath?.resolve(target.path) ?: target.path
 
         copyRecursively(
             absoluteSource, absoluteTarget,
@@ -211,13 +215,13 @@ data class CreateAction(
         addNodeToView(viewNode, target)
     }
 
-    override fun applyFilesystem(dirPath: Path) {
-        if (dirPath.fileSystem != target.path.fileSystem)
+    override fun applyFilesystem(dirPath: Path?) {
+        if (dirPath != null && dirPath.fileSystem != target.path.fileSystem)
             throw ProviderMismatchException("The given path must belong to the same filesystem as the target path.")
 
-        val absolutePath = PathNode.of(dirPath).resolve(target)
+        val absoluteTarget = if (dirPath == null) target else PathNode.of(dirPath).resolve(target)
 
-        absolutePath.createFile(recursive = recursive, onError = onError)
+        absoluteTarget.createFile(recursive = recursive, onError = onError)
     }
 }
 
@@ -246,12 +250,12 @@ data class DeleteAction(
         removeNodeFromView(viewNode, target)
     }
 
-    override fun applyFilesystem(dirPath: Path) {
-        if (dirPath.fileSystem != target.path.fileSystem)
+    override fun applyFilesystem(dirPath: Path?) {
+        if (dirPath != null && dirPath.fileSystem != target.path.fileSystem)
             throw ProviderMismatchException("The given path must belong to the same filesystem as the target path.")
 
-        val absolutePath = dirPath.resolve(target.path)
+        val absoluteTarget = dirPath?.resolve(target.path) ?: target.path
 
-        deleteRecursively(absolutePath, followLinks = followLinks, onError = onError)
+        deleteRecursively(absoluteTarget, followLinks = followLinks, onError = onError)
     }
 }

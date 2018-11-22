@@ -22,6 +22,7 @@ package io.github.lostatc.doppel.filesystem
 import io.github.lostatc.doppel.error.ErrorHandler
 import io.github.lostatc.doppel.path.PathNode
 import java.nio.file.Path
+import java.nio.file.ProviderMismatchException
 import java.util.Deque
 import java.util.LinkedList
 import java.util.Objects
@@ -105,11 +106,14 @@ class PathDelta {
     /**
      * Applies the changes in the queue to the filesystem in the order they were made.
      *
-     * Any relative paths that were passed to [FilesystemAction] classes are resolved against [dirPath]. Applying the
-     * changes does not consume them. If an [ErrorHandler] that was passed to an [FilesystemAction] class throws an
-     * exception, it will be thrown here.
+     * Applying the changes does not consume them. If [dirPath] is not `null`, any relative paths that were passed to
+     * [FilesystemAction] instances are resolved against it. If an [ErrorHandler] that was passed to a
+     * [FilesystemAction] instance throws an exception, it will be thrown here.
+     *
+     * @throws [ProviderMismatchException] The given [dirPath] doesn't belong to the same filesystem as the paths passed
+     * to one of the [FilesystemAction] instances.
      */
-    fun apply(dirPath: Path) {
+    fun apply(dirPath: Path? = null) {
         for (action in actions) {
             action.applyFilesystem(dirPath)
         }
