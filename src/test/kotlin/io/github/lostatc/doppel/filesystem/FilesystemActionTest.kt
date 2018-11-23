@@ -27,10 +27,13 @@ import io.github.lostatc.doppel.path.dir
 import io.github.lostatc.doppel.path.file
 import io.github.lostatc.doppel.path.symlink
 import io.github.lostatc.doppel.testing.DEFAULT_JIMFS_CONFIG
+import io.kotlintest.assertSoftly
+import io.kotlintest.matchers.boolean.shouldBeFalse
 import io.kotlintest.matchers.boolean.shouldBeTrue
 import io.kotlintest.matchers.maps.shouldContainKey
 import io.kotlintest.matchers.maps.shouldNotContainKey
 import io.kotlintest.specs.WordSpec
+import java.nio.file.Files
 
 class FilesystemActionKtTest : WordSpec() {
     init {
@@ -86,7 +89,7 @@ class FilesystemActionKtTest : WordSpec() {
 
 class MoveActionTest : WordSpec() {
     init {
-        "MoveActionTest.applyFilesystem" should {
+        "MoveAction.applyFilesystem" should {
             "recursively move files" {
                 val fs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
 
@@ -101,7 +104,7 @@ class MoveActionTest : WordSpec() {
                 val targetNode = PathNode.of(fs.getPath("target"))
                 targetNode.createFile()
 
-                val expectedNode = PathNode.of(fs.getPath("target")) {
+                val expectedTargetNode = PathNode.of(fs.getPath("target")) {
                     file("a")
                     dir("b") {
                         file("c")
@@ -111,7 +114,10 @@ class MoveActionTest : WordSpec() {
                 val action = MoveAction(sourceNode, targetNode)
                 action.applyFilesystem()
 
-                expectedNode.exists(checkType = true, recursive = true).shouldBeTrue()
+                assertSoftly {
+                    expectedTargetNode.exists(checkType = true, recursive = true).shouldBeTrue()
+                    Files.exists(fs.getPath("source")).shouldBeFalse()
+                }
             }
 
             "move symbolic links instead of their targets" {
@@ -127,14 +133,14 @@ class MoveActionTest : WordSpec() {
                 val targetNode = PathNode.of(fs.getPath("target"))
                 targetNode.createFile()
 
-                val expectedNode = PathNode.of(fs.getPath("target")) {
+                val expectedTargetNode = PathNode.of(fs.getPath("target")) {
                     symlink("a", target = symlinkTargetPath)
                 }
 
                 val action = MoveAction(sourceNode, targetNode)
                 action.applyFilesystem()
 
-                expectedNode.exists(checkType = true, recursive = true).shouldBeTrue()
+                expectedTargetNode.exists(checkType = true, recursive = true).shouldBeTrue()
             }
 
             "not overwrite files at the target" {
@@ -154,7 +160,7 @@ class MoveActionTest : WordSpec() {
                 }
                 targetNode.createFile(recursive = true)
 
-                val expectedNode = PathNode.of(fs.getPath("target")) {
+                val expectedTargetNode = PathNode.of(fs.getPath("target")) {
                     file("a")
                     dir("b") {
                         file("c")
@@ -164,7 +170,7 @@ class MoveActionTest : WordSpec() {
                 val action = MoveAction(sourceNode, targetNode)
                 action.applyFilesystem()
 
-                expectedNode.exists(checkType = true, recursive = true).shouldBeTrue()
+                expectedTargetNode.exists(checkType = true, recursive = true).shouldBeTrue()
             }
 
             "overwrite files at the target" {
@@ -184,7 +190,7 @@ class MoveActionTest : WordSpec() {
                 }
                 targetNode.createFile(recursive = true)
 
-                val expectedNode = PathNode.of(fs.getPath("target")) {
+                val expectedTargetNode = PathNode.of(fs.getPath("target")) {
                     dir("a")
                     file("b")
                 }
@@ -192,7 +198,151 @@ class MoveActionTest : WordSpec() {
                 val action = MoveAction(sourceNode, targetNode, overwrite = true, onError = ::skipOnError)
                 action.applyFilesystem()
 
-                expectedNode.exists(checkType = true, recursive = true).shouldBeTrue()
+                expectedTargetNode.exists(checkType = true, recursive = true).shouldBeTrue()
+            }
+        }
+    }
+}
+
+class CopyActionTest : WordSpec() {
+    init {
+        "CopyAction.applyFilesystem" should {
+            "recursively copy files" {
+                val fs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
+
+                val sourceNode = PathNode.of(fs.getPath("source")) {
+                    file("a")
+                    dir("b") {
+                        file("c")
+                    }
+                }
+                sourceNode.createFile(recursive = true)
+
+                val targetNode = PathNode.of(fs.getPath("target"))
+                targetNode.createFile()
+
+                val expectedTargetNode = PathNode.of(fs.getPath("target")) {
+                    file("a")
+                    dir("b") {
+                        file("c")
+                    }
+                }
+
+                val action = CopyAction(sourceNode, targetNode)
+                action.applyFilesystem()
+
+                assertSoftly {
+                    expectedTargetNode.exists(checkType = true, recursive = true).shouldBeTrue()
+                    sourceNode.exists(checkType = true, recursive = true).shouldBeTrue()
+                }
+
+            }
+
+            "copy symbolic links instead of their targets" {
+                val fs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
+
+                // Get the absolute path to prevent a relative symlink from being created.
+                val symlinkTargetPath = fs.getPath("symlinkTarget").toAbsolutePath()
+
+                val sourceNode = PathNode.of(fs.getPath("source")) {
+                    symlink("a", target = symlinkTargetPath)
+                }
+                sourceNode.createFile(recursive = true)
+
+                val targetNode = PathNode.of(fs.getPath("target"))
+                targetNode.createFile()
+
+                val expectedTargetNode = PathNode.of(fs.getPath("target")) {
+                    symlink("a", target = symlinkTargetPath)
+                }
+
+                val action = CopyAction(sourceNode, targetNode)
+                action.applyFilesystem()
+
+                expectedTargetNode.exists(checkType = true, recursive = true).shouldBeTrue()
+            }
+
+            "copy the targets of symbolic links" {
+                val fs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
+
+                // Get the absolute path to prevent a relative symlink from being created.
+                val symlinkTargetPath = fs.getPath("symlinkTarget").toAbsolutePath()
+                Files.createFile(symlinkTargetPath)
+
+                val sourceNode = PathNode.of(fs.getPath("source")) {
+                    symlink("a", target = symlinkTargetPath)
+                }
+                sourceNode.createFile(recursive = true)
+
+                val targetNode = PathNode.of(fs.getPath("target"))
+                targetNode.createFile()
+
+                val expectedTargetNode = PathNode.of(fs.getPath("target")) {
+                    file("a")
+                }
+
+                val action = CopyAction(sourceNode, targetNode, followLinks = true)
+                action.applyFilesystem()
+
+                expectedTargetNode.exists(checkType = true, recursive = true).shouldBeTrue()
+            }
+
+            "not overwrite files at the target" {
+                val fs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
+
+                val sourceNode = PathNode.of(fs.getPath("source")) {
+                    dir("a")
+                    file("b")
+                }
+                sourceNode.createFile(recursive = true)
+
+                val targetNode = PathNode.of(fs.getPath("target")) {
+                    file("a")
+                    dir("b") {
+                        file("c")
+                    }
+                }
+                targetNode.createFile(recursive = true)
+
+                val expectedTargetNode = PathNode.of(fs.getPath("target")) {
+                    file("a")
+                    dir("b") {
+                        file("c")
+                    }
+                }
+
+                val action = CopyAction(sourceNode, targetNode)
+                action.applyFilesystem()
+
+                expectedTargetNode.exists(checkType = true, recursive = true).shouldBeTrue()
+            }
+
+            "overwrite files at the target" {
+                val fs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
+
+                val sourceNode = PathNode.of(fs.getPath("source")) {
+                    dir("a")
+                    file("b")
+                }
+                sourceNode.createFile(recursive = true)
+
+                val targetNode = PathNode.of(fs.getPath("target")) {
+                    file("a")
+                    dir("b") {
+                        file("c")
+                    }
+                }
+                targetNode.createFile(recursive = true)
+
+                val expectedTargetNode = PathNode.of(fs.getPath("target")) {
+                    dir("a")
+                    file("b")
+                }
+
+                val action = CopyAction(sourceNode, targetNode, overwrite = true, onError = ::skipOnError)
+                action.applyFilesystem()
+
+                expectedTargetNode.exists(checkType = true, recursive = true).shouldBeTrue()
             }
         }
     }
