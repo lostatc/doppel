@@ -22,6 +22,7 @@ package io.github.lostatc.doppel.path
 import io.github.lostatc.doppel.filesystem.getFileChecksum
 import java.io.IOException
 import java.nio.file.Files
+import java.nio.file.LinkOption
 import java.nio.file.Path
 
 /**
@@ -156,8 +157,8 @@ class UnknownType : FileType {
  * Returns the [FileType] that is most appropriate for file at the given [path].
  */
 fun fileTypeFromFilesystem(path: Path): FileType = when {
-    Files.isRegularFile(path) -> RegularFileType()
-    Files.isDirectory(path) -> DirectoryType()
+    Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS) -> RegularFileType()
+    Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS) -> DirectoryType()
     Files.isSymbolicLink(path) -> SymbolicLinkType(Files.readSymbolicLink(path))
     else -> UnknownType()
 }
