@@ -36,9 +36,12 @@ private val DEFAULT_ERROR_HANDLER: ErrorHandler = ::skipOnError
 /**
  * Adds [pathNode] to [viewNode] if [pathNode] is relative or a descendant of [viewNode].
  *
+ * If [pathNode] and [viewNode] belong to different filesystems, this function does nothing.
+ *
  * This function can be used to implement [FilesystemAction.applyView].
  */
 fun addNodeToView(viewNode: MutablePathNode, pathNode: PathNode) {
+    if (viewNode.path.fileSystem != pathNode.path.fileSystem) return
     val absoluteNode = viewNode.resolve(pathNode)
     if (absoluteNode.startsWith(viewNode)) viewNode.addDescendant(absoluteNode.toMutablePathNode())
 }
@@ -46,11 +49,14 @@ fun addNodeToView(viewNode: MutablePathNode, pathNode: PathNode) {
 /**
  * Removes [pathNode] from [viewNode] if [pathNode] is relative or a descendant of [viewNode].
  *
+ * If [pathNode] and [viewNode] belong to different filesystems, this function does nothing.
+ *
  * This function can be used to implement [FilesystemAction.applyView].
  */
 fun removeNodeFromView(viewNode: MutablePathNode, pathNode: PathNode) {
-    val absoluteNode = viewNode.resolve(pathNode)
-    viewNode.removeDescendant(absoluteNode.path)
+    if (viewNode.path.fileSystem != pathNode.path.fileSystem) return
+    val absolutePath = viewNode.path.resolve(pathNode.path)
+    viewNode.removeDescendant(absolutePath)
 }
 
 /**
@@ -66,8 +72,9 @@ interface FilesystemAction {
     /**
      * Modifies [viewNode] to provide a view of what the filesystem will look like after [applyView] is called.
      *
-     * After this is called, [viewNode] should match what the filesystem would look like if [applyFilesystem] were called
-     * assuming there are no errors. Relative paths passed to [FilesystemAction] instances are resolved against [viewNode].
+     * After this is called, [viewNode] will match what the filesystem would look like if [applyFilesystem] were called
+     * assuming there are no errors. Relative paths passed to [FilesystemAction] instances are resolved against
+     * [viewNode] if they belong to the same filesystem as it.
      *
      * The functions [addNodeToView] and [removeNodeFromView] can be useful in implementing this method.
      */

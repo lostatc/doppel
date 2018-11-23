@@ -92,8 +92,8 @@ class PathDelta {
     /**
      * Returns what [dirNode] will look like after the [apply] method is called assuming there are no errors.
      *
-     * Any relative paths that were passed to [FilesystemAction] classes are resolved against [dirNode]. This does not
-     * modify the filesystem.
+     * Any relative paths that were passed to [FilesystemAction] classes are resolved against [dirNode] if they belong
+     * to the same filesystem as it. This method does not modify the filesystem.
      */
     fun view(dirNode: PathNode): PathNode {
         val outputPath = dirNode.toMutablePathNode()
