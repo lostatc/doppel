@@ -39,8 +39,8 @@ private val DEFAULT_ERROR_HANDLER: ErrorHandler = ::skipOnError
  * This function can be used to implement [FilesystemAction.applyView].
  */
 fun addNodeToView(viewNode: MutablePathNode, pathNode: PathNode) {
-    val absolutePath = viewNode.resolve(pathNode)
-    if (absolutePath.startsWith(viewNode)) viewNode.addDescendant(pathNode.toMutablePathNode())
+    val absoluteNode = viewNode.resolve(pathNode)
+    if (absoluteNode.startsWith(viewNode)) viewNode.addDescendant(absoluteNode.toMutablePathNode())
 }
 
 /**
@@ -49,8 +49,8 @@ fun addNodeToView(viewNode: MutablePathNode, pathNode: PathNode) {
  * This function can be used to implement [FilesystemAction.applyView].
  */
 fun removeNodeFromView(viewNode: MutablePathNode, pathNode: PathNode) {
-    val absolutePath = viewNode.resolve(pathNode)
-    if (absolutePath.startsWith(viewNode)) viewNode.removeDescendant(pathNode.path)
+    val absoluteNode = viewNode.resolve(pathNode)
+    viewNode.removeDescendant(absoluteNode.path)
 }
 
 /**
