@@ -193,6 +193,13 @@ class MutablePathNode(
         return childOfThisNode.descendants[fullPath] ?: childOfThisNode
     }
 
+    override fun toAbsoluteNode(): MutablePathNode {
+        if (path.isAbsolute) return toMutablePathNode()
+
+        val newAncestor = MutablePathNode.of(root.path.toAbsolutePath())
+        return newAncestor.parent?.resolve(this) ?: toMutablePathNode()
+    }
+
     override fun diff(other: PathNode, onError: ErrorHandler): PathDiff =
         PathDiff.fromPathNodes(this, other, onError)
 

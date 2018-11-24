@@ -53,7 +53,12 @@ class MutablePathNodeTest : WordSpec() {
             }
 
             "throw if the file name and parent filesystems are different" {
-                // TODO: Implement test
+                val nameFs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
+                val parentFs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
+
+                shouldThrow<IllegalArgumentException> {
+                    MutablePathNode(nameFs.getPath("a"), MutablePathNode(parentFs.getPath("b")))
+                }
             }
         }
 
@@ -335,6 +340,24 @@ class MutablePathNodeTest : WordSpec() {
                 val otherNode = PathNode.of("b", "c")
 
                 testNode.resolve(otherNode).shouldBe(PathNode.of("a", "b", "c"))
+            }
+        }
+
+        "MutablePathNode.toAbsoluteNode" should {
+            "return a copy of the node if it is absolute" {
+                val testNode = PathNode.of("/", "a", "b")
+                val absoluteTestNode = testNode.toAbsoluteNode()
+
+                testNode.shouldBe(absoluteTestNode)
+                testNode.shouldNotBeSameInstanceAs(absoluteTestNode)
+            }
+
+            "return an absolute copy of the node" {
+                val fs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
+                val testNode = PathNode.of(fs.getPath("a", "b"))
+                val expectedNode = PathNode.of(fs.getPath("/", "a", "b"))
+
+                testNode.toAbsoluteNode().shouldBe(expectedNode)
             }
         }
 

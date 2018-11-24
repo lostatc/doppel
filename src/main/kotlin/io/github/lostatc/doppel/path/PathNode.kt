@@ -188,6 +188,17 @@ interface PathNode {
     fun resolve(other: PathNode): PathNode
 
     /**
+     * Returns a copy of this node that is absolute.
+     *
+     * If this node is absolute, then this method returns a copy of this node.
+     *
+     * @throws [IOException] An I/O error occurred.
+     *
+     * @see [Path.toAbsolutePath]
+     */
+    fun toAbsoluteNode(): PathNode
+
+    /**
      * Returns an immutable representation of the difference between this directory and [other].
      *
      * The following exceptions can be passed to [onError]:
