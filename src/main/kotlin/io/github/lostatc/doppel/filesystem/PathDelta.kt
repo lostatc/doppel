@@ -21,8 +21,6 @@ package io.github.lostatc.doppel.filesystem
 
 import io.github.lostatc.doppel.error.ErrorHandler
 import io.github.lostatc.doppel.path.PathNode
-import java.nio.file.Path
-import java.nio.file.ProviderMismatchException
 import java.util.Deque
 import java.util.LinkedList
 import java.util.Objects
@@ -30,14 +28,11 @@ import java.util.Objects
 /**
  * A set of changes to apply to the filesystem.
  *
- * This class allows for creating a set of changes that can be applied to multiple directories. Changes are stored in a
- * queue and can be applied to the filesystem all at once. New changes can be queued up by passing instances of
+ * This class allows for creating a set of changes that can be applied to the filesystem. Changes are stored in a queue
+ * and can be applied to the filesystem all at once. New changes can be queued up by passing instances of
  * [FilesystemAction] to the [add] method, but the filesystem is not modified until [apply] is called. There are actions
  * for moving, copying, creating and deleting files and directories. Custom actions can be created by implementing
  * [FilesystemAction].
- *
- * [FilesystemAction] classes accept both absolute and relative path nodes. If the paths are relative, they are resolved
- * against the path provided to [apply]. Using relative paths allows you to apply the changes to multiple directories.
  *
  * The [view] method can be used to see what a directory will look like after all changes are applied. The [clear] and
  * [undo] methods can be used to undo changes before they're applied.
@@ -90,32 +85,28 @@ class PathDelta {
     }
 
     /**
-     * Returns what [dirNode] will look like after the [apply] method is called assuming there are no errors.
+     * See what the filesystem will look like after all changes are applied.
      *
-     * Any relative paths that were passed to [FilesystemAction] classes are resolved against [dirNode] if they belong
-     * to the same filesystem as it. This method does not modify the filesystem.
+     * This returns an absolute copy of [viewNode] that represents what the filesystem will look like after [apply] is
+     * called assuming there are no errors. This method does not modify the filesystem.
      */
-    fun view(dirNode: PathNode): PathNode {
-        val outputPath = dirNode.toMutablePathNode()
+    fun view(viewNode: PathNode): PathNode {
+        val outputNode = viewNode.toMutablePathNode()
         for (action in actions) {
-            action.applyView(outputPath)
+            action.applyView(outputNode)
         }
-        return outputPath
+        return outputNode
     }
 
     /**
      * Applies the changes in the queue to the filesystem in the order they were made.
      *
-     * Applying the changes does not consume them. If [dirPath] is not `null`, any relative paths that were passed to
-     * [FilesystemAction] instances are resolved against it. If an [ErrorHandler] that was passed to a
-     * [FilesystemAction] instance throws an exception, it will be thrown here.
-     *
-     * @throws [ProviderMismatchException] The given [dirPath] doesn't belong to the same filesystem as the paths passed
-     * to one of the [FilesystemAction] instances.
+     * Applying the changes does not consume them. If an [ErrorHandler] that was passed to a [FilesystemAction] instance
+     * throws an exception, it will be thrown here.
      */
-    fun apply(dirPath: Path? = null) {
+    fun apply() {
         for (action in actions) {
-            action.applyFilesystem(dirPath)
+            action.applyFilesystem()
         }
     }
 }

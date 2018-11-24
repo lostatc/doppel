@@ -12,4 +12,3 @@ doppel is a library for manipulating the filesystem in memory.
   * Queue up changes and then apply them all at once
   * Undo changes before they're applied
   * See a preview of what the filesystem will look like with changes applied
-  * Create a set of changes that can be applied to multiple directories

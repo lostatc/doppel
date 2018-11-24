@@ -25,7 +25,6 @@ import io.github.lostatc.doppel.path.MutablePathNode
 import io.github.lostatc.doppel.path.PathNode
 import java.io.IOException
 import java.nio.file.FileSystemLoopException
-import java.nio.file.Path
 import java.nio.file.ProviderMismatchException
 
 /**
@@ -34,29 +33,22 @@ import java.nio.file.ProviderMismatchException
 private val DEFAULT_ERROR_HANDLER: ErrorHandler = ::skipOnError
 
 /**
- * Adds [pathNode] to [viewNode] if [pathNode] is relative or a descendant of [viewNode].
- *
- * If [pathNode] and [viewNode] belong to different filesystems, this function does nothing.
+ * Adds [pathNode] to [viewNode] if [pathNode] starts with [viewNode].
  *
  * This function can be used to implement [FilesystemAction.applyView].
  */
 fun addNodeToView(viewNode: MutablePathNode, pathNode: PathNode) {
-    if (viewNode.path.fileSystem != pathNode.path.fileSystem) return
-    val absoluteNode = viewNode.resolve(pathNode)
-    if (absoluteNode.startsWith(viewNode)) viewNode.addDescendant(absoluteNode.toMutablePathNode())
+    if (pathNode.startsWith(viewNode)) viewNode.addDescendant(pathNode.toMutablePathNode())
 }
 
 /**
- * Removes [pathNode] from [viewNode] if [pathNode] is relative or a descendant of [viewNode].
- *
- * If [pathNode] and [viewNode] belong to different filesystems, this function does nothing.
+ * Removes [pathNode] from [viewNode] if [pathNode] is a descendant of [viewNode].
  *
  * This function can be used to implement [FilesystemAction.applyView].
  */
 fun removeNodeFromView(viewNode: MutablePathNode, pathNode: PathNode) {
-    if (viewNode.path.fileSystem != pathNode.path.fileSystem) return
-    val absolutePath = viewNode.path.resolve(pathNode.path)
-    viewNode.removeDescendant(absolutePath)
+    // We need this check in case the two nodes are associated with different filesystems.
+    if (pathNode.startsWith(viewNode)) viewNode.removeDescendant(pathNode.path)
 }
 
 /**
@@ -73,23 +65,16 @@ interface FilesystemAction {
      * Modifies [viewNode] to provide a view of what the filesystem will look like after [applyView] is called.
      *
      * After this is called, [viewNode] will match what the filesystem would look like if [applyFilesystem] were called
-     * assuming there are no errors. Relative paths passed to [FilesystemAction] instances are resolved against
-     * [viewNode] if they belong to the same filesystem as it.
+     * assuming there are no errors.
      *
-     * The functions [addNodeToView] and [removeNodeFromView] can be useful in implementing this method.
+     * The functions [addNodeToView] and [removeNodeFromView] can be used to implement this method.
      */
     fun applyView(viewNode: MutablePathNode)
 
     /**
      * Applies the change to the filesystem.
-     *
-     * If [dirPath] is not `null`, relative paths passed to this [FilesystemAction] instance are resolved against it. If
-     * [onError] throws an exception, it will be thrown here.
-     *
-     * @throws [ProviderMismatchException] The given [dirPath] doesn't belong to the same filesystem as the paths passed
-     * to this [FilesystemAction] instance.
      */
-    fun applyFilesystem(dirPath: Path? = null)
+    fun applyFilesystem()
 }
 
 /**
@@ -125,26 +110,18 @@ data class MoveAction(
     val followLinks: Boolean = false,
     override val onError: ErrorHandler = DEFAULT_ERROR_HANDLER
 ) : FilesystemAction {
+    init {
+        if (source.path.fileSystem != target.path.fileSystem)
+            throw ProviderMismatchException("The source and target paths must belong to the same filesystem.")
+    }
+
     override fun applyView(viewNode: MutablePathNode) {
         removeNodeFromView(viewNode, source)
         addNodeToView(viewNode, target)
     }
 
-    override fun applyFilesystem(dirPath: Path?) {
-        if (source.path.fileSystem != target.path.fileSystem)
-            throw ProviderMismatchException("The source and target paths must belong to the same filesystem.")
-        if (dirPath != null && dirPath.fileSystem != source.path.fileSystem)
-            throw ProviderMismatchException(
-                "The given path must belong to the same filesystem as the source and target paths."
-            )
-
-        val absoluteSource = dirPath?.resolve(source.path) ?: source.path
-        val absoluteTarget = dirPath?.resolve(target.path) ?: target.path
-
-        moveRecursively(
-            absoluteSource, absoluteTarget,
-            overwrite = overwrite, followLinks = followLinks, onError = onError
-        )
+    override fun applyFilesystem() {
+        moveRecursively(source.path, target.path, overwrite = overwrite, followLinks = followLinks, onError = onError)
     }
 }
 
@@ -182,23 +159,18 @@ data class CopyAction(
     val followLinks: Boolean = false,
     override val onError: ErrorHandler = DEFAULT_ERROR_HANDLER
 ) : FilesystemAction {
+    init {
+        if (source.path.fileSystem != target.path.fileSystem)
+            throw ProviderMismatchException("The source and target paths must belong to the same filesystem.")
+    }
+
     override fun applyView(viewNode: MutablePathNode) {
         addNodeToView(viewNode, target)
     }
 
-    override fun applyFilesystem(dirPath: Path?) {
-        if (source.path.fileSystem != target.path.fileSystem)
-            throw ProviderMismatchException("The source and target paths must belong to the same filesystem.")
-        if (dirPath != null && dirPath.fileSystem != source.path.fileSystem)
-            throw ProviderMismatchException(
-                "The given path must belong to the same filesystem as the source and target paths."
-            )
-
-        val absoluteSource = dirPath?.resolve(source.path) ?: source.path
-        val absoluteTarget = dirPath?.resolve(target.path) ?: target.path
-
+    override fun applyFilesystem() {
         copyRecursively(
-            absoluteSource, absoluteTarget,
+            source.path, target.path,
             overwrite = overwrite, copyAttributes = copyAttributes, followLinks = followLinks, onError = onError
         )
     }
@@ -222,13 +194,8 @@ data class CreateAction(
         addNodeToView(viewNode, target)
     }
 
-    override fun applyFilesystem(dirPath: Path?) {
-        if (dirPath != null && dirPath.fileSystem != target.path.fileSystem)
-            throw ProviderMismatchException("The given path must belong to the same filesystem as the target path.")
-
-        val absoluteTarget = if (dirPath == null) target else PathNode.of(dirPath).resolve(target)
-
-        absoluteTarget.createFile(recursive = recursive, onError = onError)
+    override fun applyFilesystem() {
+        target.createFile(recursive = recursive, onError = onError)
     }
 }
 
@@ -257,12 +224,7 @@ data class DeleteAction(
         removeNodeFromView(viewNode, target)
     }
 
-    override fun applyFilesystem(dirPath: Path?) {
-        if (dirPath != null && dirPath.fileSystem != target.path.fileSystem)
-            throw ProviderMismatchException("The given path must belong to the same filesystem as the target path.")
-
-        val absoluteTarget = dirPath?.resolve(target.path) ?: target.path
-
-        deleteRecursively(absoluteTarget, followLinks = followLinks, onError = onError)
+    override fun applyFilesystem() {
+        deleteRecursively(target.path, followLinks = followLinks, onError = onError)
     }
 }

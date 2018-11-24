@@ -102,13 +102,12 @@ private open class ErrorHandlingVisitor(val onError: ErrorHandler) : SimpleFileV
  * @return How the file walk should be handled.
  */
 private fun handleWalkErrors(onError: ErrorHandler, file: Path, tryFunc: () -> Unit): FileVisitResult {
-    try {
+    return try {
         tryFunc()
+        FileVisitResult.CONTINUE
     } catch (e: IOException) {
-        return onError(file, e).visitResult
+        onError(file, e).visitResult
     }
-
-    return FileVisitResult.CONTINUE
 }
 
 /**
