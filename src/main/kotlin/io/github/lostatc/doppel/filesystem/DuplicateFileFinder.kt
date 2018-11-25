@@ -27,7 +27,7 @@ import java.util.Objects
 /**
  * A class that identifies duplicate files.
  *
- * Files are considered to be duplicates if they have the same size and checksum.
+ * Files are considered to be duplicates if they have the same size and checksum. Directories are ignored.
  *
  * @property [dirPath] The path of the directory to search for duplicate files.
  * @property [followLinks] Follow symbolic links when walking the directory tree.

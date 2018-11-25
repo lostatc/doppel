@@ -68,7 +68,7 @@ class PathDelta {
      * @throws [IllegalArgumentException] The given [numChanges] is negative.
      */
     fun undo(numChanges: Int): Int {
-        require(numChanges > 0) { "the given number of changes must be positive" }
+        require(numChanges >= 0) { "the given number of changes must be positive" }
 
         val startSize = actions.size
         repeat(numChanges) { actions.pollLast() }
