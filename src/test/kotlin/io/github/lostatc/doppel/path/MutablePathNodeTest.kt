@@ -451,8 +451,10 @@ class MutablePathNodeTest : WordSpec() {
                 val thisNode = MutablePathNode.of("/")
                 val otherNode = MutablePathNode.of("/", "a")
 
+                val expectedNode = PathNode.of("/", "a")
+
                 thisNode.addDescendant(otherNode)
-                thisNode.children.shouldContain(otherNode.fileName, otherNode)
+                thisNode.children.shouldContain(expectedNode.fileName, expectedNode)
             }
 
             "add a descendant of this node" {
@@ -463,22 +465,22 @@ class MutablePathNodeTest : WordSpec() {
                 }
                 val otherNode = MutablePathNode.of("/", "a", "c", "d")
 
+                val expectedNode = PathNode.of("/", "a", "c", "d")
+
                 thisNode.addDescendant(otherNode)
-                thisNode.descendants.shouldContain(otherNode.path, otherNode)
+                thisNode.descendants.shouldContain(expectedNode.path, expectedNode)
             }
 
             "replace an existing node" {
                 val thisNode = MutablePathNode.of("/") {
                     file("a")
                 }
-                val otherNode = MutablePathNode.of(
-                    "/",
-                    "a",
-                    type = DirectoryType()
-                )
+                val otherNode = MutablePathNode.of("/", "a", type = DirectoryType())
+
+                val expectedNode = PathNode.of("/", "a", type = DirectoryType())
 
                 thisNode.addDescendant(otherNode)
-                thisNode.children.shouldContain(otherNode.fileName, otherNode)
+                thisNode.children.shouldContain(expectedNode.fileName, expectedNode)
             }
 
             "not copy the given node" {
@@ -502,10 +504,22 @@ class MutablePathNodeTest : WordSpec() {
 
             "add an immediate child of this node" {
                 val thisNode = MutablePathNode.of("/")
-                val otherNode = MutablePathNode.of("a")
+                val otherNode = MutablePathNode.of("a", "b")
+
+                val expectedNode = PathNode.of("/", "a", "b")
 
                 thisNode.addRelativeDescendant(otherNode)
-                thisNode.children.shouldContain(otherNode.fileName, otherNode)
+                thisNode.descendants.shouldContain(expectedNode.path, expectedNode)
+            }
+
+            "add a node with a single segment" {
+                val thisNode = MutablePathNode.of("/")
+                val otherNode = MutablePathNode.of("a")
+
+                val expectedNode = PathNode.of("/", "a")
+
+                thisNode.addRelativeDescendant(otherNode)
+                thisNode.descendants.shouldContain(expectedNode.path, expectedNode)
             }
 
             "add a descendant of this node" {
@@ -516,21 +530,22 @@ class MutablePathNodeTest : WordSpec() {
                 }
                 val otherNode = MutablePathNode.of("a", "c", "d")
 
+                val expectedNode = PathNode.of("/", "a", "c", "d")
+
                 thisNode.addRelativeDescendant(otherNode)
-                thisNode.descendants.shouldContain(otherNode.path, otherNode)
+                thisNode.descendants.shouldContain(expectedNode.path, expectedNode)
             }
 
             "replace an existing node" {
                 val thisNode = MutablePathNode.of("/") {
                     file("a")
                 }
-                val otherNode = MutablePathNode.of(
-                    "a",
-                    type = DirectoryType()
-                )
+                val otherNode = MutablePathNode.of("a", type = DirectoryType())
+
+                val expectedNode = PathNode.of("/", "a", type = DirectoryType())
 
                 thisNode.addRelativeDescendant(otherNode)
-                thisNode.children.shouldContain(otherNode.fileName, otherNode)
+                thisNode.children.shouldContain(expectedNode.fileName, expectedNode)
             }
 
             "not copy the given node" {
