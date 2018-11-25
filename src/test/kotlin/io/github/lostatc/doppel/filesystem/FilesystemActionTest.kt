@@ -28,24 +28,18 @@ import io.github.lostatc.doppel.path.file
 import io.github.lostatc.doppel.path.symlink
 import io.github.lostatc.doppel.testing.DEFAULT_JIMFS_CONFIG
 import io.kotlintest.assertSoftly
-import io.kotlintest.matchers.boolean.shouldBeFalse
 import io.kotlintest.matchers.boolean.shouldBeTrue
+import io.kotlintest.matchers.collections.shouldBeEmpty
 import io.kotlintest.matchers.maps.shouldContainKey
 import io.kotlintest.matchers.maps.shouldNotContainKey
+import io.kotlintest.shouldThrow
 import io.kotlintest.specs.WordSpec
 import java.nio.file.Files
+import java.nio.file.ProviderMismatchException
 
 class FilesystemActionKtTest : WordSpec() {
     init {
         "addNodeToView" should {
-            "add the node if it is relative" {
-                val viewNode = MutablePathNode.of("/", "a")
-                val pathNode = PathNode.of("b")
-                addNodeToView(viewNode, pathNode)
-
-                viewNode.relativeDescendants.shouldContainKey(pathNode.path)
-            }
-
             "add the node if it is a descendant" {
                 val viewNode = MutablePathNode.of("/", "a")
                 val pathNode = PathNode.of("/", "a", "b")
@@ -61,19 +55,21 @@ class FilesystemActionKtTest : WordSpec() {
 
                 viewNode.descendants.shouldNotContainKey(pathNode.path)
             }
+
+            "not add the node if it belongs to a different filesystem" {
+                val viewNodeFs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
+                val viewNode = MutablePathNode.of(viewNodeFs.getPath("/", "a"))
+
+                val pathNodeFs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
+                val pathNode = PathNode.of(pathNodeFs.getPath("/", "a", "b"))
+
+                addNodeToView(viewNode, pathNode)
+
+                viewNode.descendants.entries.shouldBeEmpty()
+            }
         }
 
         "removeNodeFromView" should {
-            "remove the node if it is relative" {
-                val viewNode = MutablePathNode.of("/", "a") {
-                    file("b")
-                }
-                val pathNode = PathNode.of("b")
-                removeNodeFromView(viewNode, pathNode)
-
-                viewNode.relativeDescendants.shouldNotContainKey(pathNode.path)
-            }
-
             "remove the node if it is a descendant" {
                 val viewNode = MutablePathNode.of("/", "a") {
                     file("b")
@@ -83,6 +79,20 @@ class FilesystemActionKtTest : WordSpec() {
 
                 viewNode.descendants.shouldNotContainKey(pathNode.path)
             }
+
+            "not remove the node if it belongs to a different filesystem" {
+                val viewNodeFs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
+                val viewNode = MutablePathNode.of(viewNodeFs.getPath("/", "a"))
+                val testPath = viewNodeFs.getPath("/", "a", "b")
+                viewNode.addDescendant(MutablePathNode.of(testPath))
+
+                val pathNodeFs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
+                val pathNode = PathNode.of(pathNodeFs.getPath("/", "a", "b"))
+
+                removeNodeFromView(viewNode, pathNode)
+
+                viewNode.descendants.shouldContainKey(testPath)
+            }
         }
     }
 }
@@ -90,6 +100,18 @@ class FilesystemActionKtTest : WordSpec() {
 class MoveActionTest : WordSpec() {
     init {
         "MoveAction.applyFilesystem" should {
+            "throw if source and target belong to different filesystems" {
+                val sourceFs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
+                val targetFs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
+
+                val sourceNode = PathNode.of(sourceFs.getPath("source"))
+                val targetNode = PathNode.of(targetFs.getPath("target"))
+
+                shouldThrow<ProviderMismatchException> {
+                    MoveAction(sourceNode, targetNode)
+                }
+            }
+
             "recursively move files" {
                 val fs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
 
@@ -116,7 +138,7 @@ class MoveActionTest : WordSpec() {
 
                 assertSoftly {
                     expectedTargetNode.exists(checkType = true, recursive = true).shouldBeTrue()
-                    Files.exists(fs.getPath("source")).shouldBeFalse()
+                    Files.notExists(fs.getPath("source")).shouldBeTrue()
                 }
             }
 
@@ -207,6 +229,18 @@ class MoveActionTest : WordSpec() {
 class CopyActionTest : WordSpec() {
     init {
         "CopyAction.applyFilesystem" should {
+            "throw if source and target belong to different filesystems" {
+                val sourceFs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
+                val targetFs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
+
+                val sourceNode = PathNode.of(sourceFs.getPath("source"))
+                val targetNode = PathNode.of(targetFs.getPath("target"))
+
+                shouldThrow<ProviderMismatchException> {
+                    CopyAction(sourceNode, targetNode)
+                }
+            }
+
             "recursively copy files" {
                 val fs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
 
@@ -343,6 +377,48 @@ class CopyActionTest : WordSpec() {
                 action.applyFilesystem()
 
                 expectedTargetNode.exists(checkType = true, recursive = true).shouldBeTrue()
+            }
+        }
+    }
+}
+
+class DeleteActionTest : WordSpec() {
+    init {
+        "DeleteAction.applyFilesystem" should {
+            "recursively delete files" {
+                val fs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
+                val targetNode = PathNode.of(fs.getPath("target")) {
+                    file("a")
+                    dir("b") {
+                        dir("c") {
+                            file("d")
+                        }
+                        dir("e")
+                    }
+                }
+                targetNode.createFile(recursive = true)
+
+                val action = DeleteAction(targetNode)
+                action.applyFilesystem()
+
+                Files.notExists(fs.getPath("target")).shouldBeTrue()
+            }
+
+            "delete links instead of their targets" {
+                val fs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
+
+                val linkTarget = fs.getPath("linkTarget")
+                Files.createFile(linkTarget)
+
+                val targetNode = PathNode.of(fs.getPath("target")) {
+                    symlink("link", target = linkTarget)
+                }
+                targetNode.createFile(recursive = true)
+
+                val action = DeleteAction(targetNode)
+                action.applyFilesystem()
+
+                Files.exists(linkTarget).shouldBeTrue()
             }
         }
     }
