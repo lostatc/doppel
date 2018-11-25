@@ -34,6 +34,8 @@ interface FileType {
     /**
      * Returns whether the file at the given [path] is the type of file represented by this class.
      *
+     * This does not follow links.
+     *
      * @return `true` if the type of the file matches or `false` if it does not match, the file does not exist or the
      * type cannot be determined.
      */
@@ -41,6 +43,8 @@ interface FileType {
 
     /**
      * Returns whether the files [left] and [right] have the same contents.
+     *
+     * This does not follow links.
      *
      * @throws [IOException] An I/O error occurred.
      */
@@ -66,19 +70,19 @@ interface FileType {
  * A type representing a regular file.
  */
 class RegularFileType : FileType {
-    override fun checkType(path: Path): Boolean = Files.isRegularFile(path)
+    override fun checkType(path: Path): Boolean = Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS)
 
     /**
      * Returns whether the files [left] and [right] have the same size and checksum.
+     *
+     * This does not follow links.
      *
      * @throws [IOException] An I/O error occurred.
      */
     override fun checkSame(left: Path, right: Path): Boolean {
         if (Files.isSameFile(left, right)) return true
         if (Files.size(left) != Files.size(right)) return false
-        return getFileChecksum(left) contentEquals getFileChecksum(
-            right
-        )
+        return getFileChecksum(left) contentEquals getFileChecksum(right)
     }
 
     override fun createFile(path: Path) {
@@ -94,10 +98,12 @@ class RegularFileType : FileType {
  * A type representing a directory.
  */
 class DirectoryType : FileType {
-    override fun checkType(path: Path): Boolean = Files.isDirectory(path)
+    override fun checkType(path: Path): Boolean = Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)
 
     /**
      * Returns whether the directories [left] and [right] contain the same paths.
+     *
+     * This does not follow links.
      *
      * @throws [IOException] An I/O error occurred.
      */
@@ -125,6 +131,8 @@ data class SymbolicLinkType(val target: Path) : FileType {
 
     /**
      * Returns whether the symbolic links [left] and [right] point to the same path.
+     *
+     * This does not follow links.
      *
      * @throws [IOException] An I/O error occurred.
      */
@@ -155,6 +163,8 @@ class UnknownType : FileType {
 
 /**
  * Returns the [FileType] that is most appropriate for file at the given [path].
+ *
+ * @throws [IOException] An I/O error occurred.
  */
 fun fileTypeFromFilesystem(path: Path): FileType = when {
     Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS) -> RegularFileType()
