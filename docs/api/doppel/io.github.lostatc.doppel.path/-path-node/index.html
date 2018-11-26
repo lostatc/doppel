@@ -10,7 +10,7 @@
 <br/>
 <h1>PathNode</h1>
 <code><span class="keyword">interface </span><span class="identifier">PathNode</span></code> <a
-        href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/path/PathNode.kt#L61">(source)</a>
+        href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/path/PathNode.kt#L72">(source)</a>
 <p><strong>Platform and version requirements:</strong> JVM</p>
 <p>A read-only representation of a tree of file paths.</p>
 <p>Objects of this type wrap a <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html">Path</a>
@@ -25,12 +25,21 @@
     <a href="children.html">children</a> property. The full <a
             href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html">Path</a> can be accessed through the
     <a href="path.html">path</a> property.</p>
+<p>The properties <a href="descendants.html">descendants</a> and <a
+        href="relative-descendants.html">relativeDescendants</a> can be used to efficiently find descendants of this
+    node by
+    their <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html">Path</a>.</p>
 <p>Each <a href="./index.html">PathNode</a> has a <a href="type.html">type</a>, which indicates the type of file the
     node represents in the filesystem. An initial type
     is provided through the constructor, but this type can change based on the state of the node. For example, if the
     <a href="type.html">type</a> of a node is a regular file, then it will change to a directory if children are added.
     Custom file types with
     custom behavior can be created by implementing <a href="../-file-type/index.html">FileType</a>.</p>
+<p>You can use <a href="diff.html">diff</a> to get a comparision of two <a href="./index.html">PathNode</a> objects.</p>
+<p><a href="./index.html">PathNode</a> objects can be created using the builder method <a
+        href="-companion/of.html">of</a> which provides a DSL for specifying what the
+    directory tree should look like. They can also be created by walking a directory tree in the filesystem using
+    <a href="-companion/from-filesystem.html">fromFilesystem</a>.</p>
 <p><em>Warning:</em> This interface is not meant to be implemented. New members may be added in the future.</p>
 <h3>Types</h3>
 <table>
