@@ -1,12 +1,15 @@
+import org.jetbrains.dokka.gradle.DokkaTask
+
 group = "io.github.lostatc"
 version = "0.1"
 
-plugins {
-    kotlin("jvm") version "1.3.0"
+repositories {
+    jcenter()
 }
 
-val test by tasks.getting(Test::class) {
-    useJUnitPlatform { }
+plugins {
+    kotlin("jvm") version "1.3.0"
+    id("org.jetbrains.dokka") version "0.9.17"
 }
 
 dependencies {
@@ -17,6 +20,11 @@ dependencies {
     testCompile(group = "com.google.jimfs", name = "jimfs", version = "1.1")
 }
 
-repositories {
-    jcenter()
+val test by tasks.getting(Test::class) {
+    useJUnitPlatform { }
+}
+
+val dokka by tasks.getting(DokkaTask::class) {
+    outputFormat = "html"
+    outputDirectory = "$buildDir/dokka"
 }
