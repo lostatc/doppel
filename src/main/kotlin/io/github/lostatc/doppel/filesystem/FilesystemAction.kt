@@ -28,11 +28,6 @@ import java.nio.file.FileSystemLoopException
 import java.nio.file.ProviderMismatchException
 
 /**
- * The default error handler to use for [FilesystemAction] implementations.
- */
-private val DEFAULT_ERROR_HANDLER: ErrorHandler = ::skipOnError
-
-/**
  * Adds [pathNode] to [viewNode] if [pathNode] starts with [viewNode].
  *
  * This function can be used to implement [FilesystemAction.applyView].
@@ -108,7 +103,7 @@ data class MoveAction(
     val source: PathNode, val target: PathNode,
     val overwrite: Boolean = false,
     val followLinks: Boolean = false,
-    override val onError: ErrorHandler = DEFAULT_ERROR_HANDLER
+    override val onError: ErrorHandler = ::skipOnError
 ) : FilesystemAction {
     init {
         if (source.path.fileSystem != target.path.fileSystem)
@@ -157,7 +152,7 @@ data class CopyAction(
     val overwrite: Boolean = false,
     val copyAttributes: Boolean = false,
     val followLinks: Boolean = false,
-    override val onError: ErrorHandler = DEFAULT_ERROR_HANDLER
+    override val onError: ErrorHandler = ::skipOnError
 ) : FilesystemAction {
     init {
         if (source.path.fileSystem != target.path.fileSystem)
@@ -188,7 +183,7 @@ data class CopyAction(
 data class CreateAction(
     val target: PathNode,
     val recursive: Boolean = false,
-    override val onError: ErrorHandler = DEFAULT_ERROR_HANDLER
+    override val onError: ErrorHandler = ::skipOnError
 ) : FilesystemAction {
     override fun applyView(viewNode: MutablePathNode) {
         addNodeToView(viewNode, target)
@@ -218,7 +213,7 @@ data class CreateAction(
 data class DeleteAction(
     val target: PathNode,
     val followLinks: Boolean = false,
-    override val onError: ErrorHandler = DEFAULT_ERROR_HANDLER
+    override val onError: ErrorHandler = ::skipOnError
 ) : FilesystemAction {
     override fun applyView(viewNode: MutablePathNode) {
         removeNodeFromView(viewNode, target)
