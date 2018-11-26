@@ -1,0 +1,46 @@
+<HTML>
+<HEAD>
+    <meta charset="UTF-8">
+    <title>PathNode.diff - doppel</title>
+    <link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">doppel</a>&nbsp;/&nbsp;<a href="../index.html">io.github.lostatc.doppel.path</a>&nbsp;/&nbsp;<a
+        href="index.html">PathNode</a>&nbsp;/&nbsp;<a href="./diff.html">diff</a><br/>
+<br/>
+<h1>diff</h1>
+<a name="io.github.lostatc.doppel.path.PathNode$diff(io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))"></a>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">diff</span><span
+        class="symbol">(</span><span class="identifier"
+                                     id="io.github.lostatc.doppel.path.PathNode$diff(io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/other">other</span><span
+        class="symbol">:</span>&nbsp;<a href="index.html"><span class="identifier">PathNode</span></a><span
+        class="symbol">, </span><span class="identifier"
+                                      id="io.github.lostatc.doppel.path.PathNode$diff(io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/onError">onError</span><span
+        class="symbol">:</span>&nbsp;<a href="../../io.github.lostatc.doppel.error/-error-handler.html"><span
+        class="identifier">ErrorHandler</span></a>&nbsp;<span class="symbol">=</span>&nbsp;::skipOnError<span
+        class="symbol">)</span><span class="symbol">: </span><a href="../-path-diff/index.html"><span
+        class="identifier">PathDiff</span></a></code> <a
+        href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/path/PathNode.kt#L212">(source)</a>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>Returns an immutable representation of the difference between this directory and <a
+        href="diff.html#io.github.lostatc.doppel.path.PathNode$diff(io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/other">other</a>.
+</p>
+<p>The following exceptions can be passed to <a
+        href="diff.html#io.github.lostatc.doppel.path.PathNode$diff(io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/onError">onError</a>:
+</p>
+<ul>
+    <li><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.io/-no-such-file-exception/index.html">NoSuchFileException</a>
+        A file in one of the directories was not found in the filesystem.
+    </li>
+    <li><a href="http://docs.oracle.com/javase/8/docs/api/java/io/IOException.html">IOException</a>: Some other I/O
+        error occurred.
+    </li>
+</ul>
+<h3>Parameters</h3>
+<p><a name="other"></a>
+    <code>other</code> - The path node to compare this node with.</p>
+<p><a name="onError"></a>
+    <code>onError</code> - A function that is called for each I/O error that occurs and determines how to handle them.
+</p>
+</BODY>
+</HTML>

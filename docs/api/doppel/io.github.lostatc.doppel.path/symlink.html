@@ -1,0 +1,43 @@
+<HTML>
+<HEAD>
+    <meta charset="UTF-8">
+    <title>symlink - doppel</title>
+    <link rel="stylesheet" href="../../style.css">
+</HEAD>
+<BODY>
+<a href="../index.html">doppel</a>&nbsp;/&nbsp;<a href="index.html">io.github.lostatc.doppel.path</a>&nbsp;/&nbsp;<a
+        href="./symlink.html">symlink</a><br/>
+<br/>
+<h1>symlink</h1>
+<a name="io.github.lostatc.doppel.path$symlink(io.github.lostatc.doppel.path.MutablePathNode, kotlin.String, kotlin.Array((kotlin.String)), java.nio.file.Path)"></a>
+<code><span class="keyword">fun </span><a href="-mutable-path-node/index.html"><span
+        class="identifier">MutablePathNode</span></a><span class="symbol">.</span><span
+        class="identifier">symlink</span><span class="symbol">(</span><span class="identifier"
+                                                                            id="io.github.lostatc.doppel.path$symlink(io.github.lostatc.doppel.path.MutablePathNode, kotlin.String, kotlin.Array((kotlin.String)), java.nio.file.Path)/firstSegment">firstSegment</span><span
+        class="symbol">:</span>&nbsp;<a
+        href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span
+        class="identifier">String</span></a><span class="symbol">, </span><span class="keyword">vararg</span> <span
+        class="identifier"
+        id="io.github.lostatc.doppel.path$symlink(io.github.lostatc.doppel.path.MutablePathNode, kotlin.String, kotlin.Array((kotlin.String)), java.nio.file.Path)/segments">segments</span><span
+        class="symbol">:</span>&nbsp;<a
+        href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span
+        class="identifier">String</span></a><span class="symbol">, </span><span class="identifier"
+                                                                                id="io.github.lostatc.doppel.path$symlink(io.github.lostatc.doppel.path.MutablePathNode, kotlin.String, kotlin.Array((kotlin.String)), java.nio.file.Path)/target">target</span><span
+        class="symbol">:</span>&nbsp;<a href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span
+        class="identifier">Path</span></a><span class="symbol">)</span><span class="symbol">: </span><a
+        href="-mutable-path-node/index.html"><span class="identifier">MutablePathNode</span></a></code> <a
+        href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/path/PathNodeBuilders.kt#L81">(source)</a>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>Builds a path node from the given file segments with a type of <a href="-symbolic-link-type/index.html">SymbolicLinkType</a>.
+</p>
+<p>This is meant to be used with <a href="-mutable-path-node/-companion/of.html">MutablePathNode.of</a> to construct a
+    tree of path nodes.</p>
+<h3>Parameters</h3>
+<p><a name="firstSegment"></a>
+    <code>firstSegment</code> - The first segment of the new path node.</p>
+<p><a name="segments"></a>
+    <code>segments</code> - The remaining segments of the new path node.</p>
+<p><a name="target"></a>
+    <code>target</code> - The path the link points to.</p>
+</BODY>
+</HTML>

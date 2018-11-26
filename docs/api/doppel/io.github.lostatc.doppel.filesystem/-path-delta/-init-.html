@@ -1,0 +1,28 @@
+<HTML>
+<HEAD>
+    <meta charset="UTF-8">
+    <title>PathDelta.
+        <init> - doppel
+    </title>
+    <link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">doppel</a>&nbsp;/&nbsp;<a href="../index.html">io.github.lostatc.doppel.filesystem</a>&nbsp;/&nbsp;<a
+        href="index.html">PathDelta</a>&nbsp;/&nbsp;<a href="./-init-.html">&lt;init&gt;</a><br/>
+<br/>
+<h1>&lt;init&gt;</h1>
+<a name="io.github.lostatc.doppel.filesystem.PathDelta$&lt;init&gt;()"></a>
+<code><span class="identifier">PathDelta</span><span class="symbol">(</span><span class="symbol">)</span></code>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>A set of changes to apply to the filesystem.</p>
+<p>This class allows for creating a set of changes that can be applied to the filesystem. Changes are stored in a queue
+    and can be applied to the filesystem all at once. New changes can be queued up by passing instances of
+    <a href="../-filesystem-action/index.html">FilesystemAction</a> to the <a href="add.html">add</a> method, but the
+    filesystem is not modified until <a href="apply.html">apply</a> is called. There are actions
+    for moving, copying, creating and deleting files and directories. Custom actions can be created by implementing
+    <a href="../-filesystem-action/index.html">FilesystemAction</a>.</p>
+<p>The <a href="view.html">view</a> method can be used to see what a directory will look like after all changes are
+    applied. The <a href="clear.html">clear</a> and
+    <a href="undo.html">undo</a> methods can be used to undo changes before they're applied.</p>
+</BODY>
+</HTML>

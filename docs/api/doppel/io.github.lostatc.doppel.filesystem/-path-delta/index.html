@@ -1,0 +1,143 @@
+<HTML>
+<HEAD>
+    <meta charset="UTF-8">
+    <title>PathDelta - doppel</title>
+    <link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">doppel</a>&nbsp;/&nbsp;<a href="../index.html">io.github.lostatc.doppel.filesystem</a>&nbsp;/&nbsp;<a
+        href="./index.html">PathDelta</a><br/>
+<br/>
+<h1>PathDelta</h1>
+<code><span class="keyword">class </span><span class="identifier">PathDelta</span></code> <a
+        href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/filesystem/PathDelta.kt#L40">(source)</a>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>A set of changes to apply to the filesystem.</p>
+<p>This class allows for creating a set of changes that can be applied to the filesystem. Changes are stored in a queue
+    and can be applied to the filesystem all at once. New changes can be queued up by passing instances of
+    <a href="../-filesystem-action/index.html">FilesystemAction</a> to the <a href="add.html">add</a> method, but the
+    filesystem is not modified until <a href="apply.html">apply</a> is called. There are actions
+    for moving, copying, creating and deleting files and directories. Custom actions can be created by implementing
+    <a href="../-filesystem-action/index.html">FilesystemAction</a>.</p>
+<p>The <a href="view.html">view</a> method can be used to see what a directory will look like after all changes are
+    applied. The <a href="clear.html">clear</a> and
+    <a href="undo.html">undo</a> methods can be used to undo changes before they're applied.</p>
+<h3>Constructors</h3>
+<table>
+    <tbody>
+    <tr>
+        <td>
+            <p><a href="-init-.html">&lt;init&gt;</a></p>
+        </td>
+        <td>
+            <code><span class="identifier">PathDelta</span><span class="symbol">(</span><span
+                    class="symbol">)</span></code>
+            <p>A set of changes to apply to the filesystem.</p>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<h3>Functions</h3>
+<table>
+    <tbody>
+    <tr>
+        <td>
+            <p><a href="add.html">add</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">fun </span><span class="identifier">add</span><span class="symbol">(</span><span
+                    class="keyword">vararg</span> <span class="identifier"
+                                                        id="io.github.lostatc.doppel.filesystem.PathDelta$add(kotlin.Array((io.github.lostatc.doppel.filesystem.FilesystemAction)))/changes">changes</span><span
+                    class="symbol">:</span>&nbsp;<a href="../-filesystem-action/index.html"><span class="identifier">FilesystemAction</span></a><span
+                    class="symbol">)</span><span class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span
+                    class="identifier">Unit</span></a></code>
+            <p>Adds the given <a
+                    href="add.html#io.github.lostatc.doppel.filesystem.PathDelta$add(kotlin.Array((io.github.lostatc.doppel.filesystem.FilesystemAction)))/changes">changes</a>
+                to the queue.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="apply.html">apply</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">fun </span><span class="identifier">apply</span><span
+                    class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span
+                    class="identifier">Unit</span></a></code>
+            <p>Applies the changes in the queue to the filesystem in the order they were made.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="clear.html">clear</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">fun </span><span class="identifier">clear</span><span
+                    class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a></code>
+            <p>Removes all changes from the queue and returns how many were removed.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="equals.html">equals</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">fun </span><span class="identifier">equals</span><span
+                    class="symbol">(</span><span class="identifier"
+                                                 id="io.github.lostatc.doppel.filesystem.PathDelta$equals(kotlin.Any)/other">other</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html"><span class="identifier">Any</span></a><span
+                    class="symbol">?</span><span class="symbol">)</span><span class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
+                    class="identifier">Boolean</span></a></code></td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="hash-code.html">hashCode</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">fun </span><span class="identifier">hashCode</span><span class="symbol">(</span><span
+                    class="symbol">)</span><span class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a></code>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="undo.html">undo</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">fun </span><span class="identifier">undo</span><span
+                    class="symbol">(</span><span class="identifier"
+                                                 id="io.github.lostatc.doppel.filesystem.PathDelta$undo(kotlin.Int)/numChanges">numChanges</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a><span
+                    class="symbol">)</span><span class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a></code>
+            <p>Removes the last <a
+                    href="undo.html#io.github.lostatc.doppel.filesystem.PathDelta$undo(kotlin.Int)/numChanges">numChanges</a>
+                changes from the queue and returns how many were removed.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="view.html">view</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">fun </span><span class="identifier">view</span><span
+                    class="symbol">(</span><span class="identifier"
+                                                 id="io.github.lostatc.doppel.filesystem.PathDelta$view(io.github.lostatc.doppel.path.PathNode)/viewNode">viewNode</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="../../io.github.lostatc.doppel.path/-path-node/index.html"><span
+                    class="identifier">PathNode</span></a><span class="symbol">)</span><span class="symbol">: </span><a
+                    href="../../io.github.lostatc.doppel.path/-path-node/index.html"><span
+                    class="identifier">PathNode</span></a></code>
+            <p>See what the filesystem will look like after all changes are applied.</p>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</BODY>
+</HTML>

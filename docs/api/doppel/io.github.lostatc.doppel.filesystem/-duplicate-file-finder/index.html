@@ -1,0 +1,146 @@
+<HTML>
+<HEAD>
+    <meta charset="UTF-8">
+    <title>DuplicateFileFinder - doppel</title>
+    <link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">doppel</a>&nbsp;/&nbsp;<a href="../index.html">io.github.lostatc.doppel.filesystem</a>&nbsp;/&nbsp;<a
+        href="./index.html">DuplicateFileFinder</a><br/>
+<br/>
+<h1>DuplicateFileFinder</h1>
+<code><span class="keyword">class </span><span class="identifier">DuplicateFileFinder</span></code> <a
+        href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/filesystem/DuplicateFileFinder.kt#L36">(source)</a>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>A class that identifies duplicate files.</p>
+<p>Files are considered to be duplicates if they have the same size and checksum. Directories are ignored.</p>
+<h3>Constructors</h3>
+<table>
+    <tbody>
+    <tr>
+        <td>
+            <p><a href="-init-.html">&lt;init&gt;</a></p>
+        </td>
+        <td>
+            <code><span class="identifier">DuplicateFileFinder</span><span class="symbol">(</span><span
+                    class="identifier"
+                    id="io.github.lostatc.doppel.filesystem.DuplicateFileFinder$<init>(java.nio.file.Path, kotlin.Boolean, kotlin.Boolean)/dirPath">dirPath</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
+                    class="symbol">, </span><span class="identifier"
+                                                  id="io.github.lostatc.doppel.filesystem.DuplicateFileFinder$<init>(java.nio.file.Path, kotlin.Boolean, kotlin.Boolean)/followLinks">followLinks</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
+                    class="identifier">Boolean</span></a>&nbsp;<span class="symbol">=</span>&nbsp;false<span
+                    class="symbol">, </span><span class="identifier"
+                                                  id="io.github.lostatc.doppel.filesystem.DuplicateFileFinder$<init>(java.nio.file.Path, kotlin.Boolean, kotlin.Boolean)/recursive">recursive</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
+                    class="identifier">Boolean</span></a>&nbsp;<span class="symbol">=</span>&nbsp;false<span
+                    class="symbol">)</span></code>
+            <p>A class that identifies duplicate files.</p>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<h3>Properties</h3>
+<table>
+    <tbody>
+    <tr>
+        <td>
+            <p><a href="dir-path.html">dirPath</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">val </span><span class="identifier">dirPath</span><span class="symbol">: </span><a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a></code>
+            <p>The path of the directory to search for duplicate files.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="duplicates.html">duplicates</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">var </span><span class="identifier">duplicates</span><span
+                    class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html"><span
+                    class="identifier">Map</span></a><span class="symbol">&lt;</span><a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
+                    class="symbol">,</span>&nbsp;<a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html"><span
+                    class="identifier">Set</span></a><span class="symbol">&lt;</span><a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
+                    class="symbol">&gt;</span><span class="symbol">&gt;</span></code>
+            <p>A map that maps each file path to a set of paths of duplicate files.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="follow-links.html">followLinks</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">val </span><span class="identifier">followLinks</span><span
+                    class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
+                    class="identifier">Boolean</span></a></code>
+            <p>Follow symbolic links when walking the directory tree.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="recursive.html">recursive</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">val </span><span class="identifier">recursive</span><span
+                    class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
+                    class="identifier">Boolean</span></a></code>
+            <p>Search <a href="dir-path.html">dirPath</a> recursively instead of just finding immediate children.</p>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<h3>Functions</h3>
+<table>
+    <tbody>
+    <tr>
+        <td>
+            <p><a href="equals.html">equals</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">fun </span><span class="identifier">equals</span><span
+                    class="symbol">(</span><span class="identifier"
+                                                 id="io.github.lostatc.doppel.filesystem.DuplicateFileFinder$equals(kotlin.Any)/other">other</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html"><span class="identifier">Any</span></a><span
+                    class="symbol">?</span><span class="symbol">)</span><span class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
+                    class="identifier">Boolean</span></a></code></td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="find.html">find</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">fun </span><span class="identifier">find</span><span
+                    class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span
+                    class="identifier">Unit</span></a></code>
+            <p>Finds duplicate files in <a href="dir-path.html">dirPath</a> and populates <a href="duplicates.html">duplicates</a>.
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="hash-code.html">hashCode</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">fun </span><span class="identifier">hashCode</span><span class="symbol">(</span><span
+                    class="symbol">)</span><span class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a></code>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</BODY>
+</HTML>

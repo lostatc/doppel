@@ -1,0 +1,42 @@
+<HTML>
+<HEAD>
+    <meta charset="UTF-8">
+    <title>MutablePathNode.
+        <init> - doppel
+    </title>
+    <link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">doppel</a>&nbsp;/&nbsp;<a href="../index.html">io.github.lostatc.doppel.path</a>&nbsp;/&nbsp;<a
+        href="index.html">MutablePathNode</a>&nbsp;/&nbsp;<a href="./-init-.html">&lt;init&gt;</a><br/>
+<br/>
+<h1>&lt;init&gt;</h1>
+<a name="io.github.lostatc.doppel.path.MutablePathNode$&lt;init&gt;(java.nio.file.Path, io.github.lostatc.doppel.path.MutablePathNode, io.github.lostatc.doppel.path.FileType)"></a>
+<code><span class="identifier">MutablePathNode</span><span class="symbol">(</span><span class="identifier"
+                                                                                        id="io.github.lostatc.doppel.path.MutablePathNode$<init>(java.nio.file.Path, io.github.lostatc.doppel.path.MutablePathNode, io.github.lostatc.doppel.path.FileType)/fileName">fileName</span><span
+        class="symbol">:</span>&nbsp;<a href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span
+        class="identifier">Path</span></a><span class="symbol">, </span><span class="identifier"
+                                                                              id="io.github.lostatc.doppel.path.MutablePathNode$<init>(java.nio.file.Path, io.github.lostatc.doppel.path.MutablePathNode, io.github.lostatc.doppel.path.FileType)/parent">parent</span><span
+        class="symbol">:</span>&nbsp;<a href="index.html"><span class="identifier">MutablePathNode</span></a><span
+        class="symbol">?</span>&nbsp;<span class="symbol">=</span>&nbsp;null<span class="symbol">, </span><span
+        class="identifier"
+        id="io.github.lostatc.doppel.path.MutablePathNode$<init>(java.nio.file.Path, io.github.lostatc.doppel.path.MutablePathNode, io.github.lostatc.doppel.path.FileType)/type">type</span><span
+        class="symbol">:</span>&nbsp;<a href="../-file-type/index.html"><span class="identifier">FileType</span></a>&nbsp;<span
+        class="symbol">=</span>&nbsp;UnknownType()<span class="symbol">)</span></code>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>A mutable representation of a tree of file paths.</p>
+<p>This <a href="../-path-node/index.html">PathNode</a> implementation allows for modifying the tree of nodes in place
+    using methods like <a href="add-descendant.html">addDescendant</a>,
+    <a href="add-relative-descendant.html">addRelativeDescendant</a>, <a
+            href="remove-descendant.html">removeDescendant</a> and <a href="clear-children.html">clearChildren</a>. Any
+    methods or property setters which modify this
+    path node will ensure that each path node is always a child of its parent.</p>
+<h3>Parameters</h3>
+<p><a name="fileName"></a>
+    <code>fileName</code> - The file name for this path node.</p>
+<p><a name="parent"></a>
+    <code>parent</code> - The parent node for this path node.</p>
+<p><a name="type"></a>
+    <code>type</code> - The initial type for this path node.</p>
+</BODY>
+</HTML>

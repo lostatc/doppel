@@ -1,0 +1,161 @@
+<HTML>
+<HEAD>
+    <meta charset="UTF-8">
+    <title>io.github.lostatc.doppel.filesystem - doppel</title>
+    <link rel="stylesheet" href="../../style.css">
+</HEAD>
+<BODY>
+<a href="../index.html">doppel</a>&nbsp;/&nbsp;<a href="./index.html">io.github.lostatc.doppel.filesystem</a><br/>
+<br/>
+<h2>Package io.github.lostatc.doppel.filesystem</h2>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>Classes for accessing and modifying the filesystem.</p>
+<p>This package provides the <a href="-path-delta/index.html">PathDelta</a> class which allows changes to the filesystem
+    to be queued up in memory and then
+    applied all at once. Different types of changes that can be applied are represented by implementations of
+    <a href="-filesystem-action/index.html">FilesystemAction</a>.</p>
+<h3>Types</h3>
+<table>
+    <tbody>
+    <tr>
+        <td>
+            <p><a href="-copy-action/index.html">CopyAction</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">data</span> <span class="keyword">class </span><span class="identifier">CopyAction</span>&nbsp;<span
+                    class="symbol">:</span>&nbsp;<a href="-filesystem-action/index.html"><span class="identifier">FilesystemAction</span></a></code>
+            <p>An action that recursively copies a file or directory from <a href="-copy-action/source.html">source</a>
+                to <a href="-copy-action/target.html">target</a>.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="-create-action/index.html">CreateAction</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">data</span> <span class="keyword">class </span><span class="identifier">CreateAction</span>&nbsp;<span
+                    class="symbol">:</span>&nbsp;<a href="-filesystem-action/index.html"><span class="identifier">FilesystemAction</span></a></code>
+            <p>An action that creates the file represented by <a href="-create-action/target.html">target</a>.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="-delete-action/index.html">DeleteAction</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">data</span> <span class="keyword">class </span><span class="identifier">DeleteAction</span>&nbsp;<span
+                    class="symbol">:</span>&nbsp;<a href="-filesystem-action/index.html"><span class="identifier">FilesystemAction</span></a></code>
+            <p>An action that recursively deletes a file or directory represented by <a
+                    href="-delete-action/target.html">target</a>.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="-duplicate-file-finder/index.html">DuplicateFileFinder</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">class </span><span class="identifier">DuplicateFileFinder</span></code>
+            <p>A class that identifies duplicate files.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="-filesystem-action/index.html">FilesystemAction</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">interface </span><span class="identifier">FilesystemAction</span></code>
+            <p>A change to apply to the filesystem.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="-move-action/index.html">MoveAction</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">data</span> <span class="keyword">class </span><span class="identifier">MoveAction</span>&nbsp;<span
+                    class="symbol">:</span>&nbsp;<a href="-filesystem-action/index.html"><span class="identifier">FilesystemAction</span></a></code>
+            <p>An action that recursively moves a file or directory from <a href="-move-action/source.html">source</a>
+                to <a href="-move-action/target.html">target</a>.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="-path-delta/index.html">PathDelta</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">class </span><span class="identifier">PathDelta</span></code>
+            <p>A set of changes to apply to the filesystem.</p>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<h3>Functions</h3>
+<table>
+    <tbody>
+    <tr>
+        <td>
+            <p><a href="add-node-to-view.html">addNodeToView</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">fun </span><span class="identifier">addNodeToView</span><span
+                    class="symbol">(</span><span class="identifier"
+                                                 id="io.github.lostatc.doppel.filesystem$addNodeToView(io.github.lostatc.doppel.path.MutablePathNode, io.github.lostatc.doppel.path.PathNode)/viewNode">viewNode</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="../io.github.lostatc.doppel.path/-mutable-path-node/index.html"><span class="identifier">MutablePathNode</span></a><span
+                    class="symbol">, </span><span class="identifier"
+                                                  id="io.github.lostatc.doppel.filesystem$addNodeToView(io.github.lostatc.doppel.path.MutablePathNode, io.github.lostatc.doppel.path.PathNode)/pathNode">pathNode</span><span
+                    class="symbol">:</span>&nbsp;<a href="../io.github.lostatc.doppel.path/-path-node/index.html"><span
+                    class="identifier">PathNode</span></a><span class="symbol">)</span><span class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span
+                    class="identifier">Unit</span></a></code>
+            <p>Adds <a
+                    href="add-node-to-view.html#io.github.lostatc.doppel.filesystem$addNodeToView(io.github.lostatc.doppel.path.MutablePathNode, io.github.lostatc.doppel.path.PathNode)/pathNode">pathNode</a>
+                to
+                <a href="add-node-to-view.html#io.github.lostatc.doppel.filesystem$addNodeToView(io.github.lostatc.doppel.path.MutablePathNode, io.github.lostatc.doppel.path.PathNode)/viewNode">viewNode</a>
+                if
+                <a href="add-node-to-view.html#io.github.lostatc.doppel.filesystem$addNodeToView(io.github.lostatc.doppel.path.MutablePathNode, io.github.lostatc.doppel.path.PathNode)/pathNode">pathNode</a>
+                starts with <a
+                        href="add-node-to-view.html#io.github.lostatc.doppel.filesystem$addNodeToView(io.github.lostatc.doppel.path.MutablePathNode, io.github.lostatc.doppel.path.PathNode)/viewNode">viewNode</a>.
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="remove-node-from-view.html">removeNodeFromView</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">fun </span><span class="identifier">removeNodeFromView</span><span
+                    class="symbol">(</span><span class="identifier"
+                                                 id="io.github.lostatc.doppel.filesystem$removeNodeFromView(io.github.lostatc.doppel.path.MutablePathNode, io.github.lostatc.doppel.path.PathNode)/viewNode">viewNode</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="../io.github.lostatc.doppel.path/-mutable-path-node/index.html"><span class="identifier">MutablePathNode</span></a><span
+                    class="symbol">, </span><span class="identifier"
+                                                  id="io.github.lostatc.doppel.filesystem$removeNodeFromView(io.github.lostatc.doppel.path.MutablePathNode, io.github.lostatc.doppel.path.PathNode)/pathNode">pathNode</span><span
+                    class="symbol">:</span>&nbsp;<a href="../io.github.lostatc.doppel.path/-path-node/index.html"><span
+                    class="identifier">PathNode</span></a><span class="symbol">)</span><span class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span
+                    class="identifier">Unit</span></a></code>
+            <p>Removes <a
+                    href="remove-node-from-view.html#io.github.lostatc.doppel.filesystem$removeNodeFromView(io.github.lostatc.doppel.path.MutablePathNode, io.github.lostatc.doppel.path.PathNode)/pathNode">pathNode</a>
+                from
+                <a href="remove-node-from-view.html#io.github.lostatc.doppel.filesystem$removeNodeFromView(io.github.lostatc.doppel.path.MutablePathNode, io.github.lostatc.doppel.path.PathNode)/viewNode">viewNode</a>
+                if
+                <a href="remove-node-from-view.html#io.github.lostatc.doppel.filesystem$removeNodeFromView(io.github.lostatc.doppel.path.MutablePathNode, io.github.lostatc.doppel.path.PathNode)/pathNode">pathNode</a>
+                is a descendant of <a
+                        href="remove-node-from-view.html#io.github.lostatc.doppel.filesystem$removeNodeFromView(io.github.lostatc.doppel.path.MutablePathNode, io.github.lostatc.doppel.path.PathNode)/viewNode">viewNode</a>.
+            </p>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</BODY>
+</HTML>

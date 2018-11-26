@@ -24,7 +24,7 @@ test {
 
 dokka {
     outputFormat = "html"
-    outputDirectory = "$buildDir/dokka"
+    outputDirectory = "$projectDir/docs/api"
     jdkVersion = 8
     includes = ["packages.md"]
 

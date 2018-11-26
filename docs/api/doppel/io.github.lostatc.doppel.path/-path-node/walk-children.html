@@ -1,0 +1,33 @@
+<HTML>
+<HEAD>
+    <meta charset="UTF-8">
+    <title>PathNode.walkChildren - doppel</title>
+    <link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">doppel</a>&nbsp;/&nbsp;<a href="../index.html">io.github.lostatc.doppel.path</a>&nbsp;/&nbsp;<a
+        href="index.html">PathNode</a>&nbsp;/&nbsp;<a href="./walk-children.html">walkChildren</a><br/>
+<br/>
+<h1>walkChildren</h1>
+<a name="io.github.lostatc.doppel.path.PathNode$walkChildren(io.github.lostatc.doppel.path.WalkDirection)"></a>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span
+        class="identifier">walkChildren</span><span class="symbol">(</span><span class="identifier"
+                                                                                 id="io.github.lostatc.doppel.path.PathNode$walkChildren(io.github.lostatc.doppel.path.WalkDirection)/direction">direction</span><span
+        class="symbol">:</span>&nbsp;<a href="../-walk-direction/index.html"><span
+        class="identifier">WalkDirection</span></a>&nbsp;<span class="symbol">=</span>&nbsp;WalkDirection.TOP_DOWN<span
+        class="symbol">)</span><span class="symbol">: </span><a
+        href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.sequences/-sequence/index.html"><span
+        class="identifier">Sequence</span></a><span class="symbol">&lt;</span><a href="index.html"><span
+        class="identifier">PathNode</span></a><span class="symbol">&gt;</span></code> <a
+        href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/path/PathNode.kt#L154">(source)</a>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>Returns a sequence of all the descendants of this node.</p>
+<p>This walks through the tree of <a href="children.html">children</a> depth-first regardless of which <a
+        href="walk-children.html#io.github.lostatc.doppel.path.PathNode$walkChildren(io.github.lostatc.doppel.path.WalkDirection)/direction">direction</a>
+    is being used. This node is
+    not included in the sequence.</p>
+<h3>Parameters</h3>
+<p><a name="direction"></a>
+    <code>direction</code> - The direction in which to walk the tree.</p>
+</BODY>
+</HTML>

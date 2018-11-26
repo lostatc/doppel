@@ -1,0 +1,151 @@
+<HTML>
+<HEAD>
+    <meta charset="UTF-8">
+    <title>FileType - doppel</title>
+    <link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">doppel</a>&nbsp;/&nbsp;<a href="../index.html">io.github.lostatc.doppel.path</a>&nbsp;/&nbsp;<a
+        href="./index.html">FileType</a><br/>
+<br/>
+<h1>FileType</h1>
+<code><span class="keyword">interface </span><span class="identifier">FileType</span></code> <a
+        href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/path/FileType.kt#L33">(source)</a>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>A type of file in the filesystem.</p>
+<p>This class provides a common interface for interacting with the filesystem for different types of files.</p>
+<h3>Functions</h3>
+<table>
+    <tbody>
+    <tr>
+        <td>
+            <p><a href="check-same.html">checkSame</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">checkSame</span><span
+                    class="symbol">(</span><span class="identifier"
+                                                 id="io.github.lostatc.doppel.path.FileType$checkSame(java.nio.file.Path, java.nio.file.Path)/left">left</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
+                    class="symbol">, </span><span class="identifier"
+                                                  id="io.github.lostatc.doppel.path.FileType$checkSame(java.nio.file.Path, java.nio.file.Path)/right">right</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
+                    class="symbol">)</span><span class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
+                    class="identifier">Boolean</span></a></code>
+            <p>Returns whether the files <a
+                    href="check-same.html#io.github.lostatc.doppel.path.FileType$checkSame(java.nio.file.Path, java.nio.file.Path)/left">left</a>
+                and
+                <a href="check-same.html#io.github.lostatc.doppel.path.FileType$checkSame(java.nio.file.Path, java.nio.file.Path)/right">right</a>
+                have the same contents.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="check-type.html">checkType</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">checkType</span><span
+                    class="symbol">(</span><span class="identifier"
+                                                 id="io.github.lostatc.doppel.path.FileType$checkType(java.nio.file.Path)/path">path</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
+                    class="symbol">)</span><span class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
+                    class="identifier">Boolean</span></a></code>
+            <p>Returns whether the file at the given <a
+                    href="check-type.html#io.github.lostatc.doppel.path.FileType$checkType(java.nio.file.Path)/path">path</a>
+                is the type of file represented by this class.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="create-file.html">createFile</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">createFile</span><span
+                    class="symbol">(</span><span class="identifier"
+                                                 id="io.github.lostatc.doppel.path.FileType$createFile(java.nio.file.Path)/path">path</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
+                    class="symbol">)</span><span class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span
+                    class="identifier">Unit</span></a></code>
+            <p>Creates a file of this type at the given <a
+                    href="create-file.html#io.github.lostatc.doppel.path.FileType$createFile(java.nio.file.Path)/path">path</a>
+                in the filesystem.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="get-file-type.html">getFileType</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">open</span> <span class="keyword">fun </span><span class="identifier">getFileType</span><span
+                    class="symbol">(</span><span class="identifier"
+                                                 id="io.github.lostatc.doppel.path.FileType$getFileType(io.github.lostatc.doppel.path.PathNode)/pathNode">pathNode</span><span
+                    class="symbol">:</span>&nbsp;<a href="../-path-node/index.html"><span
+                    class="identifier">PathNode</span></a><span class="symbol">)</span><span class="symbol">: </span><a
+                    href="./index.html"><span class="identifier">FileType</span></a></code>
+            <p>Returns the file type that is most appropriate for a given <a
+                    href="../-path-node/index.html">PathNode</a>.</p>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<h3>Inheritors</h3>
+<table>
+    <tbody>
+    <tr>
+        <td>
+            <p><a href="../-directory-type/index.html">DirectoryType</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">class </span><span class="identifier">DirectoryType</span>&nbsp;<span
+                    class="symbol">:</span>&nbsp;<a href="./index.html"><span
+                    class="identifier">FileType</span></a></code>
+            <p>A type representing a directory.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="../-regular-file-type/index.html">RegularFileType</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">class </span><span class="identifier">RegularFileType</span>&nbsp;<span
+                    class="symbol">:</span>&nbsp;<a href="./index.html"><span
+                    class="identifier">FileType</span></a></code>
+            <p>A type representing a regular file.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="../-symbolic-link-type/index.html">SymbolicLinkType</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">data</span> <span class="keyword">class </span><span class="identifier">SymbolicLinkType</span>&nbsp;<span
+                    class="symbol">:</span>&nbsp;<a href="./index.html"><span
+                    class="identifier">FileType</span></a></code>
+            <p>A type representing a symbolic link.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="../-unknown-type/index.html">UnknownType</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">class </span><span class="identifier">UnknownType</span>&nbsp;<span
+                    class="symbol">:</span>&nbsp;<a href="./index.html"><span
+                    class="identifier">FileType</span></a></code>
+            <p>A type representing a file whose type is unknown.</p>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</BODY>
+</HTML>

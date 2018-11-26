@@ -1,0 +1,513 @@
+<HTML>
+<HEAD>
+    <meta charset="UTF-8">
+    <title>PathNode - doppel</title>
+    <link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">doppel</a>&nbsp;/&nbsp;<a href="../index.html">io.github.lostatc.doppel.path</a>&nbsp;/&nbsp;<a
+        href="./index.html">PathNode</a><br/>
+<br/>
+<h1>PathNode</h1>
+<code><span class="keyword">interface </span><span class="identifier">PathNode</span></code> <a
+        href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/path/PathNode.kt#L61">(source)</a>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>A read-only representation of a tree of file paths.</p>
+<p>Objects of this type wrap a <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html">Path</a>
+    object to allow them to form a tree of file paths. This allows file hierarchies to
+    be represented and manipulated in memory. <a href="./index.html">PathNode</a> objects are read-only, while <a
+            href="../-mutable-path-node/index.html">MutablePathNode</a> objects allow the
+    tree of paths to be modified.</p>
+<p>This class works like a prefix tree, where each <a href="./index.html">PathNode</a> stores only a single path segment
+    as <a href="file-name.html">fileName</a>. The
+    parent node can be accessed through the <a href="parent.html">parent</a> property and a map of child nodes can be
+    accessed through the
+    <a href="children.html">children</a> property. The full <a
+            href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html">Path</a> can be accessed through the
+    <a href="path.html">path</a> property.</p>
+<p>Each <a href="./index.html">PathNode</a> has a <a href="type.html">type</a>, which indicates the type of file the
+    node represents in the filesystem. An initial type
+    is provided through the constructor, but this type can change based on the state of the node. For example, if the
+    <a href="type.html">type</a> of a node is a regular file, then it will change to a directory if children are added.
+    Custom file types with
+    custom behavior can be created by implementing <a href="../-file-type/index.html">FileType</a>.</p>
+<p><em>Warning:</em> This interface is not meant to be implemented. New members may be added in the future.</p>
+<h3>Types</h3>
+<table>
+    <tbody>
+    <tr>
+        <td>
+            <p><a href="-companion/index.html">Companion</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">companion</span> <span class="keyword">object </span><span class="identifier">Companion</span>&nbsp;<span
+                    class="symbol">:</span>&nbsp;<a href="../-path-node-factory/index.html"><span class="identifier">PathNodeFactory</span></a></code>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<h3>Properties</h3>
+<table>
+    <tbody>
+    <tr>
+        <td>
+            <p><a href="children.html">children</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">children</span><span
+                    class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html"><span
+                    class="identifier">Map</span></a><span class="symbol">&lt;</span><a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
+                    class="symbol">,</span>&nbsp;<a href="./index.html"><span
+                    class="identifier">PathNode</span></a><span class="symbol">&gt;</span></code>
+            <p>A map of file names to path nodes for the immediate children of this node.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="descendants.html">descendants</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">descendants</span><span
+                    class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html"><span
+                    class="identifier">Map</span></a><span class="symbol">&lt;</span><a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
+                    class="symbol">,</span>&nbsp;<a href="./index.html"><span
+                    class="identifier">PathNode</span></a><span class="symbol">&gt;</span></code>
+            <p>A map of file paths to path nodes for all the descendants of this node.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="file-name.html">fileName</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">fileName</span><span
+                    class="symbol">: </span><a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a></code>
+            <p>The name of the file or directory represented by this node.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="parent.html">parent</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">abstract</span> <span class="keyword">val </span><span
+                    class="identifier">parent</span><span class="symbol">: </span><a href="./index.html"><span
+                    class="identifier">PathNode</span></a><span class="symbol">?</span></code>
+            <p>The parent node or <code>null</code> if there is no parent.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="path.html">path</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">abstract</span> <span class="keyword">val </span><span
+                    class="identifier">path</span><span class="symbol">: </span><a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a></code>
+            <p>A <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html">Path</a> representing this
+                node.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="relative-descendants.html">relativeDescendants</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">relativeDescendants</span><span
+                    class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html"><span
+                    class="identifier">Map</span></a><span class="symbol">&lt;</span><a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
+                    class="symbol">,</span>&nbsp;<a href="./index.html"><span
+                    class="identifier">PathNode</span></a><span class="symbol">&gt;</span></code>
+            <p>A map of relative file paths to path nodes for all the descendants of this node.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="root.html">root</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">abstract</span> <span class="keyword">val </span><span
+                    class="identifier">root</span><span class="symbol">: </span><a href="./index.html"><span
+                    class="identifier">PathNode</span></a></code>
+            <p>The ancestor whose <a href="parent.html">parent</a> is <code>null</code>, which could be this node.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="type.html">type</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">abstract</span> <span class="keyword">val </span><span
+                    class="identifier">type</span><span class="symbol">: </span><a href="../-file-type/index.html"><span
+                    class="identifier">FileType</span></a></code>
+            <p>The type of file represented by this node.</p>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<h3>Functions</h3>
+<table>
+    <tbody>
+    <tr>
+        <td>
+            <p><a href="create-file.html">createFile</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">createFile</span><span
+                    class="symbol">(</span><span class="identifier"
+                                                 id="io.github.lostatc.doppel.path.PathNode$createFile(kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/recursive">recursive</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
+                    class="identifier">Boolean</span></a>&nbsp;<span class="symbol">=</span>&nbsp;false<span
+                    class="symbol">, </span><span class="identifier"
+                                                  id="io.github.lostatc.doppel.path.PathNode$createFile(kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/onError">onError</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="../../io.github.lostatc.doppel.error/-error-handler.html"><span class="identifier">ErrorHandler</span></a>&nbsp;<span
+                    class="symbol">=</span>&nbsp;::skipOnError<span class="symbol">)</span><span
+                    class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span
+                    class="identifier">Unit</span></a></code>
+            <p>Creates the file represented by this path node in the filesystem.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="diff.html">diff</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">abstract</span> <span class="keyword">fun </span><span
+                    class="identifier">diff</span><span class="symbol">(</span><span class="identifier"
+                                                                                     id="io.github.lostatc.doppel.path.PathNode$diff(io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/other">other</span><span
+                    class="symbol">:</span>&nbsp;<a href="./index.html"><span
+                    class="identifier">PathNode</span></a><span class="symbol">, </span><span class="identifier"
+                                                                                              id="io.github.lostatc.doppel.path.PathNode$diff(io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/onError">onError</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="../../io.github.lostatc.doppel.error/-error-handler.html"><span class="identifier">ErrorHandler</span></a>&nbsp;<span
+                    class="symbol">=</span>&nbsp;::skipOnError<span class="symbol">)</span><span
+                    class="symbol">: </span><a href="../-path-diff/index.html"><span class="identifier">PathDiff</span></a></code>
+            <p>Returns an immutable representation of the difference between this directory and <a
+                    href="diff.html#io.github.lostatc.doppel.path.PathNode$diff(io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/other">other</a>.
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="ends-with.html">endsWith</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">open</span> <span class="keyword">fun </span><span
+                    class="identifier">endsWith</span><span class="symbol">(</span><span class="identifier"
+                                                                                         id="io.github.lostatc.doppel.path.PathNode$endsWith(io.github.lostatc.doppel.path.PathNode)/other">other</span><span
+                    class="symbol">:</span>&nbsp;<a href="./index.html"><span
+                    class="identifier">PathNode</span></a><span class="symbol">)</span><span class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
+                    class="identifier">Boolean</span></a></code>
+            <p>Returns whether the path represented by this node ends with the path represented by <a
+                    href="ends-with.html#io.github.lostatc.doppel.path.PathNode$endsWith(io.github.lostatc.doppel.path.PathNode)/other">other</a>.
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="equals.html">equals</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">abstract</span> <span class="keyword">operator</span> <span
+                    class="keyword">fun </span><span class="identifier">equals</span><span class="symbol">(</span><span
+                    class="identifier" id="io.github.lostatc.doppel.path.PathNode$equals(kotlin.Any)/other">other</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html"><span class="identifier">Any</span></a><span
+                    class="symbol">?</span><span class="symbol">)</span><span class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
+                    class="identifier">Boolean</span></a></code>
+            <p>Indicates wither the object <a
+                    href="equals.html#io.github.lostatc.doppel.path.PathNode$equals(kotlin.Any)/other">other</a> is
+                equal to this one.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="exists.html">exists</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">abstract</span> <span class="keyword">fun </span><span
+                    class="identifier">exists</span><span class="symbol">(</span><span class="identifier"
+                                                                                       id="io.github.lostatc.doppel.path.PathNode$exists(kotlin.Boolean, kotlin.Boolean)/checkType">checkType</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
+                    class="identifier">Boolean</span></a>&nbsp;<span class="symbol">=</span>&nbsp;true<span
+                    class="symbol">, </span><span class="identifier"
+                                                  id="io.github.lostatc.doppel.path.PathNode$exists(kotlin.Boolean, kotlin.Boolean)/recursive">recursive</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
+                    class="identifier">Boolean</span></a>&nbsp;<span class="symbol">=</span>&nbsp;false<span
+                    class="symbol">)</span><span class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
+                    class="identifier">Boolean</span></a></code>
+            <p>Returns whether the file represented by this path node exists in the filesystem.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="hash-code.html">hashCode</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">hashCode</span><span
+                    class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a></code>
+            <p>Returns a hash code value for the object.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="relativize.html">relativize</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">relativize</span><span
+                    class="symbol">(</span><span class="identifier"
+                                                 id="io.github.lostatc.doppel.path.PathNode$relativize(io.github.lostatc.doppel.path.PathNode)/other">other</span><span
+                    class="symbol">:</span>&nbsp;<a href="./index.html"><span
+                    class="identifier">PathNode</span></a><span class="symbol">)</span><span class="symbol">: </span><a
+                    href="./index.html"><span class="identifier">PathNode</span></a></code>
+            <p>Returns a copy of <a
+                    href="relativize.html#io.github.lostatc.doppel.path.PathNode$relativize(io.github.lostatc.doppel.path.PathNode)/other">other</a>
+                which is relative to this path node.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="resolve.html">resolve</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">resolve</span><span
+                    class="symbol">(</span><span class="identifier"
+                                                 id="io.github.lostatc.doppel.path.PathNode$resolve(io.github.lostatc.doppel.path.PathNode)/other">other</span><span
+                    class="symbol">:</span>&nbsp;<a href="./index.html"><span
+                    class="identifier">PathNode</span></a><span class="symbol">)</span><span class="symbol">: </span><a
+                    href="./index.html"><span class="identifier">PathNode</span></a></code>
+            <p>Returns a copy of <a
+                    href="resolve.html#io.github.lostatc.doppel.path.PathNode$resolve(io.github.lostatc.doppel.path.PathNode)/other">other</a>
+                with this node as its ancestor.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="same-contents-as.html">sameContentsAs</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">sameContentsAs</span><span
+                    class="symbol">(</span><span class="identifier"
+                                                 id="io.github.lostatc.doppel.path.PathNode$sameContentsAs(io.github.lostatc.doppel.path.PathNode)/other">other</span><span
+                    class="symbol">:</span>&nbsp;<a href="./index.html"><span
+                    class="identifier">PathNode</span></a><span class="symbol">)</span><span class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
+                    class="identifier">Boolean</span></a></code>
+            <p>Returns whether the files represented by this path node and <a
+                    href="same-contents-as.html#io.github.lostatc.doppel.path.PathNode$sameContentsAs(io.github.lostatc.doppel.path.PathNode)/other">other</a>
+                have the same contents.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="starts-with.html">startsWith</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">open</span> <span class="keyword">fun </span><span
+                    class="identifier">startsWith</span><span class="symbol">(</span><span class="identifier"
+                                                                                           id="io.github.lostatc.doppel.path.PathNode$startsWith(io.github.lostatc.doppel.path.PathNode)/other">other</span><span
+                    class="symbol">:</span>&nbsp;<a href="./index.html"><span
+                    class="identifier">PathNode</span></a><span class="symbol">)</span><span class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
+                    class="identifier">Boolean</span></a></code>
+            <p>Returns whether the path represented by this node starts with the path represented by <a
+                    href="starts-with.html#io.github.lostatc.doppel.path.PathNode$startsWith(io.github.lostatc.doppel.path.PathNode)/other">other</a>.
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="to-absolute-node.html">toAbsoluteNode</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">toAbsoluteNode</span><span
+                    class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a
+                    href="./index.html"><span class="identifier">PathNode</span></a></code>
+            <p>Returns a copy of this node that is absolute.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="to-mutable-path-node.html">toMutablePathNode</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">toMutablePathNode</span><span
+                    class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a
+                    href="../-mutable-path-node/index.html"><span class="identifier">MutablePathNode</span></a></code>
+            <p>Returns a copy of this object as a <a href="../-mutable-path-node/index.html">MutablePathNode</a> object.
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="to-path-node.html">toPathNode</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">toPathNode</span><span
+                    class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a
+                    href="./index.html"><span class="identifier">PathNode</span></a></code>
+            <p>Returns a copy of this object as a <a href="./index.html">PathNode</a> object.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="to-string.html">toString</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">toString</span><span
+                    class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span
+                    class="identifier">String</span></a></code>
+            <p>Returns the string representation of this node.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="walk-ancestors.html">walkAncestors</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">walkAncestors</span><span
+                    class="symbol">(</span><span class="identifier"
+                                                 id="io.github.lostatc.doppel.path.PathNode$walkAncestors(io.github.lostatc.doppel.path.WalkDirection)/direction">direction</span><span
+                    class="symbol">:</span>&nbsp;<a href="../-walk-direction/index.html"><span class="identifier">WalkDirection</span></a>&nbsp;<span
+                    class="symbol">=</span>&nbsp;WalkDirection.BOTTOM_UP<span class="symbol">)</span><span
+                    class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.sequences/-sequence/index.html"><span
+                    class="identifier">Sequence</span></a><span class="symbol">&lt;</span><a href="./index.html"><span
+                    class="identifier">PathNode</span></a><span class="symbol">&gt;</span></code>
+            <p>Returns a sequence of all the ancestors of this node.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="walk-children.html">walkChildren</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">walkChildren</span><span
+                    class="symbol">(</span><span class="identifier"
+                                                 id="io.github.lostatc.doppel.path.PathNode$walkChildren(io.github.lostatc.doppel.path.WalkDirection)/direction">direction</span><span
+                    class="symbol">:</span>&nbsp;<a href="../-walk-direction/index.html"><span class="identifier">WalkDirection</span></a>&nbsp;<span
+                    class="symbol">=</span>&nbsp;WalkDirection.TOP_DOWN<span class="symbol">)</span><span
+                    class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.sequences/-sequence/index.html"><span
+                    class="identifier">Sequence</span></a><span class="symbol">&lt;</span><a href="./index.html"><span
+                    class="identifier">PathNode</span></a><span class="symbol">&gt;</span></code>
+            <p>Returns a sequence of all the descendants of this node.</p>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<h3>Companion Object Functions</h3>
+<table>
+    <tbody>
+    <tr>
+        <td>
+            <p><a href="from-filesystem.html">fromFilesystem</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">fun </span><span class="identifier">fromFilesystem</span><span
+                    class="symbol">(</span><span class="identifier"
+                                                 id="io.github.lostatc.doppel.path.PathNode.Companion$fromFilesystem(java.nio.file.Path, kotlin.Boolean, kotlin.Function1((java.nio.file.Path, io.github.lostatc.doppel.path.FileType)))/path">path</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
+                    class="symbol">, </span><span class="identifier"
+                                                  id="io.github.lostatc.doppel.path.PathNode.Companion$fromFilesystem(java.nio.file.Path, kotlin.Boolean, kotlin.Function1((java.nio.file.Path, io.github.lostatc.doppel.path.FileType)))/recursive">recursive</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
+                    class="identifier">Boolean</span></a><span class="symbol">, </span><span class="identifier"
+                                                                                             id="io.github.lostatc.doppel.path.PathNode.Companion$fromFilesystem(java.nio.file.Path, kotlin.Boolean, kotlin.Function1((java.nio.file.Path, io.github.lostatc.doppel.path.FileType)))/typeFactory">typeFactory</span><span
+                    class="symbol">:</span>&nbsp;<span class="symbol">(</span><a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
+                    class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a
+                    href="../-file-type/index.html"><span class="identifier">FileType</span></a><span
+                    class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span
+                    class="identifier">PathNode</span></a></code>
+            <p>Constructs a new path node from files in the filesystem.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="of.html">of</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">fun </span><span class="identifier">of</span><span class="symbol">(</span><span
+                    class="identifier"
+                    id="io.github.lostatc.doppel.path.PathNode.Companion$of(java.nio.file.Path, io.github.lostatc.doppel.path.FileType, kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/path">path</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
+                    class="symbol">, </span><span class="identifier"
+                                                  id="io.github.lostatc.doppel.path.PathNode.Companion$of(java.nio.file.Path, io.github.lostatc.doppel.path.FileType, kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/type">type</span><span
+                    class="symbol">:</span>&nbsp;<a href="../-file-type/index.html"><span
+                    class="identifier">FileType</span></a><span class="symbol">, </span><span class="identifier"
+                                                                                              id="io.github.lostatc.doppel.path.PathNode.Companion$of(java.nio.file.Path, io.github.lostatc.doppel.path.FileType, kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/init">init</span><span
+                    class="symbol">:</span>&nbsp;<a href="../-mutable-path-node/index.html"><span class="identifier">MutablePathNode</span></a><span
+                    class="symbol">.</span><span class="symbol">(</span><span class="symbol">)</span>&nbsp;<span
+                    class="symbol">-&gt;</span>&nbsp;<a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span
+                    class="identifier">Unit</span></a><span class="symbol">)</span><span class="symbol">: </span><a
+                    href="./index.html"><span class="identifier">PathNode</span></a></code>
+            <p>Constructs a new path node from the given <a
+                    href="../-path-node-factory/of.html#io.github.lostatc.doppel.path.PathNodeFactory$of(java.nio.file.Path, io.github.lostatc.doppel.path.FileType, kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/path">path</a>
+                and its children.</p>
+            <code><span class="keyword">fun </span><span class="identifier">of</span><span class="symbol">(</span><span
+                    class="identifier"
+                    id="io.github.lostatc.doppel.path.PathNode.Companion$of(kotlin.String, kotlin.Array((kotlin.String)), io.github.lostatc.doppel.path.FileType, kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/firstSegment">firstSegment</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span
+                    class="identifier">String</span></a><span class="symbol">, </span><span
+                    class="keyword">vararg</span> <span class="identifier"
+                                                        id="io.github.lostatc.doppel.path.PathNode.Companion$of(kotlin.String, kotlin.Array((kotlin.String)), io.github.lostatc.doppel.path.FileType, kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/segments">segments</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span
+                    class="identifier">String</span></a><span class="symbol">, </span><span class="identifier"
+                                                                                            id="io.github.lostatc.doppel.path.PathNode.Companion$of(kotlin.String, kotlin.Array((kotlin.String)), io.github.lostatc.doppel.path.FileType, kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/type">type</span><span
+                    class="symbol">:</span>&nbsp;<a href="../-file-type/index.html"><span
+                    class="identifier">FileType</span></a><span class="symbol">, </span><span class="identifier"
+                                                                                              id="io.github.lostatc.doppel.path.PathNode.Companion$of(kotlin.String, kotlin.Array((kotlin.String)), io.github.lostatc.doppel.path.FileType, kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/init">init</span><span
+                    class="symbol">:</span>&nbsp;<a href="../-mutable-path-node/index.html"><span class="identifier">MutablePathNode</span></a><span
+                    class="symbol">.</span><span class="symbol">(</span><span class="symbol">)</span>&nbsp;<span
+                    class="symbol">-&gt;</span>&nbsp;<a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span
+                    class="identifier">Unit</span></a><span class="symbol">)</span><span class="symbol">: </span><a
+                    href="./index.html"><span class="identifier">PathNode</span></a></code>
+            <p>Constructs a new path node from the given path segments.</p>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<h3>Inheritors</h3>
+<table>
+    <tbody>
+    <tr>
+        <td>
+            <p><a href="../-mutable-path-node/index.html">MutablePathNode</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">class </span><span class="identifier">MutablePathNode</span>&nbsp;<span
+                    class="symbol">:</span>&nbsp;<a href="./index.html"><span
+                    class="identifier">PathNode</span></a></code>
+            <p>A mutable representation of a tree of file paths.</p>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</BODY>
+</HTML>

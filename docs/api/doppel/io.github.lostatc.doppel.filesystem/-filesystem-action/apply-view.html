@@ -1,0 +1,32 @@
+<HTML>
+<HEAD>
+    <meta charset="UTF-8">
+    <title>FilesystemAction.applyView - doppel</title>
+    <link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">doppel</a>&nbsp;/&nbsp;<a href="../index.html">io.github.lostatc.doppel.filesystem</a>&nbsp;/&nbsp;<a
+        href="index.html">FilesystemAction</a>&nbsp;/&nbsp;<a href="./apply-view.html">applyView</a><br/>
+<br/>
+<h1>applyView</h1>
+<a name="io.github.lostatc.doppel.filesystem.FilesystemAction$applyView(io.github.lostatc.doppel.path.MutablePathNode)"></a>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span
+        class="identifier">applyView</span><span class="symbol">(</span><span class="identifier"
+                                                                              id="io.github.lostatc.doppel.filesystem.FilesystemAction$applyView(io.github.lostatc.doppel.path.MutablePathNode)/viewNode">viewNode</span><span
+        class="symbol">:</span>&nbsp;<a href="../../io.github.lostatc.doppel.path/-mutable-path-node/index.html"><span
+        class="identifier">MutablePathNode</span></a><span class="symbol">)</span><span class="symbol">: </span><a
+        href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<a href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/filesystem/FilesystemAction.kt#L67">(source)</a>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>Modifies <a
+        href="apply-view.html#io.github.lostatc.doppel.filesystem.FilesystemAction$applyView(io.github.lostatc.doppel.path.MutablePathNode)/viewNode">viewNode</a>
+    to provide a view of what the filesystem will look like after <a href="./apply-view.html">applyView</a> is called.
+</p>
+<p>After this is called, <a
+        href="apply-view.html#io.github.lostatc.doppel.filesystem.FilesystemAction$applyView(io.github.lostatc.doppel.path.MutablePathNode)/viewNode">viewNode</a>
+    will match what the filesystem would look like if <a href="apply-filesystem.html">applyFilesystem</a> were called
+    assuming there are no errors.</p>
+<p>The functions <a href="../add-node-to-view.html">addNodeToView</a> and <a href="../remove-node-from-view.html">removeNodeFromView</a>
+    can be used to implement this method.</p>
+</BODY>
+</HTML>

@@ -1,0 +1,25 @@
+<HTML>
+<HEAD>
+    <meta charset="UTF-8">
+    <title>ErrorHandler - doppel</title>
+    <link rel="stylesheet" href="../../style.css">
+</HEAD>
+<BODY>
+<a href="../index.html">doppel</a>&nbsp;/&nbsp;<a href="index.html">io.github.lostatc.doppel.error</a>&nbsp;/&nbsp;<a
+        href="./-error-handler.html">ErrorHandler</a><br/>
+<br/>
+<h1>ErrorHandler</h1>
+<code><span class="keyword">typealias </span><span class="identifier">ErrorHandler</span>&nbsp;<span
+        class="symbol">=</span>&nbsp;<span class="symbol">(</span><a
+        href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
+        class="symbol">,</span>&nbsp;<a href="http://docs.oracle.com/javase/8/docs/api/java/io/IOException.html"><span
+        class="identifier">IOException</span></a><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a
+        href="-error-handler-action/index.html"><span class="identifier">ErrorHandlerAction</span></a></code> <a
+        href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/error/ErrorHandler.kt#L48">(source)</a>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>A function that is called for each error that occurs during a filesystem operation.</p>
+<p>Functions of this type are passed the file that caused the error and the exception that was thrown. They return a
+    value which determines how that error is handled. If the error involves both a source file and a target file, then
+    the source file is passed in.</p>
+</BODY>
+</HTML>

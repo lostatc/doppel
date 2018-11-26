@@ -1,0 +1,95 @@
+<HTML>
+<HEAD>
+    <meta charset="UTF-8">
+    <title>MutablePathNode.Companion - doppel</title>
+    <link rel="stylesheet" href="../../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../../index.html">doppel</a>&nbsp;/&nbsp;<a href="../../index.html">io.github.lostatc.doppel.path</a>&nbsp;/&nbsp;<a
+        href="../index.html">MutablePathNode</a>&nbsp;/&nbsp;<a href="./index.html">Companion</a><br/>
+<br/>
+<h1>Companion</h1>
+<code><span class="keyword">companion</span> <span class="keyword">object </span><span
+        class="identifier">Companion</span>&nbsp;<span class="symbol">:</span>&nbsp;<a
+        href="../../-path-node-factory/index.html"><span class="identifier">PathNodeFactory</span></a></code> <a
+        href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/path/MutablePathNode.kt">(source)</a>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<h3>Companion Object Functions</h3>
+<table>
+    <tbody>
+    <tr>
+        <td>
+            <p><a href="from-filesystem.html">fromFilesystem</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">fun </span><span class="identifier">fromFilesystem</span><span
+                    class="symbol">(</span><span class="identifier"
+                                                 id="io.github.lostatc.doppel.path.MutablePathNode.Companion$fromFilesystem(java.nio.file.Path, kotlin.Boolean, kotlin.Function1((java.nio.file.Path, io.github.lostatc.doppel.path.FileType)))/path">path</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
+                    class="symbol">, </span><span class="identifier"
+                                                  id="io.github.lostatc.doppel.path.MutablePathNode.Companion$fromFilesystem(java.nio.file.Path, kotlin.Boolean, kotlin.Function1((java.nio.file.Path, io.github.lostatc.doppel.path.FileType)))/recursive">recursive</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
+                    class="identifier">Boolean</span></a><span class="symbol">, </span><span class="identifier"
+                                                                                             id="io.github.lostatc.doppel.path.MutablePathNode.Companion$fromFilesystem(java.nio.file.Path, kotlin.Boolean, kotlin.Function1((java.nio.file.Path, io.github.lostatc.doppel.path.FileType)))/typeFactory">typeFactory</span><span
+                    class="symbol">:</span>&nbsp;<span class="symbol">(</span><a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
+                    class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a
+                    href="../../-file-type/index.html"><span class="identifier">FileType</span></a><span class="symbol">)</span><span
+                    class="symbol">: </span><a href="../index.html"><span class="identifier">MutablePathNode</span></a></code>
+            <p>Constructs a new path node from files in the filesystem.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="of.html">of</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">fun </span><span class="identifier">of</span><span class="symbol">(</span><span
+                    class="identifier"
+                    id="io.github.lostatc.doppel.path.MutablePathNode.Companion$of(java.nio.file.Path, io.github.lostatc.doppel.path.FileType, kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/path">path</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
+                    class="symbol">, </span><span class="identifier"
+                                                  id="io.github.lostatc.doppel.path.MutablePathNode.Companion$of(java.nio.file.Path, io.github.lostatc.doppel.path.FileType, kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/type">type</span><span
+                    class="symbol">:</span>&nbsp;<a href="../../-file-type/index.html"><span
+                    class="identifier">FileType</span></a><span class="symbol">, </span><span class="identifier"
+                                                                                              id="io.github.lostatc.doppel.path.MutablePathNode.Companion$of(java.nio.file.Path, io.github.lostatc.doppel.path.FileType, kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/init">init</span><span
+                    class="symbol">:</span>&nbsp;<a href="../index.html"><span class="identifier">MutablePathNode</span></a><span
+                    class="symbol">.</span><span class="symbol">(</span><span class="symbol">)</span>&nbsp;<span
+                    class="symbol">-&gt;</span>&nbsp;<a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span
+                    class="identifier">Unit</span></a><span class="symbol">)</span><span class="symbol">: </span><a
+                    href="../index.html"><span class="identifier">MutablePathNode</span></a></code>
+            <p>Constructs a new path node from the given <a
+                    href="../../-path-node-factory/of.html#io.github.lostatc.doppel.path.PathNodeFactory$of(java.nio.file.Path, io.github.lostatc.doppel.path.FileType, kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/path">path</a>
+                and its children.</p>
+            <code><span class="keyword">fun </span><span class="identifier">of</span><span class="symbol">(</span><span
+                    class="identifier"
+                    id="io.github.lostatc.doppel.path.MutablePathNode.Companion$of(kotlin.String, kotlin.Array((kotlin.String)), io.github.lostatc.doppel.path.FileType, kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/firstSegment">firstSegment</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span
+                    class="identifier">String</span></a><span class="symbol">, </span><span
+                    class="keyword">vararg</span> <span class="identifier"
+                                                        id="io.github.lostatc.doppel.path.MutablePathNode.Companion$of(kotlin.String, kotlin.Array((kotlin.String)), io.github.lostatc.doppel.path.FileType, kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/segments">segments</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span
+                    class="identifier">String</span></a><span class="symbol">, </span><span class="identifier"
+                                                                                            id="io.github.lostatc.doppel.path.MutablePathNode.Companion$of(kotlin.String, kotlin.Array((kotlin.String)), io.github.lostatc.doppel.path.FileType, kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/type">type</span><span
+                    class="symbol">:</span>&nbsp;<a href="../../-file-type/index.html"><span
+                    class="identifier">FileType</span></a><span class="symbol">, </span><span class="identifier"
+                                                                                              id="io.github.lostatc.doppel.path.MutablePathNode.Companion$of(kotlin.String, kotlin.Array((kotlin.String)), io.github.lostatc.doppel.path.FileType, kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/init">init</span><span
+                    class="symbol">:</span>&nbsp;<a href="../index.html"><span class="identifier">MutablePathNode</span></a><span
+                    class="symbol">.</span><span class="symbol">(</span><span class="symbol">)</span>&nbsp;<span
+                    class="symbol">-&gt;</span>&nbsp;<a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span
+                    class="identifier">Unit</span></a><span class="symbol">)</span><span class="symbol">: </span><a
+                    href="../index.html"><span class="identifier">MutablePathNode</span></a></code>
+            <p>Constructs a new path node from the given path segments.</p>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</BODY>
+</HTML>

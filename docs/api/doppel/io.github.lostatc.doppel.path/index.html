@@ -1,0 +1,283 @@
+<HTML>
+<HEAD>
+    <meta charset="UTF-8">
+    <title>io.github.lostatc.doppel.path - doppel</title>
+    <link rel="stylesheet" href="../../style.css">
+</HEAD>
+<BODY>
+<a href="../index.html">doppel</a>&nbsp;/&nbsp;<a href="./index.html">io.github.lostatc.doppel.path</a><br/>
+<br/>
+<h2>Package io.github.lostatc.doppel.path</h2>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>In-memory representations of directory trees.</p>
+<p>This package allows directory trees to be represented in memory using <a href="-path-node/index.html">PathNode</a>
+    and <a href="-mutable-path-node/index.html">MutablePathNode</a>.</p>
+<h3>Types</h3>
+<table>
+    <tbody>
+    <tr>
+        <td>
+            <p><a href="-directory-type/index.html">DirectoryType</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">class </span><span class="identifier">DirectoryType</span>&nbsp;<span
+                    class="symbol">:</span>&nbsp;<a href="-file-type/index.html"><span
+                    class="identifier">FileType</span></a></code>
+            <p>A type representing a directory.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="-file-type/index.html">FileType</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">interface </span><span class="identifier">FileType</span></code>
+            <p>A type of file in the filesystem.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="-mutable-path-node/index.html">MutablePathNode</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">class </span><span class="identifier">MutablePathNode</span>&nbsp;<span
+                    class="symbol">:</span>&nbsp;<a href="-path-node/index.html"><span
+                    class="identifier">PathNode</span></a></code>
+            <p>A mutable representation of a tree of file paths.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="-path-diff/index.html">PathDiff</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">data</span> <span class="keyword">class </span><span
+                    class="identifier">PathDiff</span></code>
+            <p>An immutable comparison of two path nodes.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="-path-node/index.html">PathNode</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">interface </span><span class="identifier">PathNode</span></code>
+            <p>A read-only representation of a tree of file paths.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="-path-node-factory/index.html">PathNodeFactory</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">interface </span><span class="identifier">PathNodeFactory</span></code>
+            <p>A factory for creating <a href="-path-node/index.html">PathNode</a> instances.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="-regular-file-type/index.html">RegularFileType</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">class </span><span class="identifier">RegularFileType</span>&nbsp;<span
+                    class="symbol">:</span>&nbsp;<a href="-file-type/index.html"><span
+                    class="identifier">FileType</span></a></code>
+            <p>A type representing a regular file.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="-symbolic-link-type/index.html">SymbolicLinkType</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">data</span> <span class="keyword">class </span><span class="identifier">SymbolicLinkType</span>&nbsp;<span
+                    class="symbol">:</span>&nbsp;<a href="-file-type/index.html"><span
+                    class="identifier">FileType</span></a></code>
+            <p>A type representing a symbolic link.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="-unknown-type/index.html">UnknownType</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">class </span><span class="identifier">UnknownType</span>&nbsp;<span
+                    class="symbol">:</span>&nbsp;<a href="-file-type/index.html"><span
+                    class="identifier">FileType</span></a></code>
+            <p>A type representing a file whose type is unknown.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="-walk-direction/index.html">WalkDirection</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">enum</span> <span class="keyword">class </span><span class="identifier">WalkDirection</span></code>
+            <p>Possible orders in which hierarchical data can be iterated over.</p>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<h3>Functions</h3>
+<table>
+    <tbody>
+    <tr>
+        <td>
+            <p><a href="dir.html">dir</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">fun </span><a href="-mutable-path-node/index.html"><span class="identifier">MutablePathNode</span></a><span
+                    class="symbol">.</span><span class="identifier">dir</span><span class="symbol">(</span><span
+                    class="identifier"
+                    id="io.github.lostatc.doppel.path$dir(io.github.lostatc.doppel.path.MutablePathNode, kotlin.String, kotlin.Array((kotlin.String)), kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/firstSegment">firstSegment</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span
+                    class="identifier">String</span></a><span class="symbol">, </span><span
+                    class="keyword">vararg</span> <span class="identifier"
+                                                        id="io.github.lostatc.doppel.path$dir(io.github.lostatc.doppel.path.MutablePathNode, kotlin.String, kotlin.Array((kotlin.String)), kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/segments">segments</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span
+                    class="identifier">String</span></a><span class="symbol">, </span><span class="identifier"
+                                                                                            id="io.github.lostatc.doppel.path$dir(io.github.lostatc.doppel.path.MutablePathNode, kotlin.String, kotlin.Array((kotlin.String)), kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/init">init</span><span
+                    class="symbol">:</span>&nbsp;<a href="-mutable-path-node/index.html"><span class="identifier">MutablePathNode</span></a><span
+                    class="symbol">.</span><span class="symbol">(</span><span class="symbol">)</span>&nbsp;<span
+                    class="symbol">-&gt;</span>&nbsp;<a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span
+                    class="identifier">Unit</span></a>&nbsp;<span class="symbol">=</span>&nbsp;{}<span
+                    class="symbol">)</span><span class="symbol">: </span><a href="-mutable-path-node/index.html"><span
+                    class="identifier">MutablePathNode</span></a></code>
+            <p>Builds a path node from the given file segments with a type of <a href="-directory-type/index.html">DirectoryType</a>.
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="file.html">file</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">fun </span><a href="-mutable-path-node/index.html"><span class="identifier">MutablePathNode</span></a><span
+                    class="symbol">.</span><span class="identifier">file</span><span class="symbol">(</span><span
+                    class="identifier"
+                    id="io.github.lostatc.doppel.path$file(io.github.lostatc.doppel.path.MutablePathNode, kotlin.String, kotlin.Array((kotlin.String)))/firstSegment">firstSegment</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span
+                    class="identifier">String</span></a><span class="symbol">, </span><span
+                    class="keyword">vararg</span> <span class="identifier"
+                                                        id="io.github.lostatc.doppel.path$file(io.github.lostatc.doppel.path.MutablePathNode, kotlin.String, kotlin.Array((kotlin.String)))/segments">segments</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span
+                    class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a
+                    href="-mutable-path-node/index.html"><span class="identifier">MutablePathNode</span></a></code>
+            <p>Builds a path node from the given file segments with a type of <a href="-regular-file-type/index.html">RegularFileType</a>.
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="file-type-from-filesystem.html">fileTypeFromFilesystem</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">fun </span><span class="identifier">fileTypeFromFilesystem</span><span
+                    class="symbol">(</span><span class="identifier"
+                                                 id="io.github.lostatc.doppel.path$fileTypeFromFilesystem(java.nio.file.Path)/path">path</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
+                    class="symbol">)</span><span class="symbol">: </span><a href="-file-type/index.html"><span
+                    class="identifier">FileType</span></a></code>
+            <p>Returns the <a href="-file-type/index.html">FileType</a> that is most appropriate for file at the given
+                <a href="file-type-from-filesystem.html#io.github.lostatc.doppel.path$fileTypeFromFilesystem(java.nio.file.Path)/path">path</a>.
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="path-node.html">pathNode</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">fun </span><a href="-mutable-path-node/index.html"><span class="identifier">MutablePathNode</span></a><span
+                    class="symbol">.</span><span class="identifier">pathNode</span><span class="symbol">(</span><span
+                    class="identifier"
+                    id="io.github.lostatc.doppel.path$pathNode(io.github.lostatc.doppel.path.MutablePathNode, kotlin.String, kotlin.Array((kotlin.String)), io.github.lostatc.doppel.path.FileType)/firstSegment">firstSegment</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span
+                    class="identifier">String</span></a><span class="symbol">, </span><span
+                    class="keyword">vararg</span> <span class="identifier"
+                                                        id="io.github.lostatc.doppel.path$pathNode(io.github.lostatc.doppel.path.MutablePathNode, kotlin.String, kotlin.Array((kotlin.String)), io.github.lostatc.doppel.path.FileType)/segments">segments</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span
+                    class="identifier">String</span></a><span class="symbol">, </span><span class="identifier"
+                                                                                            id="io.github.lostatc.doppel.path$pathNode(io.github.lostatc.doppel.path.MutablePathNode, kotlin.String, kotlin.Array((kotlin.String)), io.github.lostatc.doppel.path.FileType)/type">type</span><span
+                    class="symbol">:</span>&nbsp;<a href="-file-type/index.html"><span
+                    class="identifier">FileType</span></a><span class="symbol">)</span><span class="symbol">: </span><a
+                    href="-mutable-path-node/index.html"><span class="identifier">MutablePathNode</span></a></code>
+            <p>Builds a path node from the given file segments and file type.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="symlink.html">symlink</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">fun </span><a href="-mutable-path-node/index.html"><span class="identifier">MutablePathNode</span></a><span
+                    class="symbol">.</span><span class="identifier">symlink</span><span class="symbol">(</span><span
+                    class="identifier"
+                    id="io.github.lostatc.doppel.path$symlink(io.github.lostatc.doppel.path.MutablePathNode, kotlin.String, kotlin.Array((kotlin.String)), java.nio.file.Path)/firstSegment">firstSegment</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span
+                    class="identifier">String</span></a><span class="symbol">, </span><span
+                    class="keyword">vararg</span> <span class="identifier"
+                                                        id="io.github.lostatc.doppel.path$symlink(io.github.lostatc.doppel.path.MutablePathNode, kotlin.String, kotlin.Array((kotlin.String)), java.nio.file.Path)/segments">segments</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span
+                    class="identifier">String</span></a><span class="symbol">, </span><span class="identifier"
+                                                                                            id="io.github.lostatc.doppel.path$symlink(io.github.lostatc.doppel.path.MutablePathNode, kotlin.String, kotlin.Array((kotlin.String)), java.nio.file.Path)/target">target</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
+                    class="symbol">)</span><span class="symbol">: </span><a href="-mutable-path-node/index.html"><span
+                    class="identifier">MutablePathNode</span></a></code>
+            <p>Builds a path node from the given file segments with a type of <a href="-symbolic-link-type/index.html">SymbolicLinkType</a>.
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="unknown.html">unknown</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">fun </span><a href="-mutable-path-node/index.html"><span class="identifier">MutablePathNode</span></a><span
+                    class="symbol">.</span><span class="identifier">unknown</span><span class="symbol">(</span><span
+                    class="identifier"
+                    id="io.github.lostatc.doppel.path$unknown(io.github.lostatc.doppel.path.MutablePathNode, kotlin.String, kotlin.Array((kotlin.String)))/firstSegment">firstSegment</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span
+                    class="identifier">String</span></a><span class="symbol">, </span><span
+                    class="keyword">vararg</span> <span class="identifier"
+                                                        id="io.github.lostatc.doppel.path$unknown(io.github.lostatc.doppel.path.MutablePathNode, kotlin.String, kotlin.Array((kotlin.String)))/segments">segments</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span
+                    class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a
+                    href="-mutable-path-node/index.html"><span class="identifier">MutablePathNode</span></a></code>
+            <p>Builds a path node from the given file segments with a type of <a href="-unknown-type/index.html">UnknownType</a>.
+            </p>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</BODY>
+</HTML>

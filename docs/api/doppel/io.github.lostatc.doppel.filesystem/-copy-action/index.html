@@ -1,0 +1,205 @@
+<HTML>
+<HEAD>
+    <meta charset="UTF-8">
+    <title>CopyAction - doppel</title>
+    <link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">doppel</a>&nbsp;/&nbsp;<a href="../index.html">io.github.lostatc.doppel.filesystem</a>&nbsp;/&nbsp;<a
+        href="./index.html">CopyAction</a><br/>
+<br/>
+<h1>CopyAction</h1>
+<code><span class="keyword">data</span> <span class="keyword">class </span><span class="identifier">CopyAction</span>&nbsp;<span
+        class="symbol">:</span>&nbsp;<a href="../-filesystem-action/index.html"><span class="identifier">FilesystemAction</span></a></code>
+<a href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/filesystem/FilesystemAction.kt#L150">(source)</a>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>An action that recursively copies a file or directory from <a href="source.html">source</a> to <a href="target.html">target</a>.
+</p>
+<p>The files represented by <a href="source.html">source</a> and <a href="target.html">target</a> must belong to the
+    same filesystem.</p>
+<p>If <a href="source.html">source</a> and <a href="target.html">target</a> represent the same file, then nothing is
+    copied.</p>
+<p>Copying a file or directory is not an atomic operation. If an <a
+        href="http://docs.oracle.com/javase/8/docs/api/java/io/IOException.html">IOException</a> is thrown, then the
+    state of the
+    filesystem is undefined.</p>
+<p>The following exceptions can be passed to <a href="on-error.html">onError</a>:</p>
+<ul>
+    <li><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.io/-no-such-file-exception/index.html">NoSuchFileException</a>:
+        There was an attempt to copy a nonexistent file.
+    </li>
+    <li><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.io/-file-already-exists-exception/index.html">FileAlreadyExistsException</a>:
+        The destination file already exists.
+    </li>
+    <li><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.io/-access-denied-exception/index.html">AccessDeniedException</a>:
+        There was an attempt to open a directory that didn't succeed.
+    </li>
+    <li><a href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/FileSystemLoopException.html">FileSystemLoopException</a>:
+        <a href="follow-links.html">followLinks</a> is <code>true</code> and a cycle of symbolic links was detected.
+    </li>
+    <li><a href="http://docs.oracle.com/javase/8/docs/api/java/io/IOException.html">IOException</a>: Some other problem
+        occurred while copying.
+    </li>
+</ul>
+<h3>Constructors</h3>
+<table>
+    <tbody>
+    <tr>
+        <td>
+            <p><a href="-init-.html">&lt;init&gt;</a></p>
+        </td>
+        <td>
+            <code><span class="identifier">CopyAction</span><span class="symbol">(</span><span class="identifier"
+                                                                                               id="io.github.lostatc.doppel.filesystem.CopyAction$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Boolean, kotlin.Boolean, kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/source">source</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="../../io.github.lostatc.doppel.path/-path-node/index.html"><span
+                    class="identifier">PathNode</span></a><span class="symbol">, </span><span class="identifier"
+                                                                                              id="io.github.lostatc.doppel.filesystem.CopyAction$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Boolean, kotlin.Boolean, kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/target">target</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="../../io.github.lostatc.doppel.path/-path-node/index.html"><span
+                    class="identifier">PathNode</span></a><span class="symbol">, </span><span class="identifier"
+                                                                                              id="io.github.lostatc.doppel.filesystem.CopyAction$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Boolean, kotlin.Boolean, kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/overwrite">overwrite</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
+                    class="identifier">Boolean</span></a>&nbsp;<span class="symbol">=</span>&nbsp;false<span
+                    class="symbol">, </span><span class="identifier"
+                                                  id="io.github.lostatc.doppel.filesystem.CopyAction$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Boolean, kotlin.Boolean, kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/copyAttributes">copyAttributes</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
+                    class="identifier">Boolean</span></a>&nbsp;<span class="symbol">=</span>&nbsp;false<span
+                    class="symbol">, </span><span class="identifier"
+                                                  id="io.github.lostatc.doppel.filesystem.CopyAction$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Boolean, kotlin.Boolean, kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/followLinks">followLinks</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
+                    class="identifier">Boolean</span></a>&nbsp;<span class="symbol">=</span>&nbsp;false<span
+                    class="symbol">, </span><span class="identifier"
+                                                  id="io.github.lostatc.doppel.filesystem.CopyAction$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Boolean, kotlin.Boolean, kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/onError">onError</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="../../io.github.lostatc.doppel.error/-error-handler.html"><span class="identifier">ErrorHandler</span></a>&nbsp;<span
+                    class="symbol">=</span>&nbsp;::skipOnError<span class="symbol">)</span></code>
+            <p>An action that recursively copies a file or directory from <a href="source.html">source</a> to <a
+                    href="target.html">target</a>.</p>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<h3>Properties</h3>
+<table>
+    <tbody>
+    <tr>
+        <td>
+            <p><a href="copy-attributes.html">copyAttributes</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">val </span><span class="identifier">copyAttributes</span><span
+                    class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
+                    class="identifier">Boolean</span></a></code>
+            <p>Attempt to copy file attributes from <a href="source.html">source</a> to <a href="target.html">target</a>.
+                The last modified time is
+                always copied if supported. Whether other attributes are copied is platform and filesystem dependent.
+                File attributes
+                of links may not be copied.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="follow-links.html">followLinks</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">val </span><span class="identifier">followLinks</span><span
+                    class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
+                    class="identifier">Boolean</span></a></code>
+            <p>Follow symbolic links when walking the directory tree and copy the targets of links instead
+                of links themselves.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="on-error.html">onError</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">val </span><span class="identifier">onError</span><span class="symbol">: </span><a
+                    href="../../io.github.lostatc.doppel.error/-error-handler.html"><span class="identifier">ErrorHandler</span></a></code>
+            <p>A function that is called for each error that occurs while changes are being applied which determines how
+                to
+                handle them.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="overwrite.html">overwrite</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">val </span><span class="identifier">overwrite</span><span
+                    class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
+                    class="identifier">Boolean</span></a></code>
+            <p>If a file or directory already exists at <a href="target.html">target</a>, replace it. If the directory
+                is not empty,
+                it is deleted recursively.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="source.html">source</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">val </span><span class="identifier">source</span><span
+                    class="symbol">: </span><a href="../../io.github.lostatc.doppel.path/-path-node/index.html"><span
+                    class="identifier">PathNode</span></a></code>
+            <p>A path node representing the file or directory to copy.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="target.html">target</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">val </span><span class="identifier">target</span><span
+                    class="symbol">: </span><a href="../../io.github.lostatc.doppel.path/-path-node/index.html"><span
+                    class="identifier">PathNode</span></a></code>
+            <p>A path node representing the file or directory to copy <a href="source.html">source</a> to.</p>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<h3>Functions</h3>
+<table>
+    <tbody>
+    <tr>
+        <td>
+            <p><a href="apply-filesystem.html">applyFilesystem</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">fun </span><span class="identifier">applyFilesystem</span><span
+                    class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span
+                    class="identifier">Unit</span></a></code>
+            <p>Applies the change to the filesystem.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="apply-view.html">applyView</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">fun </span><span class="identifier">applyView</span><span
+                    class="symbol">(</span><span class="identifier"
+                                                 id="io.github.lostatc.doppel.filesystem.CopyAction$applyView(io.github.lostatc.doppel.path.MutablePathNode)/viewNode">viewNode</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="../../io.github.lostatc.doppel.path/-mutable-path-node/index.html"><span class="identifier">MutablePathNode</span></a><span
+                    class="symbol">)</span><span class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span
+                    class="identifier">Unit</span></a></code>
+            <p>Modifies <a
+                    href="../-filesystem-action/apply-view.html#io.github.lostatc.doppel.filesystem.FilesystemAction$applyView(io.github.lostatc.doppel.path.MutablePathNode)/viewNode">viewNode</a>
+                to provide a view of what the filesystem will look like after <a
+                        href="../-filesystem-action/apply-view.html">applyView</a> is called.</p>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</BODY>
+</HTML>

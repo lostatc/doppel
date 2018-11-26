@@ -1,0 +1,124 @@
+<HTML>
+<HEAD>
+    <meta charset="UTF-8">
+    <title>io.github.lostatc.doppel.error - doppel</title>
+    <link rel="stylesheet" href="../../style.css">
+</HEAD>
+<BODY>
+<a href="../index.html">doppel</a>&nbsp;/&nbsp;<a href="./index.html">io.github.lostatc.doppel.error</a><br/>
+<br/>
+<h2>Package io.github.lostatc.doppel.error</h2>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>Tools for handling errors that occur when accessing the filesystem.</p>
+<p>Many functions, methods and classes that access or modify the filesystem accept an <a href="-error-handler.html">ErrorHandler</a>
+    to determine how
+    errors are handled on a file-by-file basis. This package provides the default error handlers <a
+            href="skip-on-error.html">skipOnError</a>,
+    <a href="terminate-on-error.html">terminateOnError</a> and <a href="throw-on-error.html">throwOnError</a>.</p>
+<h3>Types</h3>
+<table>
+    <tbody>
+    <tr>
+        <td>
+            <p><a href="-error-handler-action/index.html">ErrorHandlerAction</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">enum</span> <span class="keyword">class </span><span class="identifier">ErrorHandlerAction</span></code>
+            <p>A value which determines how an error that occurs during a filesystem operation is handled.</p>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<h3>Type Aliases</h3>
+<table>
+    <tbody>
+    <tr>
+        <td>
+            <p><a href="-error-handler.html">ErrorHandler</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">typealias </span><span class="identifier">ErrorHandler</span>&nbsp;<span
+                    class="symbol">=</span>&nbsp;<span class="symbol">(</span><a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
+                    class="symbol">,</span>&nbsp;<a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/io/IOException.html"><span class="identifier">IOException</span></a><span
+                    class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a
+                    href="-error-handler-action/index.html"><span
+                    class="identifier">ErrorHandlerAction</span></a></code>
+            <p>A function that is called for each error that occurs during a filesystem operation.</p>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<h3>Functions</h3>
+<table>
+    <tbody>
+    <tr>
+        <td>
+            <p><a href="skip-on-error.html">skipOnError</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">fun </span><span class="identifier">skipOnError</span><span
+                    class="symbol">(</span><span class="identifier"
+                                                 id="io.github.lostatc.doppel.error$skipOnError(java.nio.file.Path, java.io.IOException)/file">file</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
+                    class="symbol">, </span><span class="identifier"
+                                                  id="io.github.lostatc.doppel.error$skipOnError(java.nio.file.Path, java.io.IOException)/exception">exception</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/io/IOException.html"><span class="identifier">IOException</span></a><span
+                    class="symbol">)</span><span class="symbol">: </span><a
+                    href="-error-handler-action/index.html"><span
+                    class="identifier">ErrorHandlerAction</span></a></code>
+            <p>Handles filesystem errors by always skipping the file that caused the error.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="terminate-on-error.html">terminateOnError</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">fun </span><span class="identifier">terminateOnError</span><span class="symbol">(</span><span
+                    class="identifier"
+                    id="io.github.lostatc.doppel.error$terminateOnError(java.nio.file.Path, java.io.IOException)/file">file</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
+                    class="symbol">, </span><span class="identifier"
+                                                  id="io.github.lostatc.doppel.error$terminateOnError(java.nio.file.Path, java.io.IOException)/exception">exception</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/io/IOException.html"><span class="identifier">IOException</span></a><span
+                    class="symbol">)</span><span class="symbol">: </span><a
+                    href="-error-handler-action/index.html"><span
+                    class="identifier">ErrorHandlerAction</span></a></code>
+            <p>Handles filesystem errors by always terminating the operation when there is an error.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="throw-on-error.html">throwOnError</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">fun </span><span class="identifier">throwOnError</span><span
+                    class="symbol">(</span><span class="identifier"
+                                                 id="io.github.lostatc.doppel.error$throwOnError(java.nio.file.Path, java.io.IOException)/file">file</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
+                    class="symbol">, </span><span class="identifier"
+                                                  id="io.github.lostatc.doppel.error$throwOnError(java.nio.file.Path, java.io.IOException)/exception">exception</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/io/IOException.html"><span class="identifier">IOException</span></a><span
+                    class="symbol">)</span><span class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-nothing/index.html"><span
+                    class="identifier">Nothing</span></a></code>
+            <p>Handles filesystem errors by always throwing the exception.</p>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</BODY>
+</HTML>

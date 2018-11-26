@@ -1,0 +1,48 @@
+<HTML>
+<HEAD>
+    <meta charset="UTF-8">
+    <title>DeleteAction.
+        <init> - doppel
+    </title>
+    <link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">doppel</a>&nbsp;/&nbsp;<a href="../index.html">io.github.lostatc.doppel.filesystem</a>&nbsp;/&nbsp;<a
+        href="index.html">DeleteAction</a>&nbsp;/&nbsp;<a href="./-init-.html">&lt;init&gt;</a><br/>
+<br/>
+<h1>&lt;init&gt;</h1>
+<a name="io.github.lostatc.doppel.filesystem.DeleteAction$&lt;init&gt;(io.github.lostatc.doppel.path.PathNode, kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))"></a>
+<code><span class="identifier">DeleteAction</span><span class="symbol">(</span><span class="identifier"
+                                                                                     id="io.github.lostatc.doppel.filesystem.DeleteAction$<init>(io.github.lostatc.doppel.path.PathNode, kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/target">target</span><span
+        class="symbol">:</span>&nbsp;<a href="../../io.github.lostatc.doppel.path/-path-node/index.html"><span
+        class="identifier">PathNode</span></a><span class="symbol">, </span><span class="identifier"
+                                                                                  id="io.github.lostatc.doppel.filesystem.DeleteAction$<init>(io.github.lostatc.doppel.path.PathNode, kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/followLinks">followLinks</span><span
+        class="symbol">:</span>&nbsp;<a
+        href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
+        class="identifier">Boolean</span></a>&nbsp;<span class="symbol">=</span>&nbsp;false<span
+        class="symbol">, </span><span class="identifier"
+                                      id="io.github.lostatc.doppel.filesystem.DeleteAction$<init>(io.github.lostatc.doppel.path.PathNode, kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/onError">onError</span><span
+        class="symbol">:</span>&nbsp;<a href="../../io.github.lostatc.doppel.error/-error-handler.html"><span
+        class="identifier">ErrorHandler</span></a>&nbsp;<span class="symbol">=</span>&nbsp;::skipOnError<span
+        class="symbol">)</span></code>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>An action that recursively deletes a file or directory represented by <a href="target.html">target</a>.</p>
+<p>This operation is not atomic. Deleting an individual file or directory may not be atomic either.</p>
+<p>If the file to be deleted is a symbolic link then the link itself, and not its target, is deleted.</p>
+<p>The following exceptions can be passed to <a href="on-error.html">onError</a>:</p>
+<ul>
+    <li><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.io/-no-such-file-exception/index.html">NoSuchFileException</a>:
+        There was an attempt to delete a nonexistent file.
+    </li>
+    <li><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.io/-access-denied-exception/index.html">AccessDeniedException</a>:
+        There was an attempt to open a directory that didn't succeed.
+    </li>
+    <li><a href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/FileSystemLoopException.html">FileSystemLoopException</a>:
+        <a href="follow-links.html">followLinks</a> is <code>true</code> and a cycle of symbolic links was detected.
+    </li>
+    <li><a href="http://docs.oracle.com/javase/8/docs/api/java/io/IOException.html">IOException</a>: Some other problem
+        occurred while deleting.
+    </li>
+</ul>
+</BODY>
+</HTML>
