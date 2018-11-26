@@ -2,6 +2,8 @@
 Doppel is a library for manipulating the filesystem in memory. It works on top of Java NIO to reduce the need for
 expensive filesystem access.
 
+[API Documentation](https://lostatc.github.io/doppel/api/doppel/index.html)
+
 ## Features
 * Represent and manipulate directory trees in memory
   * Create directory trees using a DSL
