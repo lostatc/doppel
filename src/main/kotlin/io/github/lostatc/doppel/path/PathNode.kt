@@ -44,7 +44,8 @@ enum class WalkDirection {
  * A read-only representation of a tree of file paths.
  *
  * Objects of this type wrap a [Path] object to allow them to form a tree of file paths. This allows file hierarchies to
- * be represented and manipulated in memory.
+ * be represented and manipulated in memory. [PathNode] objects are read-only, while [MutablePathNode] objects allow the
+ * tree of paths to be modified.
  *
  * This class works like a prefix tree, where each [PathNode] stores only a single path segment as [fileName]. The
  * parent node can be accessed through the [parent] property and a map of child nodes can be accessed through the

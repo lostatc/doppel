@@ -25,4 +25,17 @@ test {
 dokka {
     outputFormat = "html"
     outputDirectory = "$buildDir/dokka"
+    jdkVersion = 8
+    includes = ["packages.md"]
+
+    sourceRoot {
+        path = "src/main"
+        platforms = ["JVM"]
+    }
+
+    linkMapping {
+        dir = "$projectDir/src/main"
+        url = "https://github.com/lostatc/doppel/blob/master/src/main"
+        suffix = "#L"
+    }
 }
