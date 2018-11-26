@@ -24,22 +24,14 @@ import java.io.IOException
 import java.nio.file.CopyOption
 import java.nio.file.FileVisitOption
 import java.nio.file.FileVisitResult
+import java.nio.file.FileVisitor
 import java.nio.file.Files
 import java.nio.file.LinkOption
 import java.nio.file.Path
-import java.nio.file.SimpleFileVisitor
 import java.nio.file.StandardCopyOption
 import java.nio.file.attribute.BasicFileAttributes
 import java.security.DigestInputStream
 import java.security.MessageDigest
-
-/**
- * Copies basic file attributes from [source] to [target].
- */
-internal fun copyFileAttributes(source: Path, target: Path) {
-    val mtime = Files.getLastModifiedTime(source)
-    Files.setLastModifiedTime(target, mtime)
-}
 
 /**
  * An algorithm used to create a message digest.
@@ -88,12 +80,30 @@ internal fun getFileChecksum(file: Path, algorithm: DigestAlgorithm = DigestAlgo
 }
 
 /**
- * A file visitor that handles errors based on an [ErrorHandler].
- *
- * @property [onError] A function that determines how errors are handled.
+ * Copies basic file attributes from [source] to [target].
  */
-private open class ErrorHandlingVisitor(val onError: ErrorHandler) : SimpleFileVisitor<Path>() {
+internal fun copyFileAttributes(source: Path, target: Path) {
+    val mtime = Files.getLastModifiedTime(source)
+    Files.setLastModifiedTime(target, mtime)
+}
+
+/**
+ * A file visitor that handles errors using an [ErrorHandler].
+ */
+private interface ErrorHandlingVisitor : FileVisitor<Path> {
+    /**
+     * A function that determines how errors are handled.
+     */
+    val onError: ErrorHandler
+
+    override fun preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult = FileVisitResult.CONTINUE
+
+    override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult = FileVisitResult.CONTINUE
+
     override fun visitFileFailed(file: Path, exc: IOException): FileVisitResult = onError(file, exc).visitResult
+
+    override fun postVisitDirectory(dir: Path, exc: IOException?): FileVisitResult =
+        if (exc == null) FileVisitResult.CONTINUE else onError(dir, exc).visitResult
 }
 
 /**
@@ -123,17 +133,15 @@ internal fun moveRecursively(
     val copyOptions = mutableSetOf<CopyOption>()
     if (overwrite) copyOptions.add(StandardCopyOption.REPLACE_EXISTING)
 
-    val fileVisitor = object : ErrorHandlingVisitor(onError) {
+    val fileVisitor = object : ErrorHandlingVisitor {
+        override val onError = onError
+
         override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
             val destFile = target.resolve(source.relativize(file))
 
             return handleWalkErrors(onError, file) {
                 // [Files.move] will not replace a non-empty directory. You need to delete it recursively.
-                if (overwrite) deleteRecursively(
-                    destFile,
-                    followLinks = followLinks,
-                    onError = onError
-                )
+                if (overwrite) deleteRecursively(destFile, followLinks = followLinks, onError = onError)
                 Files.move(file, destFile, *copyOptions.toTypedArray())
             }
         }
@@ -150,11 +158,7 @@ internal fun moveRecursively(
             } catch (e: IOException) {
                 handleWalkErrors(onError, dir) {
                     // [Files.copy] will not replace a non-empty directory. You need to delete it recursively.
-                    if (overwrite) deleteRecursively(
-                        destDir,
-                        followLinks = followLinks,
-                        onError = onError
-                    )
+                    if (overwrite) deleteRecursively(destDir, followLinks = followLinks, onError = onError)
                     Files.copy(dir, destDir, *copyOptions.toTypedArray())
                 }
             }
@@ -194,17 +198,15 @@ internal fun copyRecursively(
     if (copyAttributes) copyOptions.add(StandardCopyOption.COPY_ATTRIBUTES)
     if (!followLinks) copyOptions.add(LinkOption.NOFOLLOW_LINKS)
 
-    val fileVisitor = object : ErrorHandlingVisitor(onError) {
+    val fileVisitor = object : ErrorHandlingVisitor {
+        override val onError = onError
+
         override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
             val destFile = target.resolve(source.relativize(file))
 
             return handleWalkErrors(onError, file) {
                 // [Files.copy] will not replace a non-empty directory. You need to delete it recursively.
-                if (overwrite) deleteRecursively(
-                    destFile,
-                    followLinks = followLinks,
-                    onError = onError
-                )
+                if (overwrite) deleteRecursively(destFile, followLinks = followLinks, onError = onError)
                 Files.copy(file, destFile, *copyOptions.toTypedArray())
             }
         }
@@ -215,11 +217,7 @@ internal fun copyRecursively(
             // Copy the directory itself with its attributes if necessary.
             return handleWalkErrors(onError, dir) {
                 // [Files.copy] will not replace a non-empty directory. You need to delete it recursively.
-                if (overwrite) deleteRecursively(
-                    destDir,
-                    followLinks = followLinks,
-                    onError = onError
-                )
+                if (overwrite) deleteRecursively(destDir, followLinks = followLinks, onError = onError)
                 Files.copy(dir, destDir, *copyOptions.toTypedArray())
             }
         }
@@ -246,12 +244,10 @@ internal fun copyRecursively(
  *
  * @see [DeleteAction]
  */
-internal fun deleteRecursively(
-    path: Path,
-    followLinks: Boolean,
-    onError: ErrorHandler
-) {
-    val fileVisitor = object : ErrorHandlingVisitor(onError) {
+internal fun deleteRecursively(path: Path, followLinks: Boolean, onError: ErrorHandler) {
+    val fileVisitor = object : ErrorHandlingVisitor {
+        override val onError = onError
+
         override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult =
             handleWalkErrors(onError, file) { Files.delete(file) }
 
