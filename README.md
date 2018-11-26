@@ -15,5 +15,5 @@ expensive filesystem access.
   * Queue up changes and then apply them all at once
   * Undo changes before they're applied
   * See a preview of what the filesystem will look like with changes applied
-  * Recursively copy, move and delete files
+  * Recursively move, copy, create and delete files
   * Handle I/O errors on a file-by-file basis

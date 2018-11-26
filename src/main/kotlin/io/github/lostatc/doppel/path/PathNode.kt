@@ -21,6 +21,8 @@ package io.github.lostatc.doppel.path
 
 import io.github.lostatc.doppel.error.ErrorHandler
 import io.github.lostatc.doppel.error.skipOnError
+import io.github.lostatc.doppel.path.PathNode.Companion.fromFilesystem
+import io.github.lostatc.doppel.path.PathNode.Companion.of
 import java.io.IOException
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -51,10 +53,19 @@ enum class WalkDirection {
  * parent node can be accessed through the [parent] property and a map of child nodes can be accessed through the
  * [children] property. The full [Path] can be accessed through the [path] property.
  *
+ * The properties [descendants] and [relativeDescendants] can be used to efficiently find descendants of this node by
+ * their [Path].
+ *
  * Each [PathNode] has a [type], which indicates the type of file the node represents in the filesystem. An initial type
  * is provided through the constructor, but this type can change based on the state of the node. For example, if the
  * [type] of a node is a regular file, then it will change to a directory if children are added. Custom file types with
  * custom behavior can be created by implementing [FileType].
+ *
+ * You can use [diff] to get a comparision of two [PathNode] objects.
+ *
+ * [PathNode] objects can be created using the builder method [of] which provides a DSL for specifying what the
+ * directory tree should look like. They can also be created by walking a directory tree in the filesystem using
+ * [fromFilesystem].
  *
  * *Warning:* This interface is not meant to be implemented. New members may be added in the future.
  */
@@ -242,26 +253,19 @@ interface PathNode {
     fun createFile(recursive: Boolean = false, onError: ErrorHandler = ::skipOnError)
 
     companion object : PathNodeFactory {
-        override fun of(path: Path, type: FileType, init: MutablePathNode.() -> Unit): PathNode {
-            return MutablePathNode.of(path, type, init)
-        }
+        override fun of(path: Path, type: FileType, init: MutablePathNode.() -> Unit): PathNode =
+            MutablePathNode.of(path, type, init)
 
         override fun of(
             firstSegment: String, vararg segments: String,
             type: FileType,
             init: MutablePathNode.() -> Unit
         ): PathNode {
-            return MutablePathNode.of(
-                firstSegment,
-                *segments,
-                type = type,
-                init = init
-            )
+            return MutablePathNode.of(firstSegment, *segments, type = type, init = init)
         }
 
-        override fun fromFilesystem(path: Path, recursive: Boolean, typeFactory: (Path) -> FileType): PathNode {
-            return MutablePathNode.fromFilesystem(path, recursive, typeFactory)
-        }
+        override fun fromFilesystem(path: Path, recursive: Boolean, typeFactory: (Path) -> FileType): PathNode =
+            MutablePathNode.fromFilesystem(path, recursive, typeFactory)
 
     }
 }
