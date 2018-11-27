@@ -49,8 +49,8 @@ enum class WalkDirection {
  * be represented and manipulated in memory. [PathNode] objects are read-only, while [MutablePathNode] objects allow the
  * tree of paths to be modified.
  *
- * This class works like a prefix tree, where each [PathNode] stores only a single path segment as [fileName]. The
- * parent node can be accessed through the [parent] property and a map of child nodes can be accessed through the
+ * [PathNode] objects work like a prefix tree, where each [PathNode] stores only a single path segment as [fileName].
+ * The parent node can be accessed through the [parent] property and a map of child nodes can be accessed through the
  * [children] property. The full [Path] can be accessed through the [path] property.
  *
  * The properties [descendants] and [relativeDescendants] can be used to efficiently find descendants of this node by
@@ -275,10 +275,10 @@ interface PathNodeFactory {
     /**
      * Constructs a new path node from the given [path] and its children.
      *
-     * This method is a type-safe builder. It allows you to create a tree of path nodes of specified types. The
-     * [init] parameter accepts a lambda in which you can call builder methods like [file], [dir], [symlink] and
-     * [unknown] to create new path nodes as children of this node. Builder methods can be created for custom
-     * [FileType] classes using [pathNode].
+     * This method is a type-safe builder. It allows you to create a tree of path nodes of specified types. The [init]
+     * parameter accepts a lambda in which you can call builder methods like [file], [dir], [symlink] and [unknown] to
+     * create new path nodes as children of this node. Builder methods can be created for custom [FileType]
+     * implementations using [pathNode].
      *
      * The whole tree of path nodes will be associated with the same filesystem as [path].
      *

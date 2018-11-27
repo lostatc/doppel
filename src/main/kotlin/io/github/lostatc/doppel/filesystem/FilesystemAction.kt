@@ -48,6 +48,8 @@ fun removeNodeFromView(viewNode: MutablePathNode, pathNode: PathNode) {
 
 /**
  * A change to apply to the filesystem.
+ *
+ * Implementations of this interface are immutable.
  */
 interface FilesystemAction {
     /**
@@ -95,8 +97,8 @@ interface FilesystemAction {
  *
  * @property [source] A path node representing file or directory to move.
  * @property [target] A path node representing file or directory to move [source] to.
- * @property [overwrite] If a file or directory already exists at [target], replace it. If the directory is not empty,
- * it is deleted recursively.
+ * @property [overwrite] If a file or directory already exists at [target], replace it. If is is a directory and it is
+ * not empty, it is deleted recursively.
  * @property [followLinks] Follow symbolic links when walking the directory tree.
  */
 data class MoveAction(
@@ -127,20 +129,22 @@ data class MoveAction(
  *
  * If [source] and [target] represent the same file, then nothing is copied.
  *
+ * If the file to be copied is a symbolic link then the link itself, and not its target, is moved.
+ *
  * Copying a file or directory is not an atomic operation. If an [IOException] is thrown, then the state of the
  * filesystem is undefined.
  *
  * The following exceptions can be passed to [onError]:
  * - [NoSuchFileException]: There was an attempt to copy a nonexistent file.
- * - [FileAlreadyExistsException]: The destination file already exists.
+ * - [FileAlreadyExistsException]: The destination file already exists and [overwrite] is `false`.
  * - [AccessDeniedException]: There was an attempt to open a directory that didn't succeed.
  * - [FileSystemLoopException]: [followLinks] is `true` and a cycle of symbolic links was detected.
  * - [IOException]: Some other problem occurred while copying.
  *
  * @property [source] A path node representing the file or directory to copy.
  * @property [target] A path node representing the file or directory to copy [source] to.
- * @property [overwrite] If a file or directory already exists at [target], replace it. If the directory is not empty,
- * it is deleted recursively.
+ * @property [overwrite] If a file or directory already exists at [target], replace it. If is is a directory and it is
+ * not empty, it is deleted recursively.
  * @property [copyAttributes] Attempt to copy file attributes from [source] to [target]. The last modified time is
  * always copied if supported. Whether other attributes are copied is platform and filesystem dependent. File attributes
  * of links may not be copied.
@@ -195,7 +199,7 @@ data class CreateAction(
 }
 
 /**
- * An action that recursively deletes a file or directory represented by [target].
+ * An action that recursively deletes the file or directory represented by [target].
  *
  * This operation is not atomic. Deleting an individual file or directory may not be atomic either.
  *
