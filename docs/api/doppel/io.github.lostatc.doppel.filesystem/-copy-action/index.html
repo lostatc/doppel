@@ -11,7 +11,7 @@
 <h1>CopyAction</h1>
 <code><span class="keyword">data</span> <span class="keyword">class </span><span class="identifier">CopyAction</span>&nbsp;<span
         class="symbol">:</span>&nbsp;<a href="../-filesystem-action/index.html"><span class="identifier">FilesystemAction</span></a></code>
-<a href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/filesystem/FilesystemAction.kt#L150">(source)</a>
+<a href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/filesystem/FilesystemAction.kt#L154">(source)</a>
 <p><strong>Platform and version requirements:</strong> JVM</p>
 <p>An action that recursively copies a file or directory from <a href="source.html">source</a> to <a href="target.html">target</a>.
 </p>
@@ -19,6 +19,7 @@
     same filesystem.</p>
 <p>If <a href="source.html">source</a> and <a href="target.html">target</a> represent the same file, then nothing is
     copied.</p>
+<p>If the file to be copied is a symbolic link then the link itself, and not its target, is moved.</p>
 <p>Copying a file or directory is not an atomic operation. If an <a
         href="http://docs.oracle.com/javase/8/docs/api/java/io/IOException.html">IOException</a> is thrown, then the
     state of the
@@ -29,7 +30,7 @@
         There was an attempt to copy a nonexistent file.
     </li>
     <li><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.io/-file-already-exists-exception/index.html">FileAlreadyExistsException</a>:
-        The destination file already exists.
+        The destination file already exists and <a href="overwrite.html">overwrite</a> is <code>false</code>.
     </li>
     <li><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.io/-access-denied-exception/index.html">AccessDeniedException</a>:
         There was an attempt to open a directory that didn't succeed.
@@ -136,9 +137,9 @@
                     class="symbol">: </span><a
                     href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
                     class="identifier">Boolean</span></a></code>
-            <p>If a file or directory already exists at <a href="target.html">target</a>, replace it. If the directory
-                is not empty,
-                it is deleted recursively.</p>
+            <p>If a file or directory already exists at <a href="target.html">target</a>, replace it. If is is a
+                directory and it is
+                not empty, it is deleted recursively.</p>
         </td>
     </tr>
     <tr>

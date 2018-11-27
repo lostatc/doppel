@@ -9,8 +9,9 @@
         href="./index.html">PathNode</a><br/>
 <br/>
 <h1>PathNode</h1>
-<code><span class="keyword">interface </span><span class="identifier">PathNode</span></code> <a
-        href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/path/PathNode.kt#L72">(source)</a>
+<code><span class="keyword">sealed</span> <span class="keyword">class </span><span
+        class="identifier">PathNode</span></code> <a
+        href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/path/PathNode.kt#L73">(source)</a>
 <p><strong>Platform and version requirements:</strong> JVM</p>
 <p>A read-only representation of a tree of file paths.</p>
 <p>Objects of this type wrap a <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html">Path</a>
@@ -18,10 +19,10 @@
     be represented and manipulated in memory. <a href="./index.html">PathNode</a> objects are read-only, while <a
             href="../-mutable-path-node/index.html">MutablePathNode</a> objects allow the
     tree of paths to be modified.</p>
-<p>This class works like a prefix tree, where each <a href="./index.html">PathNode</a> stores only a single path segment
-    as <a href="file-name.html">fileName</a>. The
-    parent node can be accessed through the <a href="parent.html">parent</a> property and a map of child nodes can be
-    accessed through the
+<p><a href="./index.html">PathNode</a> objects work like a prefix tree, where each <a href="./index.html">PathNode</a>
+    stores only a single path segment as <a href="file-name.html">fileName</a>.
+    The parent node can be accessed through the <a href="parent.html">parent</a> property and a map of child nodes can
+    be accessed through the
     <a href="children.html">children</a> property. The full <a
             href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html">Path</a> can be accessed through the
     <a href="path.html">path</a> property.</p>
@@ -40,7 +41,6 @@
         href="-companion/of.html">of</a> which provides a DSL for specifying what the
     directory tree should look like. They can also be created by walking a directory tree in the filesystem using
     <a href="-companion/from-filesystem.html">fromFilesystem</a>.</p>
-<p><em>Warning:</em> This interface is not meant to be implemented. New members may be added in the future.</p>
 <h3>Types</h3>
 <table>
     <tbody>
@@ -51,8 +51,7 @@
         </td>
         <td>
             <code><span class="keyword">companion</span> <span class="keyword">object </span><span class="identifier">Companion</span>&nbsp;<span
-                    class="symbol">:</span>&nbsp;<a href="../-path-node-factory/index.html"><span class="identifier">PathNodeFactory</span></a></code>
-        </td>
+                    class="symbol">:</span>&nbsp;<span class="identifier">PathNodeFactory</span></code></td>
     </tr>
     </tbody>
 </table>
@@ -212,9 +211,9 @@
             <p><a href="ends-with.html">endsWith</a></p>
         </td>
         <td>
-            <code><span class="keyword">open</span> <span class="keyword">fun </span><span
-                    class="identifier">endsWith</span><span class="symbol">(</span><span class="identifier"
-                                                                                         id="io.github.lostatc.doppel.path.PathNode$endsWith(io.github.lostatc.doppel.path.PathNode)/other">other</span><span
+            <code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">endsWith</span><span
+                    class="symbol">(</span><span class="identifier"
+                                                 id="io.github.lostatc.doppel.path.PathNode$endsWith(io.github.lostatc.doppel.path.PathNode)/other">other</span><span
                     class="symbol">:</span>&nbsp;<a href="./index.html"><span
                     class="identifier">PathNode</span></a><span class="symbol">)</span><span class="symbol">: </span><a
                     href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
@@ -329,9 +328,9 @@
             <p><a href="starts-with.html">startsWith</a></p>
         </td>
         <td>
-            <code><span class="keyword">open</span> <span class="keyword">fun </span><span
-                    class="identifier">startsWith</span><span class="symbol">(</span><span class="identifier"
-                                                                                           id="io.github.lostatc.doppel.path.PathNode$startsWith(io.github.lostatc.doppel.path.PathNode)/other">other</span><span
+            <code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">startsWith</span><span
+                    class="symbol">(</span><span class="identifier"
+                                                 id="io.github.lostatc.doppel.path.PathNode$startsWith(io.github.lostatc.doppel.path.PathNode)/other">other</span><span
                     class="symbol">:</span>&nbsp;<a href="./index.html"><span
                     class="identifier">PathNode</span></a><span class="symbol">)</span><span class="symbol">: </span><a
                     href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
@@ -472,9 +471,7 @@
                     href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span
                     class="identifier">Unit</span></a><span class="symbol">)</span><span class="symbol">: </span><a
                     href="./index.html"><span class="identifier">PathNode</span></a></code>
-            <p>Constructs a new path node from the given <a
-                    href="../-path-node-factory/of.html#io.github.lostatc.doppel.path.PathNodeFactory$of(java.nio.file.Path, io.github.lostatc.doppel.path.FileType, kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/path">path</a>
-                and its children.</p>
+            <p>Constructs a new path node from the given <a href="#">path</a> and its children.</p>
             <code><span class="keyword">fun </span><span class="identifier">of</span><span class="symbol">(</span><span
                     class="identifier"
                     id="io.github.lostatc.doppel.path.PathNode.Companion$of(kotlin.String, kotlin.Array((kotlin.String)), io.github.lostatc.doppel.path.FileType, kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/firstSegment">firstSegment</span><span

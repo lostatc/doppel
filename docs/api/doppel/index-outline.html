@@ -607,8 +607,8 @@
                     class="symbol">)</span></a></a><br/>
             <a href="/home/garrett/Google Drive/Documents/Programs/doppel/docs/api/doppel/index"><a
                     href="io.github.lostatc.doppel.path/-mutable-path-node/-companion/index.html"><span class="keyword">companion</span>
-                <span class="keyword">object </span><span class="identifier">Companion</span>&nbsp;<span class="symbol">:</span>&nbsp;<a
-                        href="io.github.lostatc.doppel.path/-path-node-factory/index.html"><span class="identifier">PathNodeFactory</span></a></a></a><br/>
+                <span class="keyword">object </span><span class="identifier">Companion</span>&nbsp;<span class="symbol">:</span>&nbsp;<span
+                        class="identifier">PathNodeFactory</span></a></a><br/>
             <ul>
                 <HTML>
                 <HEAD>
@@ -753,6 +753,15 @@
                     class="identifier">ErrorHandler</span></a><span class="symbol">)</span><span
                     class="symbol">: </span><a href="io.github.lostatc.doppel.path/-path-diff/index.html"><span
                     class="identifier">PathDiff</span></a></a></a><br/>
+            <a href="/home/garrett/Google Drive/Documents/Programs/doppel/docs/api/doppel/index"><a
+                    href="io.github.lostatc.doppel.path/-mutable-path-node/ends-with.html"><span
+                    class="keyword">fun </span><span class="identifier">endsWith</span><span
+                    class="symbol">(</span><span class="identifier"
+                                                 id="io.github.lostatc.doppel.path.MutablePathNode$endsWith(io.github.lostatc.doppel.path.PathNode)/other">other</span><span
+                    class="symbol">:</span>&nbsp;<a href="io.github.lostatc.doppel.path/-path-node/index.html"><span
+                    class="identifier">PathNode</span></a><span class="symbol">)</span><span class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
+                    class="identifier">Boolean</span></a></a></a><br/>
             <a href="/home/garrett/Google Drive/Documents/Programs/doppel/docs/api/doppel/index"><a
                     href="io.github.lostatc.doppel.path/-mutable-path-node/equals.html"><span
                     class="keyword">fun </span><span class="identifier">equals</span><span class="symbol">(</span><span
@@ -910,6 +919,15 @@
                     href="io.github.lostatc.doppel.path/-mutable-path-node/same-contents-as.html"><span class="keyword">fun </span><span
                     class="identifier">sameContentsAs</span><span class="symbol">(</span><span class="identifier"
                                                                                                id="io.github.lostatc.doppel.path.MutablePathNode$sameContentsAs(io.github.lostatc.doppel.path.PathNode)/other">other</span><span
+                    class="symbol">:</span>&nbsp;<a href="io.github.lostatc.doppel.path/-path-node/index.html"><span
+                    class="identifier">PathNode</span></a><span class="symbol">)</span><span class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
+                    class="identifier">Boolean</span></a></a></a><br/>
+            <a href="/home/garrett/Google Drive/Documents/Programs/doppel/docs/api/doppel/index"><a
+                    href="io.github.lostatc.doppel.path/-mutable-path-node/starts-with.html"><span
+                    class="keyword">fun </span><span class="identifier">startsWith</span><span
+                    class="symbol">(</span><span class="identifier"
+                                                 id="io.github.lostatc.doppel.path.MutablePathNode$startsWith(io.github.lostatc.doppel.path.PathNode)/other">other</span><span
                     class="symbol">:</span>&nbsp;<a href="io.github.lostatc.doppel.path/-path-node/index.html"><span
                     class="identifier">PathNode</span></a><span class="symbol">)</span><span class="symbol">: </span><a
                     href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
@@ -1173,8 +1191,8 @@
             </HTML>
         </ul>
         <a href="/home/garrett/Google Drive/Documents/Programs/doppel/docs/api/doppel/index"><a
-                href="io.github.lostatc.doppel.path/-path-node/index.html"><span class="keyword">interface </span><span
-                class="identifier">PathNode</span></a></a><br/>
+                href="io.github.lostatc.doppel.path/-path-node/index.html"><span class="keyword">sealed</span> <span
+                class="keyword">class </span><span class="identifier">PathNode</span></a></a><br/>
         <ul>
             <HTML>
             <HEAD>
@@ -1185,8 +1203,8 @@
             <BODY>
             <a href="/home/garrett/Google Drive/Documents/Programs/doppel/docs/api/doppel/index"><a
                     href="io.github.lostatc.doppel.path/-path-node/-companion/index.html"><span class="keyword">companion</span>
-                <span class="keyword">object </span><span class="identifier">Companion</span>&nbsp;<span class="symbol">:</span>&nbsp;<a
-                        href="io.github.lostatc.doppel.path/-path-node-factory/index.html"><span class="identifier">PathNodeFactory</span></a></a></a><br/>
+                <span class="keyword">object </span><span class="identifier">Companion</span>&nbsp;<span class="symbol">:</span>&nbsp;<span
+                        class="identifier">PathNodeFactory</span></a></a><br/>
             <ul>
                 <HTML>
                 <HEAD>
@@ -1313,7 +1331,7 @@
                         href="io.github.lostatc.doppel.path/-path-diff/index.html"><span
                         class="identifier">PathDiff</span></a></a></a><br/>
             <a href="/home/garrett/Google Drive/Documents/Programs/doppel/docs/api/doppel/index"><a
-                    href="io.github.lostatc.doppel.path/-path-node/ends-with.html"><span class="keyword">open</span>
+                    href="io.github.lostatc.doppel.path/-path-node/ends-with.html"><span class="keyword">abstract</span>
                 <span class="keyword">fun </span><span class="identifier">endsWith</span><span
                         class="symbol">(</span><span class="identifier"
                                                      id="io.github.lostatc.doppel.path.PathNode$endsWith(io.github.lostatc.doppel.path.PathNode)/other">other</span><span
@@ -1473,15 +1491,14 @@
                     href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
                     class="identifier">Boolean</span></a></a></a><br/>
             <a href="/home/garrett/Google Drive/Documents/Programs/doppel/docs/api/doppel/index"><a
-                    href="io.github.lostatc.doppel.path/-path-node/starts-with.html"><span class="keyword">open</span>
-                <span class="keyword">fun </span><span class="identifier">startsWith</span><span class="symbol">(</span><span
-                        class="identifier"
-                        id="io.github.lostatc.doppel.path.PathNode$startsWith(io.github.lostatc.doppel.path.PathNode)/other">other</span><span
-                        class="symbol">:</span>&nbsp;<a href="io.github.lostatc.doppel.path/-path-node/index.html"><span
-                        class="identifier">PathNode</span></a><span class="symbol">)</span><span
-                        class="symbol">: </span><a
-                        href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
-                        class="identifier">Boolean</span></a></a></a><br/>
+                    href="io.github.lostatc.doppel.path/-path-node/starts-with.html"><span
+                    class="keyword">abstract</span> <span class="keyword">fun </span><span
+                    class="identifier">startsWith</span><span class="symbol">(</span><span class="identifier"
+                                                                                           id="io.github.lostatc.doppel.path.PathNode$startsWith(io.github.lostatc.doppel.path.PathNode)/other">other</span><span
+                    class="symbol">:</span>&nbsp;<a href="io.github.lostatc.doppel.path/-path-node/index.html"><span
+                    class="identifier">PathNode</span></a><span class="symbol">)</span><span class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
+                    class="identifier">Boolean</span></a></a></a><br/>
             <a href="/home/garrett/Google Drive/Documents/Programs/doppel/docs/api/doppel/index"><a
                     href="io.github.lostatc.doppel.path/-path-node/to-absolute-node.html"><span
                     class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">toAbsoluteNode</span><span
@@ -1535,90 +1552,6 @@
                     class="identifier">Sequence</span></a><span class="symbol">&lt;</span><a
                     href="io.github.lostatc.doppel.path/-path-node/index.html"><span class="identifier">PathNode</span></a><span
                     class="symbol">&gt;</span></a></a><br/>
-            </BODY>
-            </HTML>
-        </ul>
-        <a href="/home/garrett/Google Drive/Documents/Programs/doppel/docs/api/doppel/index"><a
-                href="io.github.lostatc.doppel.path/-path-node-factory/index.html"><span
-                class="keyword">interface </span><span class="identifier">PathNodeFactory</span></a></a><br/>
-        <ul>
-            <HTML>
-            <HEAD>
-                <meta charset="UTF-8">
-                <title>Module Contents</title>
-                <link rel="stylesheet" href="../style.css">
-            </HEAD>
-            <BODY>
-            <a href="/home/garrett/Google Drive/Documents/Programs/doppel/docs/api/doppel/index"><a
-                    href="io.github.lostatc.doppel.path/-path-node-factory/from-filesystem.html"><span class="keyword">abstract</span>
-                <span class="keyword">fun </span><span class="identifier">fromFilesystem</span><span
-                        class="symbol">(</span><span class="identifier"
-                                                     id="io.github.lostatc.doppel.path.PathNodeFactory$fromFilesystem(java.nio.file.Path, kotlin.Boolean, kotlin.Function1((java.nio.file.Path, io.github.lostatc.doppel.path.FileType)))/path">path</span><span
-                        class="symbol">:</span>&nbsp;<a
-                        href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span
-                        class="identifier">Path</span></a><span class="symbol">, </span><span class="identifier"
-                                                                                              id="io.github.lostatc.doppel.path.PathNodeFactory$fromFilesystem(java.nio.file.Path, kotlin.Boolean, kotlin.Function1((java.nio.file.Path, io.github.lostatc.doppel.path.FileType)))/recursive">recursive</span><span
-                        class="symbol">:</span>&nbsp;<a
-                        href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
-                        class="identifier">Boolean</span></a>&nbsp;<span class="symbol">=</span>&nbsp;false<span
-                        class="symbol">, </span><span class="identifier"
-                                                      id="io.github.lostatc.doppel.path.PathNodeFactory$fromFilesystem(java.nio.file.Path, kotlin.Boolean, kotlin.Function1((java.nio.file.Path, io.github.lostatc.doppel.path.FileType)))/typeFactory">typeFactory</span><span
-                        class="symbol">:</span>&nbsp;<span class="symbol">(</span><a
-                        href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span
-                        class="identifier">Path</span></a><span class="symbol">)</span>&nbsp;<span
-                        class="symbol">-&gt;</span>&nbsp;<a
-                        href="io.github.lostatc.doppel.path/-file-type/index.html"><span
-                        class="identifier">FileType</span></a>&nbsp;<span class="symbol">=</span>&nbsp;::fileTypeFromFilesystem<span
-                        class="symbol">)</span><span class="symbol">: </span><a
-                        href="io.github.lostatc.doppel.path/-path-node/index.html"><span
-                        class="identifier">PathNode</span></a></a></a><br/>
-            <a href="/home/garrett/Google Drive/Documents/Programs/doppel/docs/api/doppel/index"><a
-                    href="io.github.lostatc.doppel.path/-path-node-factory/of.html"><span
-                    class="keyword">abstract</span> <span class="keyword">fun </span><span
-                    class="identifier">of</span><span class="symbol">(</span><span class="identifier"
-                                                                                   id="io.github.lostatc.doppel.path.PathNodeFactory$of(java.nio.file.Path, io.github.lostatc.doppel.path.FileType, kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/path">path</span><span
-                    class="symbol">:</span>&nbsp;<a
-                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
-                    class="symbol">, </span><span class="identifier"
-                                                  id="io.github.lostatc.doppel.path.PathNodeFactory$of(java.nio.file.Path, io.github.lostatc.doppel.path.FileType, kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/type">type</span><span
-                    class="symbol">:</span>&nbsp;<a href="io.github.lostatc.doppel.path/-file-type/index.html"><span
-                    class="identifier">FileType</span></a>&nbsp;<span class="symbol">=</span>&nbsp;UnknownType()<span
-                    class="symbol">, </span><span class="identifier"
-                                                  id="io.github.lostatc.doppel.path.PathNodeFactory$of(java.nio.file.Path, io.github.lostatc.doppel.path.FileType, kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/init">init</span><span
-                    class="symbol">:</span>&nbsp;<a
-                    href="io.github.lostatc.doppel.path/-mutable-path-node/index.html"><span class="identifier">MutablePathNode</span></a><span
-                    class="symbol">.</span><span class="symbol">(</span><span class="symbol">)</span>&nbsp;<span
-                    class="symbol">-&gt;</span>&nbsp;<a
-                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span
-                    class="identifier">Unit</span></a>&nbsp;<span class="symbol">=</span>&nbsp;{}<span
-                    class="symbol">)</span><span class="symbol">: </span><a
-                    href="io.github.lostatc.doppel.path/-path-node/index.html"><span class="identifier">PathNode</span></a></a></a><br/>
-            <a href="/home/garrett/Google Drive/Documents/Programs/doppel/docs/api/doppel/index"><a
-                    href="io.github.lostatc.doppel.path/-path-node-factory/of.html"><span
-                    class="keyword">abstract</span> <span class="keyword">fun </span><span
-                    class="identifier">of</span><span class="symbol">(</span><span class="identifier"
-                                                                                   id="io.github.lostatc.doppel.path.PathNodeFactory$of(kotlin.String, kotlin.Array((kotlin.String)), io.github.lostatc.doppel.path.FileType, kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/firstSegment">firstSegment</span><span
-                    class="symbol">:</span>&nbsp;<a
-                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span
-                    class="identifier">String</span></a><span class="symbol">, </span><span
-                    class="keyword">vararg</span> <span class="identifier"
-                                                        id="io.github.lostatc.doppel.path.PathNodeFactory$of(kotlin.String, kotlin.Array((kotlin.String)), io.github.lostatc.doppel.path.FileType, kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/segments">segments</span><span
-                    class="symbol">:</span>&nbsp;<a
-                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span
-                    class="identifier">String</span></a><span class="symbol">, </span><span class="identifier"
-                                                                                            id="io.github.lostatc.doppel.path.PathNodeFactory$of(kotlin.String, kotlin.Array((kotlin.String)), io.github.lostatc.doppel.path.FileType, kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/type">type</span><span
-                    class="symbol">:</span>&nbsp;<a href="io.github.lostatc.doppel.path/-file-type/index.html"><span
-                    class="identifier">FileType</span></a>&nbsp;<span class="symbol">=</span>&nbsp;UnknownType()<span
-                    class="symbol">, </span><span class="identifier"
-                                                  id="io.github.lostatc.doppel.path.PathNodeFactory$of(kotlin.String, kotlin.Array((kotlin.String)), io.github.lostatc.doppel.path.FileType, kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/init">init</span><span
-                    class="symbol">:</span>&nbsp;<a
-                    href="io.github.lostatc.doppel.path/-mutable-path-node/index.html"><span class="identifier">MutablePathNode</span></a><span
-                    class="symbol">.</span><span class="symbol">(</span><span class="symbol">)</span>&nbsp;<span
-                    class="symbol">-&gt;</span>&nbsp;<a
-                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span
-                    class="identifier">Unit</span></a>&nbsp;<span class="symbol">=</span>&nbsp;{}<span
-                    class="symbol">)</span><span class="symbol">: </span><a
-                    href="io.github.lostatc.doppel.path/-path-node/index.html"><span class="identifier">PathNode</span></a></a></a><br/>
             </BODY>
             </HTML>
         </ul>
@@ -2581,8 +2514,8 @@
                     class="symbol">)</span></a></a><br/>
             <a href="/home/garrett/Google Drive/Documents/Programs/doppel/docs/api/doppel/index"><a
                     href="io.github.lostatc.doppel.path/-mutable-path-node/-companion/index.html"><span class="keyword">companion</span>
-                <span class="keyword">object </span><span class="identifier">Companion</span>&nbsp;<span class="symbol">:</span>&nbsp;<a
-                        href="io.github.lostatc.doppel.path/-path-node-factory/index.html"><span class="identifier">PathNodeFactory</span></a></a></a><br/>
+                <span class="keyword">object </span><span class="identifier">Companion</span>&nbsp;<span class="symbol">:</span>&nbsp;<span
+                        class="identifier">PathNodeFactory</span></a></a><br/>
             <ul>
                 <HTML>
                 <HEAD>
@@ -2727,6 +2660,15 @@
                     class="identifier">ErrorHandler</span></a><span class="symbol">)</span><span
                     class="symbol">: </span><a href="io.github.lostatc.doppel.path/-path-diff/index.html"><span
                     class="identifier">PathDiff</span></a></a></a><br/>
+            <a href="/home/garrett/Google Drive/Documents/Programs/doppel/docs/api/doppel/index"><a
+                    href="io.github.lostatc.doppel.path/-mutable-path-node/ends-with.html"><span
+                    class="keyword">fun </span><span class="identifier">endsWith</span><span
+                    class="symbol">(</span><span class="identifier"
+                                                 id="io.github.lostatc.doppel.path.MutablePathNode$endsWith(io.github.lostatc.doppel.path.PathNode)/other">other</span><span
+                    class="symbol">:</span>&nbsp;<a href="io.github.lostatc.doppel.path/-path-node/index.html"><span
+                    class="identifier">PathNode</span></a><span class="symbol">)</span><span class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
+                    class="identifier">Boolean</span></a></a></a><br/>
             <a href="/home/garrett/Google Drive/Documents/Programs/doppel/docs/api/doppel/index"><a
                     href="io.github.lostatc.doppel.path/-mutable-path-node/equals.html"><span
                     class="keyword">fun </span><span class="identifier">equals</span><span class="symbol">(</span><span
@@ -2884,6 +2826,15 @@
                     href="io.github.lostatc.doppel.path/-mutable-path-node/same-contents-as.html"><span class="keyword">fun </span><span
                     class="identifier">sameContentsAs</span><span class="symbol">(</span><span class="identifier"
                                                                                                id="io.github.lostatc.doppel.path.MutablePathNode$sameContentsAs(io.github.lostatc.doppel.path.PathNode)/other">other</span><span
+                    class="symbol">:</span>&nbsp;<a href="io.github.lostatc.doppel.path/-path-node/index.html"><span
+                    class="identifier">PathNode</span></a><span class="symbol">)</span><span class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
+                    class="identifier">Boolean</span></a></a></a><br/>
+            <a href="/home/garrett/Google Drive/Documents/Programs/doppel/docs/api/doppel/index"><a
+                    href="io.github.lostatc.doppel.path/-mutable-path-node/starts-with.html"><span
+                    class="keyword">fun </span><span class="identifier">startsWith</span><span
+                    class="symbol">(</span><span class="identifier"
+                                                 id="io.github.lostatc.doppel.path.MutablePathNode$startsWith(io.github.lostatc.doppel.path.PathNode)/other">other</span><span
                     class="symbol">:</span>&nbsp;<a href="io.github.lostatc.doppel.path/-path-node/index.html"><span
                     class="identifier">PathNode</span></a><span class="symbol">)</span><span class="symbol">: </span><a
                     href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
@@ -3079,8 +3030,8 @@
             </HTML>
         </ul>
         <a href="/home/garrett/Google Drive/Documents/Programs/doppel/docs/api/doppel/index"><a
-                href="io.github.lostatc.doppel.path/-path-node/index.html"><span class="keyword">interface </span><span
-                class="identifier">PathNode</span></a></a><br/>
+                href="io.github.lostatc.doppel.path/-path-node/index.html"><span class="keyword">sealed</span> <span
+                class="keyword">class </span><span class="identifier">PathNode</span></a></a><br/>
         <ul>
             <HTML>
             <HEAD>
@@ -3091,8 +3042,8 @@
             <BODY>
             <a href="/home/garrett/Google Drive/Documents/Programs/doppel/docs/api/doppel/index"><a
                     href="io.github.lostatc.doppel.path/-path-node/-companion/index.html"><span class="keyword">companion</span>
-                <span class="keyword">object </span><span class="identifier">Companion</span>&nbsp;<span class="symbol">:</span>&nbsp;<a
-                        href="io.github.lostatc.doppel.path/-path-node-factory/index.html"><span class="identifier">PathNodeFactory</span></a></a></a><br/>
+                <span class="keyword">object </span><span class="identifier">Companion</span>&nbsp;<span class="symbol">:</span>&nbsp;<span
+                        class="identifier">PathNodeFactory</span></a></a><br/>
             <ul>
                 <HTML>
                 <HEAD>
@@ -3219,7 +3170,7 @@
                         href="io.github.lostatc.doppel.path/-path-diff/index.html"><span
                         class="identifier">PathDiff</span></a></a></a><br/>
             <a href="/home/garrett/Google Drive/Documents/Programs/doppel/docs/api/doppel/index"><a
-                    href="io.github.lostatc.doppel.path/-path-node/ends-with.html"><span class="keyword">open</span>
+                    href="io.github.lostatc.doppel.path/-path-node/ends-with.html"><span class="keyword">abstract</span>
                 <span class="keyword">fun </span><span class="identifier">endsWith</span><span
                         class="symbol">(</span><span class="identifier"
                                                      id="io.github.lostatc.doppel.path.PathNode$endsWith(io.github.lostatc.doppel.path.PathNode)/other">other</span><span
@@ -3379,15 +3330,14 @@
                     href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
                     class="identifier">Boolean</span></a></a></a><br/>
             <a href="/home/garrett/Google Drive/Documents/Programs/doppel/docs/api/doppel/index"><a
-                    href="io.github.lostatc.doppel.path/-path-node/starts-with.html"><span class="keyword">open</span>
-                <span class="keyword">fun </span><span class="identifier">startsWith</span><span class="symbol">(</span><span
-                        class="identifier"
-                        id="io.github.lostatc.doppel.path.PathNode$startsWith(io.github.lostatc.doppel.path.PathNode)/other">other</span><span
-                        class="symbol">:</span>&nbsp;<a href="io.github.lostatc.doppel.path/-path-node/index.html"><span
-                        class="identifier">PathNode</span></a><span class="symbol">)</span><span
-                        class="symbol">: </span><a
-                        href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
-                        class="identifier">Boolean</span></a></a></a><br/>
+                    href="io.github.lostatc.doppel.path/-path-node/starts-with.html"><span
+                    class="keyword">abstract</span> <span class="keyword">fun </span><span
+                    class="identifier">startsWith</span><span class="symbol">(</span><span class="identifier"
+                                                                                           id="io.github.lostatc.doppel.path.PathNode$startsWith(io.github.lostatc.doppel.path.PathNode)/other">other</span><span
+                    class="symbol">:</span>&nbsp;<a href="io.github.lostatc.doppel.path/-path-node/index.html"><span
+                    class="identifier">PathNode</span></a><span class="symbol">)</span><span class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
+                    class="identifier">Boolean</span></a></a></a><br/>
             <a href="/home/garrett/Google Drive/Documents/Programs/doppel/docs/api/doppel/index"><a
                     href="io.github.lostatc.doppel.path/-path-node/to-absolute-node.html"><span
                     class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">toAbsoluteNode</span><span
@@ -3441,90 +3391,6 @@
                     class="identifier">Sequence</span></a><span class="symbol">&lt;</span><a
                     href="io.github.lostatc.doppel.path/-path-node/index.html"><span class="identifier">PathNode</span></a><span
                     class="symbol">&gt;</span></a></a><br/>
-            </BODY>
-            </HTML>
-        </ul>
-        <a href="/home/garrett/Google Drive/Documents/Programs/doppel/docs/api/doppel/index"><a
-                href="io.github.lostatc.doppel.path/-path-node-factory/index.html"><span
-                class="keyword">interface </span><span class="identifier">PathNodeFactory</span></a></a><br/>
-        <ul>
-            <HTML>
-            <HEAD>
-                <meta charset="UTF-8">
-                <title>Module Contents</title>
-                <link rel="stylesheet" href="../style.css">
-            </HEAD>
-            <BODY>
-            <a href="/home/garrett/Google Drive/Documents/Programs/doppel/docs/api/doppel/index"><a
-                    href="io.github.lostatc.doppel.path/-path-node-factory/from-filesystem.html"><span class="keyword">abstract</span>
-                <span class="keyword">fun </span><span class="identifier">fromFilesystem</span><span
-                        class="symbol">(</span><span class="identifier"
-                                                     id="io.github.lostatc.doppel.path.PathNodeFactory$fromFilesystem(java.nio.file.Path, kotlin.Boolean, kotlin.Function1((java.nio.file.Path, io.github.lostatc.doppel.path.FileType)))/path">path</span><span
-                        class="symbol">:</span>&nbsp;<a
-                        href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span
-                        class="identifier">Path</span></a><span class="symbol">, </span><span class="identifier"
-                                                                                              id="io.github.lostatc.doppel.path.PathNodeFactory$fromFilesystem(java.nio.file.Path, kotlin.Boolean, kotlin.Function1((java.nio.file.Path, io.github.lostatc.doppel.path.FileType)))/recursive">recursive</span><span
-                        class="symbol">:</span>&nbsp;<a
-                        href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
-                        class="identifier">Boolean</span></a>&nbsp;<span class="symbol">=</span>&nbsp;false<span
-                        class="symbol">, </span><span class="identifier"
-                                                      id="io.github.lostatc.doppel.path.PathNodeFactory$fromFilesystem(java.nio.file.Path, kotlin.Boolean, kotlin.Function1((java.nio.file.Path, io.github.lostatc.doppel.path.FileType)))/typeFactory">typeFactory</span><span
-                        class="symbol">:</span>&nbsp;<span class="symbol">(</span><a
-                        href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span
-                        class="identifier">Path</span></a><span class="symbol">)</span>&nbsp;<span
-                        class="symbol">-&gt;</span>&nbsp;<a
-                        href="io.github.lostatc.doppel.path/-file-type/index.html"><span
-                        class="identifier">FileType</span></a>&nbsp;<span class="symbol">=</span>&nbsp;::fileTypeFromFilesystem<span
-                        class="symbol">)</span><span class="symbol">: </span><a
-                        href="io.github.lostatc.doppel.path/-path-node/index.html"><span
-                        class="identifier">PathNode</span></a></a></a><br/>
-            <a href="/home/garrett/Google Drive/Documents/Programs/doppel/docs/api/doppel/index"><a
-                    href="io.github.lostatc.doppel.path/-path-node-factory/of.html"><span
-                    class="keyword">abstract</span> <span class="keyword">fun </span><span
-                    class="identifier">of</span><span class="symbol">(</span><span class="identifier"
-                                                                                   id="io.github.lostatc.doppel.path.PathNodeFactory$of(java.nio.file.Path, io.github.lostatc.doppel.path.FileType, kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/path">path</span><span
-                    class="symbol">:</span>&nbsp;<a
-                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
-                    class="symbol">, </span><span class="identifier"
-                                                  id="io.github.lostatc.doppel.path.PathNodeFactory$of(java.nio.file.Path, io.github.lostatc.doppel.path.FileType, kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/type">type</span><span
-                    class="symbol">:</span>&nbsp;<a href="io.github.lostatc.doppel.path/-file-type/index.html"><span
-                    class="identifier">FileType</span></a>&nbsp;<span class="symbol">=</span>&nbsp;UnknownType()<span
-                    class="symbol">, </span><span class="identifier"
-                                                  id="io.github.lostatc.doppel.path.PathNodeFactory$of(java.nio.file.Path, io.github.lostatc.doppel.path.FileType, kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/init">init</span><span
-                    class="symbol">:</span>&nbsp;<a
-                    href="io.github.lostatc.doppel.path/-mutable-path-node/index.html"><span class="identifier">MutablePathNode</span></a><span
-                    class="symbol">.</span><span class="symbol">(</span><span class="symbol">)</span>&nbsp;<span
-                    class="symbol">-&gt;</span>&nbsp;<a
-                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span
-                    class="identifier">Unit</span></a>&nbsp;<span class="symbol">=</span>&nbsp;{}<span
-                    class="symbol">)</span><span class="symbol">: </span><a
-                    href="io.github.lostatc.doppel.path/-path-node/index.html"><span class="identifier">PathNode</span></a></a></a><br/>
-            <a href="/home/garrett/Google Drive/Documents/Programs/doppel/docs/api/doppel/index"><a
-                    href="io.github.lostatc.doppel.path/-path-node-factory/of.html"><span
-                    class="keyword">abstract</span> <span class="keyword">fun </span><span
-                    class="identifier">of</span><span class="symbol">(</span><span class="identifier"
-                                                                                   id="io.github.lostatc.doppel.path.PathNodeFactory$of(kotlin.String, kotlin.Array((kotlin.String)), io.github.lostatc.doppel.path.FileType, kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/firstSegment">firstSegment</span><span
-                    class="symbol">:</span>&nbsp;<a
-                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span
-                    class="identifier">String</span></a><span class="symbol">, </span><span
-                    class="keyword">vararg</span> <span class="identifier"
-                                                        id="io.github.lostatc.doppel.path.PathNodeFactory$of(kotlin.String, kotlin.Array((kotlin.String)), io.github.lostatc.doppel.path.FileType, kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/segments">segments</span><span
-                    class="symbol">:</span>&nbsp;<a
-                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span
-                    class="identifier">String</span></a><span class="symbol">, </span><span class="identifier"
-                                                                                            id="io.github.lostatc.doppel.path.PathNodeFactory$of(kotlin.String, kotlin.Array((kotlin.String)), io.github.lostatc.doppel.path.FileType, kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/type">type</span><span
-                    class="symbol">:</span>&nbsp;<a href="io.github.lostatc.doppel.path/-file-type/index.html"><span
-                    class="identifier">FileType</span></a>&nbsp;<span class="symbol">=</span>&nbsp;UnknownType()<span
-                    class="symbol">, </span><span class="identifier"
-                                                  id="io.github.lostatc.doppel.path.PathNodeFactory$of(kotlin.String, kotlin.Array((kotlin.String)), io.github.lostatc.doppel.path.FileType, kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/init">init</span><span
-                    class="symbol">:</span>&nbsp;<a
-                    href="io.github.lostatc.doppel.path/-mutable-path-node/index.html"><span class="identifier">MutablePathNode</span></a><span
-                    class="symbol">.</span><span class="symbol">(</span><span class="symbol">)</span>&nbsp;<span
-                    class="symbol">-&gt;</span>&nbsp;<a
-                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span
-                    class="identifier">Unit</span></a>&nbsp;<span class="symbol">=</span>&nbsp;{}<span
-                    class="symbol">)</span><span class="symbol">: </span><a
-                    href="io.github.lostatc.doppel.path/-path-node/index.html"><span class="identifier">PathNode</span></a></a></a><br/>
             </BODY>
             </HTML>
         </ul>

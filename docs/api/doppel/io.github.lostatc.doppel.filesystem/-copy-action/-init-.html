@@ -45,6 +45,7 @@
     same filesystem.</p>
 <p>If <a href="source.html">source</a> and <a href="target.html">target</a> represent the same file, then nothing is
     copied.</p>
+<p>If the file to be copied is a symbolic link then the link itself, and not its target, is moved.</p>
 <p>Copying a file or directory is not an atomic operation. If an <a
         href="http://docs.oracle.com/javase/8/docs/api/java/io/IOException.html">IOException</a> is thrown, then the
     state of the
@@ -55,7 +56,7 @@
         There was an attempt to copy a nonexistent file.
     </li>
     <li><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.io/-file-already-exists-exception/index.html">FileAlreadyExistsException</a>:
-        The destination file already exists.
+        The destination file already exists and <a href="overwrite.html">overwrite</a> is <code>false</code>.
     </li>
     <li><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.io/-access-denied-exception/index.html">AccessDeniedException</a>:
         There was an attempt to open a directory that didn't succeed.

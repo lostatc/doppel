@@ -23,21 +23,17 @@
         class="symbol">.</span><span class="symbol">(</span><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a
         href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a><span
         class="symbol">)</span><span class="symbol">: </span><a href="index.html"><span class="identifier">MutablePathNode</span></a></code>
-<a href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/path/MutablePathNode.kt#L318">(source)</a>
+<a href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/path/PathNode.kt#L562">(source)</a>
 <p><strong>Platform and version requirements:</strong> JVM</p>
-<p>Constructs a new path node from the given <a
-        href="../-path-node-factory/of.html#io.github.lostatc.doppel.path.PathNodeFactory$of(java.nio.file.Path, io.github.lostatc.doppel.path.FileType, kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/path">path</a>
-    and its children.</p>
-<p>This method is a type-safe builder. It allows you to create a tree of path nodes of specified types. The
-    <a href="../-path-node-factory/of.html#io.github.lostatc.doppel.path.PathNodeFactory$of(java.nio.file.Path, io.github.lostatc.doppel.path.FileType, kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/init">init</a>
+<p>Constructs a new path node from the given <a href="#">path</a> and its children.</p>
+<p>This method is a type-safe builder. It allows you to create a tree of path nodes of specified types. The <a href="#">init</a>
     parameter accepts a lambda in which you can call builder methods like <a href="../file.html">file</a>, <a
-            href="../dir.html">dir</a>, <a href="../symlink.html">symlink</a> and
-    <a href="../unknown.html">unknown</a> to create new path nodes as children of this node. Builder methods can be
-    created for custom
-    <a href="../-file-type/index.html">FileType</a> classes using <a href="../path-node.html">pathNode</a>.</p>
-<p>The whole tree of path nodes will be associated with the same filesystem as <a
-        href="../-path-node-factory/of.html#io.github.lostatc.doppel.path.PathNodeFactory$of(java.nio.file.Path, io.github.lostatc.doppel.path.FileType, kotlin.Function1((io.github.lostatc.doppel.path.MutablePathNode, kotlin.Unit)))/path">path</a>.
-</p>
+            href="../dir.html">dir</a>, <a href="../symlink.html">symlink</a> and <a href="../unknown.html">unknown</a>
+    to
+    create new path nodes as children of this node. Builder methods can be created for custom <a
+            href="../-file-type/index.html">FileType</a>
+    implementations using <a href="../path-node.html">pathNode</a>.</p>
+<p>The whole tree of path nodes will be associated with the same filesystem as <a href="#">path</a>.</p>
 <p>Example:</p>
 <pre><code>val path = Paths.get("/", "home", "user")
 
@@ -78,11 +74,11 @@ val pathNode = PathNode.of(path) {
         class="symbol">.</span><span class="symbol">(</span><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a
         href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a><span
         class="symbol">)</span><span class="symbol">: </span><a href="index.html"><span class="identifier">MutablePathNode</span></a></code>
-<a href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/path/MutablePathNode.kt#L328">(source)</a>
+<a href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/path/PathNode.kt#L572">(source)</a>
 <p><strong>Platform and version requirements:</strong> JVM</p>
 <p>Constructs a new path node from the given path segments.</p>
-<p>This is an overload of <a href="../-path-node-factory/of.html">of</a> that accepts strings that form a path when
-    joined. The constructed file node is
+<p>This is an overload of <a href="#">of</a> that accepts strings that form a path when joined. The constructed file
+    node is
     associated with the default filesystem.</p>
 <p><strong>See Also</strong><br/>
 <p>
