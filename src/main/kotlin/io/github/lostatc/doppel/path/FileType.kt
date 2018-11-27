@@ -28,7 +28,8 @@ import java.nio.file.Path
 /**
  * A type of file in the filesystem.
  *
- * This class provides a common interface for interacting with the filesystem for different types of files.
+ * This interface is for interacting with the filesystem in a way that is dependent on the type of file being
+ * represented. Implementations of this interface are immutable.
  */
 interface FileType {
     /**
@@ -44,7 +45,7 @@ interface FileType {
     /**
      * Returns whether the files [left] and [right] have the same contents.
      *
-     * This does not follow links.
+     * Both [left] and [right] must be files of this type. This does not follow links.
      *
      * @throws [IOException] An I/O error occurred.
      */
@@ -59,6 +60,8 @@ interface FileType {
 
     /**
      * Returns the file type that is most appropriate for a given [PathNode].
+     *
+     * This method should return this object if no other [FileType] implementation is more appropriate.
      */
     fun getFileType(pathNode: PathNode): FileType = when {
         pathNode.children.isNotEmpty() -> DirectoryType()
@@ -75,7 +78,7 @@ class RegularFileType : FileType {
     /**
      * Returns whether the files [left] and [right] have the same size and checksum.
      *
-     * This does not follow links.
+     * Both [left] and [right] must be regular files. This does not follow links.
      *
      * @throws [IOException] An I/O error occurred.
      */
@@ -103,7 +106,7 @@ class DirectoryType : FileType {
     /**
      * Returns whether the directories [left] and [right] contain the same paths.
      *
-     * This does not follow links.
+     * Both [left] and [right] must be directories. This does not follow links.
      *
      * @throws [IOException] An I/O error occurred.
      */
@@ -132,7 +135,7 @@ data class SymbolicLinkType(val target: Path) : FileType {
     /**
      * Returns whether the symbolic links [left] and [right] point to the same path.
      *
-     * This does not follow links.
+     * Both [left] and [right] must be symbolic links. This does not follow links.
      *
      * @throws [IOException] An I/O error occurred.
      */

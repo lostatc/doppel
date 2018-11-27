@@ -132,16 +132,12 @@ interface PathNode {
     override fun hashCode(): Int
 
     /**
-     * Returns a copy of this object as a [PathNode] object.
-     *
-     * Children and ancestors are copied deeply.
+     * Returns a deep copy of this object as a [PathNode] object.
      */
     fun toPathNode(): PathNode
 
     /**
-     * Returns a copy of this object as a [MutablePathNode] object.
-     *
-     * Children and ancestors are copied deeply.
+     * Returns a deep copy of this object as a [MutablePathNode] object.
      */
     fun toMutablePathNode(): MutablePathNode
 
@@ -179,7 +175,7 @@ interface PathNode {
     fun endsWith(other: PathNode): Boolean = path.endsWith(other.path)
 
     /**
-     * Returns a copy of [other] which is relative to this path node.
+     * Returns a deep copy of [other] which is relative to this path node.
      *
      * If this path node is "/a/b" and [other] is "/a/b/c/d", then the resulting path node will be "c/d".
      *
@@ -191,18 +187,18 @@ interface PathNode {
     fun relativize(other: PathNode): PathNode
 
     /**
-     * Returns a copy of [other] with this node as its ancestor.
+     * Returns a deep copy of [other] with this node as its ancestor.
      *
      * If this path node is "/a/b", and [other] is "c/d", then the resulting path node will be "/a/b/c/d".
      *
-     * If [other] is absolute, then this method returns a copy of [other].
+     * If [other] is absolute, then this method returns a deep copy of [other].
      */
     fun resolve(other: PathNode): PathNode
 
     /**
-     * Returns a copy of this node that is absolute.
+     * Returns a deep copy of this node that is absolute.
      *
-     * If this node is absolute, then this method returns a copy of this node.
+     * If this node is absolute, then this method returns a deep copy of this node.
      *
      * @throws [IOException] An I/O error occurred.
      *
@@ -234,7 +230,7 @@ interface PathNode {
     /**
      * Returns whether the files represented by this path node and [other] have the same contents.
      *
-     * How files are compared is determined by the [type]. If the [type] of each node is different, this returns
+     * How file contents are compared is determined by the [type]. If the [type] of each node is different, this returns
      * `false`.
      */
     fun sameContentsAs(other: PathNode): Boolean

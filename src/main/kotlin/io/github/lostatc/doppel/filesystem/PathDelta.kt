@@ -39,7 +39,7 @@ import java.util.Objects
  */
 class PathDelta {
     /**
-     * A list of actions to apply to the filesystem.
+     * A queue of actions to apply to the filesystem.
      */
     private val actions: Deque<FilesystemAction> = LinkedList()
 
@@ -85,10 +85,10 @@ class PathDelta {
     }
 
     /**
-     * See what the filesystem will look like after all changes are applied.
+     * Shows what the filesystem will look like after all changes are applied.
      *
-     * This returns an absolute copy of [viewNode] that represents what the filesystem will look like after [apply] is
-     * called assuming there are no errors. This method does not modify the filesystem.
+     * This returns a deep copy of [viewNode] that represents what the filesystem will look like after [apply] is called
+     * assuming there are no errors. This method does not modify the filesystem.
      */
     fun view(viewNode: PathNode): PathNode {
         val outputNode = viewNode.toMutablePathNode()

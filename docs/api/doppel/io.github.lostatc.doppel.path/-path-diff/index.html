@@ -11,7 +11,7 @@
 <h1>PathDiff</h1>
 <code><span class="keyword">data</span> <span class="keyword">class </span><span
         class="identifier">PathDiff</span></code> <a
-        href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/path/PathDiff.kt#L47">(source)</a>
+        href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/path/PathDiff.kt#L46">(source)</a>
 <p><strong>Platform and version requirements:</strong> JVM</p>
 <p>An immutable comparison of two path nodes.</p>
 <h3>Constructors</h3>
@@ -90,7 +90,8 @@
                     class="identifier">Set</span></a><span class="symbol">&lt;</span><a
                     href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
                     class="symbol">&gt;</span></code>
-            <p>The relative paths of files that exist in both directory trees.</p>
+            <p>The relative paths of descendants that exist in both <a href="left.html">left</a> and <a
+                    href="right.html">right</a>.</p>
         </td>
     </tr>
     <tr>
@@ -104,8 +105,11 @@
                     class="identifier">Set</span></a><span class="symbol">&lt;</span><a
                     href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
                     class="symbol">&gt;</span></code>
-            <p>The relative paths of files that are different in both directory trees. Files are different if
-                they have the same relative path and different contents.</p>
+            <p>The relative paths of descendants that are different in both <a href="left.html">left</a> and <a
+                    href="right.html">right</a>. Files are
+                different if they have the same relative path and different contents. How file contents are compared is
+                determined by
+                the <a href="../-path-node/type.html">type</a>.</p>
         </td>
     </tr>
     <tr>
@@ -129,8 +133,8 @@
                     class="identifier">Set</span></a><span class="symbol">&lt;</span><a
                     href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
                     class="symbol">&gt;</span></code>
-            <p>The relative paths of files that were modified more recently in the left tree than in the
-                right tree.</p>
+            <p>The relative paths of descendants that were modified more recently in <a href="left.html">left</a> than
+                in <a href="right.html">right</a>.</p>
         </td>
     </tr>
     <tr>
@@ -144,7 +148,8 @@
                     class="identifier">Set</span></a><span class="symbol">&lt;</span><a
                     href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
                     class="symbol">&gt;</span></code>
-            <p>The relative paths of files that exist in the left tree but not the right tree.</p>
+            <p>The relative paths of descendants that exist in <a href="left.html">left</a> but not <a
+                    href="right.html">right</a>.</p>
         </td>
     </tr>
     <tr>
@@ -168,8 +173,8 @@
                     class="identifier">Set</span></a><span class="symbol">&lt;</span><a
                     href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
                     class="symbol">&gt;</span></code>
-            <p>The relative paths of files that were modified more recently in the right tree than in the
-                left tree.</p>
+            <p>The relative paths of descendants that were modified more recently in <a href="right.html">right</a> than
+                in <a href="left.html">left</a>.</p>
         </td>
     </tr>
     <tr>
@@ -183,7 +188,8 @@
                     class="identifier">Set</span></a><span class="symbol">&lt;</span><a
                     href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
                     class="symbol">&gt;</span></code>
-            <p>The relative paths of files that exist in the right tree but not the left tree.</p>
+            <p>The relative paths of descendants that exist in <a href="right.html">right</a> but not <a
+                    href="left.html">left</a>.</p>
         </td>
     </tr>
     <tr>
@@ -196,8 +202,11 @@
                     class="identifier">Set</span></a><span class="symbol">&lt;</span><a
                     href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
                     class="symbol">&gt;</span></code>
-            <p>The relative paths of files that are the same in both directory trees. Files are the same if they
-                have the same relative path and the same contents.</p>
+            <p>The relative paths of descendants that are the same in both <a href="left.html">left</a> and <a
+                    href="right.html">right</a>. Files are the same
+                if they have the same relative path and the same contents. How file contents are compared is determined
+                by the
+                <a href="../-path-node/type.html">type</a>.</p>
         </td>
     </tr>
     </tbody>

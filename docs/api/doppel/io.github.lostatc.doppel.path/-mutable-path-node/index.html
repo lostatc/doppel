@@ -20,7 +20,7 @@
     <a href="add-relative-descendant.html">addRelativeDescendant</a>, <a
             href="remove-descendant.html">removeDescendant</a>, <a href="remove-relative-descendant.html">removeRelativeDescendant</a>
     and <a href="clear-children.html">clearChildren</a>. Any methods or property
-    setters which modify this path node will ensure that each path node is always a child of its parent.</p>
+    setters that modify this path node will ensure that each path node is always a child of its parent.</p>
 <h3>Parameters</h3>
 <p><a name="fileName"></a>
     <code>fileName</code> - The file name for this path node.</p>
@@ -322,7 +322,7 @@
                     class="symbol">:</span>&nbsp;<a href="../-path-node/index.html"><span
                     class="identifier">PathNode</span></a><span class="symbol">)</span><span class="symbol">: </span><a
                     href="./index.html"><span class="identifier">MutablePathNode</span></a></code>
-            <p>Returns a copy of <a
+            <p>Returns a deep copy of <a
                     href="../-path-node/relativize.html#io.github.lostatc.doppel.path.PathNode$relativize(io.github.lostatc.doppel.path.PathNode)/other">other</a>
                 which is relative to this path node.</p>
         </td>
@@ -372,7 +372,7 @@
                     class="symbol">:</span>&nbsp;<a href="../-path-node/index.html"><span
                     class="identifier">PathNode</span></a><span class="symbol">)</span><span class="symbol">: </span><a
                     href="./index.html"><span class="identifier">MutablePathNode</span></a></code>
-            <p>Returns a copy of <a
+            <p>Returns a deep copy of <a
                     href="../-path-node/resolve.html#io.github.lostatc.doppel.path.PathNode$resolve(io.github.lostatc.doppel.path.PathNode)/other">other</a>
                 with this node as its ancestor.</p>
         </td>
@@ -402,7 +402,7 @@
             <code><span class="keyword">fun </span><span class="identifier">toAbsoluteNode</span><span
                     class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a
                     href="./index.html"><span class="identifier">MutablePathNode</span></a></code>
-            <p>Returns a copy of this node that is absolute.</p>
+            <p>Returns a deep copy of this node that is absolute.</p>
         </td>
     </tr>
     <tr>
@@ -413,7 +413,7 @@
             <code><span class="keyword">fun </span><span class="identifier">toMutablePathNode</span><span
                     class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a
                     href="./index.html"><span class="identifier">MutablePathNode</span></a></code>
-            <p>Returns a copy of this object as a <a href="./index.html">MutablePathNode</a> object.</p>
+            <p>Returns a deep copy of this object as a <a href="./index.html">MutablePathNode</a> object.</p>
         </td>
     </tr>
     <tr>
@@ -424,7 +424,7 @@
             <code><span class="keyword">fun </span><span class="identifier">toPathNode</span><span
                     class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a
                     href="../-path-node/index.html"><span class="identifier">PathNode</span></a></code>
-            <p>Returns a copy of this object as a <a href="../-path-node/index.html">PathNode</a> object.</p>
+            <p>Returns a deep copy of this object as a <a href="../-path-node/index.html">PathNode</a> object.</p>
         </td>
     </tr>
     <tr>
@@ -621,7 +621,7 @@
                     class="identifier">Unit</span></a>&nbsp;<span class="symbol">=</span>&nbsp;{}<span
                     class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span
                     class="identifier">MutablePathNode</span></a></code>
-            <p>Builds a path node from the given file segments with a type of <a href="../-directory-type/index.html">DirectoryType</a>.
+            <p>Builds a path node from the given path segments with a type of <a href="../-directory-type/index.html">DirectoryType</a>.
             </p>
         </td>
     </tr>
@@ -644,7 +644,7 @@
                     href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span
                     class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a
                     href="./index.html"><span class="identifier">MutablePathNode</span></a></code>
-            <p>Builds a path node from the given file segments with a type of <a
+            <p>Builds a path node from the given path segments with a type of <a
                     href="../-regular-file-type/index.html">RegularFileType</a>.</p>
         </td>
     </tr>
@@ -670,7 +670,7 @@
                     class="symbol">:</span>&nbsp;<a href="../-file-type/index.html"><span
                     class="identifier">FileType</span></a><span class="symbol">)</span><span class="symbol">: </span><a
                     href="./index.html"><span class="identifier">MutablePathNode</span></a></code>
-            <p>Builds a path node from the given file segments and file type.</p>
+            <p>Builds a path node from the given path segments and file type.</p>
         </td>
     </tr>
     <tr>
@@ -696,7 +696,7 @@
                     href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
                     class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span
                     class="identifier">MutablePathNode</span></a></code>
-            <p>Builds a path node from the given file segments with a type of <a
+            <p>Builds a path node from the given path segments with a type of <a
                     href="../-symbolic-link-type/index.html">SymbolicLinkType</a>.</p>
         </td>
     </tr>
@@ -719,7 +719,7 @@
                     href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span
                     class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a
                     href="./index.html"><span class="identifier">MutablePathNode</span></a></code>
-            <p>Builds a path node from the given file segments with a type of <a href="../-unknown-type/index.html">UnknownType</a>.
+            <p>Builds a path node from the given path segments with a type of <a href="../-unknown-type/index.html">UnknownType</a>.
             </p>
         </td>
     </tr>

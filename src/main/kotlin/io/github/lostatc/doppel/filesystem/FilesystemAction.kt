@@ -57,7 +57,7 @@ interface FilesystemAction {
     val onError: ErrorHandler
 
     /**
-     * Modifies [viewNode] to provide a view of what the filesystem will look like after [applyView] is called.
+     * Modifies [viewNode] to provide a view of what the filesystem will look like after [applyFilesystem] is called.
      *
      * After this is called, [viewNode] will match what the filesystem would look like if [applyFilesystem] were called
      * assuming there are no errors.

@@ -19,7 +19,7 @@
         href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/path/MutablePathNode.kt#L184">(source)</a>
 <p>Overrides <a href="../-path-node/resolve.html">PathNode.resolve</a></p>
 <p><strong>Platform and version requirements:</strong> JVM</p>
-<p>Returns a copy of <a
+<p>Returns a deep copy of <a
         href="../-path-node/resolve.html#io.github.lostatc.doppel.path.PathNode$resolve(io.github.lostatc.doppel.path.PathNode)/other">other</a>
     with this node as its ancestor.</p>
 <p>If this path node is "/a/b", and <a
@@ -27,7 +27,7 @@
     is "c/d", then the resulting path node will be "/a/b/c/d".</p>
 <p>If <a
         href="../-path-node/resolve.html#io.github.lostatc.doppel.path.PathNode$resolve(io.github.lostatc.doppel.path.PathNode)/other">other</a>
-    is absolute, then this method returns a copy of <a
+    is absolute, then this method returns a deep copy of <a
             href="../-path-node/resolve.html#io.github.lostatc.doppel.path.PathNode$resolve(io.github.lostatc.doppel.path.PathNode)/other">other</a>.
 </p>
 </BODY>

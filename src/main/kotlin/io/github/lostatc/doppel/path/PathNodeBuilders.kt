@@ -22,7 +22,7 @@ package io.github.lostatc.doppel.path
 import java.nio.file.Path
 
 /**
- * Builds a path node from the given file segments and file type.
+ * Builds a path node from the given path segments and file type.
  *
  * This can be used to create builder methods for use with [MutablePathNode.of] to create a tree of path nodes.
  *
@@ -41,7 +41,7 @@ fun MutablePathNode.pathNode(
 }
 
 /**
- * Builds a path node from the given file segments with a type of [RegularFileType].
+ * Builds a path node from the given path segments with a type of [RegularFileType].
  *
  * This is meant to be used with [MutablePathNode.of] to construct a tree of path nodes.
  *
@@ -52,7 +52,7 @@ fun MutablePathNode.file(firstSegment: String, vararg segments: String): Mutable
     pathNode(firstSegment, *segments, type = RegularFileType())
 
 /**
- * Builds a path node from the given file segments with a type of [DirectoryType].
+ * Builds a path node from the given path segments with a type of [DirectoryType].
  *
  * This is meant to be used with [MutablePathNode.of] to construct a tree of path nodes.
  *
@@ -70,7 +70,7 @@ fun MutablePathNode.dir(
 }
 
 /**
- * Builds a path node from the given file segments with a type of [SymbolicLinkType].
+ * Builds a path node from the given path segments with a type of [SymbolicLinkType].
  *
  * This is meant to be used with [MutablePathNode.of] to construct a tree of path nodes.
  *
@@ -82,7 +82,7 @@ fun MutablePathNode.symlink(firstSegment: String, vararg segments: String, targe
     pathNode(firstSegment, *segments, type = SymbolicLinkType(target))
 
 /**
- * Builds a path node from the given file segments with a type of [UnknownType].
+ * Builds a path node from the given path segments with a type of [UnknownType].
  *
  * This is meant to be used with [MutablePathNode.of] to construct a tree of path nodes.
  *

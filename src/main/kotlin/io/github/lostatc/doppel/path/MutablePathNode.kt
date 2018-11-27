@@ -34,7 +34,7 @@ private class Entry(override val key: Path, override val value: MutablePathNode)
  *
  * This [PathNode] implementation allows for modifying the tree of nodes in place using methods like [addDescendant],
  * [addRelativeDescendant], [removeDescendant], [removeRelativeDescendant] and [clearChildren]. Any methods or property
- * setters which modify this path node will ensure that each path node is always a child of its parent.
+ * setters that modify this path node will ensure that each path node is always a child of its parent.
  *
  * @param [fileName] The file name for this path node.
  * @param [parent] The parent node for this path node.

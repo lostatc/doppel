@@ -31,18 +31,17 @@ import java.nio.file.Path
  *
  * @property [left] The first path node to compare.
  * @property [right] The second path node to compare.
- * @property [common] The relative paths of files that exist in both directory trees.
- * @property [leftOnly] The relative paths of files that exist in the left tree but not the right tree.
- * @property [rightOnly] The relative paths of files that exist in the right tree but not the left tree.
- * @property [same] The relative paths of files that are the same in both directory trees. Files are the same if they
- * have the same relative path and the same contents.
- * @property [different] The relative paths of files that are different in both directory trees. Files are different if
- * they have the same relative path and different contents.
- * @property [leftNewer] The relative paths of files that were modified more recently in the left tree than in the
- * right tree.
- * @property [rightNewer] The relative paths of files that were modified more recently in the right tree than in the
- * left tree.
- *
+ * @property [common] The relative paths of descendants that exist in both [left] and [right].
+ * @property [leftOnly] The relative paths of descendants that exist in [left] but not [right].
+ * @property [rightOnly] The relative paths of descendants that exist in [right] but not [left].
+ * @property [same] The relative paths of descendants that are the same in both [left] and [right]. Files are the same
+ * if they have the same relative path and the same contents. How file contents are compared is determined by the
+ * [type][PathNode.type].
+ * @property [different] The relative paths of descendants that are different in both [left] and [right]. Files are
+ * different if they have the same relative path and different contents. How file contents are compared is determined by
+ * the [type][PathNode.type].
+ * @property [leftNewer] The relative paths of descendants that were modified more recently in [left] than in [right].
+ * @property [rightNewer] The relative paths of descendants that were modified more recently in [right] than in [left].
  */
 data class PathDiff(
     val left: PathNode, val right: PathNode,
@@ -56,14 +55,14 @@ data class PathDiff(
          * Constructs a new [PathDiff] from a [left] and [right] path node.
          *
          * The following exceptions can be passed to [onError]:
-         * - [NoSuchFileException] A file in one of the directories was not found in the filesystem.
+         * - [NoSuchFileException] A descendant of one of the path nodes was not found in the filesystem.
          * - [IOException]: Some other I/O error occurred.
          *
          * @param [onError] A function that is called for each I/O error that occurs and determines how to handle them.
          */
         fun fromPathNodes(left: PathNode, right: PathNode, onError: ErrorHandler = ::skipOnError): PathDiff {
-            val leftDescendants = left.descendants.keys.map { left.path.relativize(it) }.toSet()
-            val rightDescendants = right.descendants.keys.map { right.path.relativize(it) }.toSet()
+            val leftDescendants = left.relativeDescendants.keys
+            val rightDescendants = right.relativeDescendants.keys
 
             // Compare file paths.
             val common = leftDescendants intersect rightDescendants
