@@ -24,6 +24,7 @@ import io.github.lostatc.doppel.error.skipOnError
 import io.github.lostatc.doppel.path.MutablePathNode
 import io.github.lostatc.doppel.path.PathNode
 import java.io.IOException
+import java.nio.file.AtomicMoveNotSupportedException
 import java.nio.file.FileSystemLoopException
 import java.nio.file.ProviderMismatchException
 
@@ -93,17 +94,22 @@ interface FilesystemAction {
  * - [FileAlreadyExistsException]: The destination file already exists and [overwrite] is `false`.
  * - [AccessDeniedException]: There was an attempt to open a directory that didn't succeed.
  * - [FileSystemLoopException]: [followLinks] is `true` and a cycle of symbolic links was detected.
+ * - [AtomicMoveNotSupportedException]: [atomic] is `true` but the move cannot be performed as an atomic filesystem
+ *   operation.
  * - [IOException]: Some other problem occurred while moving.
  *
  * @property [source] A path node representing file or directory to move.
  * @property [target] A path node representing file or directory to move [source] to.
  * @property [overwrite] If a file or directory already exists at [target], replace it. If is is a directory and it is
  * not empty, it is deleted recursively.
+ * @property [atomic] Perform the move as an atomic filesystem operation. If this is `true`, [overwrite] is ignored. If
+ * the file at [target] exists, it is implementation-specific if it is replaced or an [IOException] is thrown.
  * @property [followLinks] Follow symbolic links when walking the directory tree.
  */
 data class MoveAction(
     val source: PathNode, val target: PathNode,
     val overwrite: Boolean = false,
+    val atomic: Boolean = false,
     val followLinks: Boolean = false,
     override val onError: ErrorHandler = ::skipOnError
 ) : FilesystemAction {
@@ -118,7 +124,10 @@ data class MoveAction(
     }
 
     override fun applyFilesystem() {
-        moveRecursively(source.path, target.path, overwrite = overwrite, followLinks = followLinks, onError = onError)
+        moveRecursively(
+            source.path, target.path,
+            overwrite = overwrite, atomic = atomic, followLinks = followLinks, onError = onError
+        )
     }
 }
 

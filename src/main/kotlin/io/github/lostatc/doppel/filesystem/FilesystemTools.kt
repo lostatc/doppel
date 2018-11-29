@@ -127,11 +127,12 @@ private fun handleWalkErrors(onError: ErrorHandler, file: Path, tryFunc: () -> U
  */
 internal fun moveRecursively(
     source: Path, target: Path,
-    overwrite: Boolean, followLinks: Boolean,
+    overwrite: Boolean, atomic: Boolean, followLinks: Boolean,
     onError: ErrorHandler
 ) {
     val copyOptions = mutableSetOf<CopyOption>()
     if (overwrite) copyOptions.add(StandardCopyOption.REPLACE_EXISTING)
+    if (atomic) copyOptions.add(StandardCopyOption.ATOMIC_MOVE)
 
     val fileVisitor = object : ErrorHandlingVisitor {
         override val onError = onError
