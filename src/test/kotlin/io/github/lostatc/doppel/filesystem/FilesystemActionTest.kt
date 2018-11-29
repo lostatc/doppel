@@ -104,11 +104,16 @@ class MoveActionTest : WordSpec() {
                 val sourceFs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
                 val targetFs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
 
-                val sourceNode = PathNode.of(sourceFs.getPath("source"))
+                val sourceNode = PathNode.of(sourceFs.getPath("source")) {
+                    file("a")
+                }
                 val targetNode = PathNode.of(targetFs.getPath("target"))
+                sourceNode.createFile(recursive = true)
+
+                val action = MoveAction(sourceNode, targetNode)
 
                 shouldThrow<ProviderMismatchException> {
-                    MoveAction(sourceNode, targetNode)
+                    action.applyFilesystem()
                 }
             }
 
@@ -233,11 +238,16 @@ class CopyActionTest : WordSpec() {
                 val sourceFs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
                 val targetFs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
 
-                val sourceNode = PathNode.of(sourceFs.getPath("source"))
+                val sourceNode = PathNode.of(sourceFs.getPath("source")) {
+                    file("a")
+                }
                 val targetNode = PathNode.of(targetFs.getPath("target"))
+                sourceNode.createFile(recursive = true)
+
+                val action = CopyAction(sourceNode, targetNode)
 
                 shouldThrow<ProviderMismatchException> {
-                    CopyAction(sourceNode, targetNode)
+                    action.applyFilesystem()
                 }
             }
 

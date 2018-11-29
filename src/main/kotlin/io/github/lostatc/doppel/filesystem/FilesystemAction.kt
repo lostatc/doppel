@@ -25,7 +25,9 @@ import io.github.lostatc.doppel.path.MutablePathNode
 import io.github.lostatc.doppel.path.PathNode
 import java.io.IOException
 import java.nio.file.AtomicMoveNotSupportedException
+import java.nio.file.FileSystem
 import java.nio.file.FileSystemLoopException
+import java.nio.file.Path
 import java.nio.file.ProviderMismatchException
 
 /**
@@ -46,6 +48,19 @@ fun removeNodeFromView(viewNode: MutablePathNode, pathNode: PathNode) {
     // We need this check in case the two nodes are associated with different filesystems.
     if (pathNode.startsWith(viewNode)) viewNode.removeDescendant(pathNode.path)
 }
+
+/**
+ * A function which converts a [Path] object to a [Path] of the given [FileSystem].
+ *
+ * This only needs to handle relative paths.
+ */
+typealias PathConverter = (Path, FileSystem) -> Path
+
+/**
+ * A [PathConverter] that returns the given path without converting it.
+ */
+@Suppress("UNUSED_PARAMETER")
+fun neverConvert(path: Path, filesystem: FileSystem): Path = path
 
 /**
  * A change to apply to the filesystem.
@@ -71,6 +86,9 @@ interface FilesystemAction {
 
     /**
      * Applies the change to the filesystem.
+     *
+     * @throws [ProviderMismatchException] The action attempted to act on two [Path] objects that are associated with
+     * different file system providers.
      */
     fun applyFilesystem()
 }
@@ -78,7 +96,8 @@ interface FilesystemAction {
 /**
  * An action that recursively moves a file or directory from [source] to [target].
  *
- * The files represented by [source] and [target] must belong to the same filesystem.
+ * By default, the files represented by [source] and [target] must belong to the same filesystem. By passing a function
+ * to [pathConverter], it is possible to recursively move files between filesystems.
  *
  * If [source] and [target] represent the same file, then nothing is moved.
  *
@@ -105,19 +124,16 @@ interface FilesystemAction {
  * @property [atomic] Perform the move as an atomic filesystem operation. If this is `true`, [overwrite] is ignored. If
  * the file at [target] exists, it is implementation-specific if it is replaced or an [IOException] is thrown.
  * @property [followLinks] Follow symbolic links when walking the directory tree.
+ * @property [pathConverter] A function which is used to convert [Path] objects between filesystems.
  */
 data class MoveAction(
     val source: PathNode, val target: PathNode,
     val overwrite: Boolean = false,
     val atomic: Boolean = false,
     val followLinks: Boolean = false,
+    val pathConverter: PathConverter = ::neverConvert,
     override val onError: ErrorHandler = ::skipOnError
 ) : FilesystemAction {
-    init {
-        if (source.path.fileSystem != target.path.fileSystem)
-            throw ProviderMismatchException("The source and target paths must belong to the same filesystem.")
-    }
-
     override fun applyView(viewNode: MutablePathNode) {
         removeNodeFromView(viewNode, source)
         addNodeToView(viewNode, target)
@@ -126,7 +142,8 @@ data class MoveAction(
     override fun applyFilesystem() {
         moveRecursively(
             source.path, target.path,
-            overwrite = overwrite, atomic = atomic, followLinks = followLinks, onError = onError
+            overwrite = overwrite, atomic = atomic, followLinks = followLinks,
+            pathConverter = pathConverter, onError = onError
         )
     }
 }
@@ -134,7 +151,8 @@ data class MoveAction(
 /**
  * An action that recursively copies a file or directory from [source] to [target].
  *
- * The files represented by [source] and [target] must belong to the same filesystem.
+ * By default, the files represented by [source] and [target] must belong to the same filesystem. By passing a function
+ * to [pathConverter], it is possible to recursively copy files between filesystems.
  *
  * If [source] and [target] represent the same file, then nothing is copied.
  *
@@ -159,19 +177,16 @@ data class MoveAction(
  * of links may not be copied.
  * @property [followLinks] Follow symbolic links when walking the directory tree and copy the targets of links instead
  * of links themselves.
+ * @property [pathConverter] A function which is used to convert [Path] objects between filesystems.
  */
 data class CopyAction(
     val source: PathNode, val target: PathNode,
     val overwrite: Boolean = false,
     val copyAttributes: Boolean = false,
     val followLinks: Boolean = false,
+    val pathConverter: PathConverter = ::neverConvert,
     override val onError: ErrorHandler = ::skipOnError
 ) : FilesystemAction {
-    init {
-        if (source.path.fileSystem != target.path.fileSystem)
-            throw ProviderMismatchException("The source and target paths must belong to the same filesystem.")
-    }
-
     override fun applyView(viewNode: MutablePathNode) {
         addNodeToView(viewNode, target)
     }
@@ -179,7 +194,8 @@ data class CopyAction(
     override fun applyFilesystem() {
         copyRecursively(
             source.path, target.path,
-            overwrite = overwrite, copyAttributes = copyAttributes, followLinks = followLinks, onError = onError
+            overwrite = overwrite, copyAttributes = copyAttributes, followLinks = followLinks,
+            pathConverter = pathConverter, onError = onError
         )
     }
 }
