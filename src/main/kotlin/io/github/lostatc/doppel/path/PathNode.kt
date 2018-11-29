@@ -197,6 +197,13 @@ sealed class PathNode {
     abstract fun resolve(other: PathNode): PathNode
 
     /**
+     * Returns a deep copy of [other] with this node as its ancestor.
+     *
+     * This is an operator method that calls [resolve].
+     */
+    abstract operator fun div(other: PathNode): PathNode
+
+    /**
      * Returns a deep copy of this node that is absolute.
      *
      * If this node is absolute, then this method returns a deep copy of this node.
@@ -437,6 +444,8 @@ class MutablePathNode(
         return childOfThisNode.descendants[fullPath] ?: childOfThisNode
     }
 
+    override operator fun div(other: PathNode): MutablePathNode = resolve(other)
+
     override fun toAbsoluteNode(): MutablePathNode {
         if (path.isAbsolute) return toMutablePathNode()
 
@@ -561,9 +570,7 @@ class MutablePathNode(
     companion object : PathNodeFactory {
         override fun of(path: Path, type: FileType, init: MutablePathNode.() -> Unit): MutablePathNode {
             val fileName = path.fileName ?: path
-            val parent = if (path.parent == null) null else of(
-                path.parent
-            )
+            val parent = if (path.parent == null) null else of(path.parent)
             val pathNode = MutablePathNode(fileName, parent, type)
             pathNode.init()
             return pathNode
@@ -584,10 +591,7 @@ class MutablePathNode(
             if (recursive) {
                 // Skip the path itself. We only want its descendants.
                 for (descendantPath in Files.walk(path).skip(1)) {
-                    val newDescendant = of(
-                        descendantPath,
-                        type = typeFactory(descendantPath)
-                    )
+                    val newDescendant = of(descendantPath, type = typeFactory(descendantPath))
                     newNode.addDescendant(newDescendant)
                 }
             }
