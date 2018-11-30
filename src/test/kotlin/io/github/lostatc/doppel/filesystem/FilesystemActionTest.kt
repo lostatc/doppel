@@ -44,7 +44,7 @@ class FilesystemActionKtTest : WordSpec() {
             "add the node if it is a descendant" {
                 val viewNode = MutablePathNode.of("/", "a")
                 val pathNode = PathNode.of("/", "a", "b")
-                addNodeToView(viewNode, pathNode)
+                addNodeToView(pathNode, viewNode)
 
                 viewNode.descendants.shouldContainKey(pathNode.path)
             }
@@ -52,7 +52,7 @@ class FilesystemActionKtTest : WordSpec() {
             "not add the node if it is not a descendant" {
                 val viewNode = MutablePathNode.of("/", "a")
                 val pathNode = PathNode.of("/", "c", "b")
-                addNodeToView(viewNode, pathNode)
+                addNodeToView(pathNode, viewNode)
 
                 viewNode.descendants.shouldNotContainKey(pathNode.path)
             }
@@ -64,7 +64,7 @@ class FilesystemActionKtTest : WordSpec() {
                 val pathNodeFs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
                 val pathNode = PathNode.of(pathNodeFs.getPath("/", "a", "b"))
 
-                addNodeToView(viewNode, pathNode)
+                addNodeToView(pathNode, viewNode)
 
                 viewNode.descendants.entries.shouldBeEmpty()
             }
@@ -76,7 +76,7 @@ class FilesystemActionKtTest : WordSpec() {
                     file("b")
                 }
                 val pathNode = PathNode.of("/", "a", "b")
-                removeNodeFromView(viewNode, pathNode)
+                removeNodeFromView(pathNode, viewNode)
 
                 viewNode.descendants.shouldNotContainKey(pathNode.path)
             }
@@ -90,7 +90,7 @@ class FilesystemActionKtTest : WordSpec() {
                 val pathNodeFs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
                 val pathNode = PathNode.of(pathNodeFs.getPath("/", "a", "b"))
 
-                removeNodeFromView(viewNode, pathNode)
+                removeNodeFromView(pathNode, viewNode)
 
                 viewNode.descendants.shouldContainKey(testPath)
             }

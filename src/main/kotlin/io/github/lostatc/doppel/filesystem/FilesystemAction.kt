@@ -35,7 +35,7 @@ import java.nio.file.ProviderMismatchException
  *
  * This function can be used to implement [FilesystemAction.applyView].
  */
-fun addNodeToView(viewNode: MutablePathNode, pathNode: PathNode) {
+fun addNodeToView(pathNode: PathNode, viewNode: MutablePathNode) {
     if (pathNode.startsWith(viewNode)) viewNode.addDescendant(pathNode.toMutablePathNode())
 }
 
@@ -44,7 +44,7 @@ fun addNodeToView(viewNode: MutablePathNode, pathNode: PathNode) {
  *
  * This function can be used to implement [FilesystemAction.applyView].
  */
-fun removeNodeFromView(viewNode: MutablePathNode, pathNode: PathNode) {
+fun removeNodeFromView(pathNode: PathNode, viewNode: MutablePathNode) {
     // We need this check in case the two nodes are associated with different filesystems.
     if (pathNode.startsWith(viewNode)) viewNode.removeDescendant(pathNode.path)
 }
@@ -135,8 +135,8 @@ data class MoveAction(
     override val onError: ErrorHandler = ::skipOnError
 ) : FilesystemAction {
     override fun applyView(viewNode: MutablePathNode) {
-        removeNodeFromView(viewNode, source)
-        addNodeToView(viewNode, target)
+        removeNodeFromView(source, viewNode)
+        addNodeToView(target, viewNode)
     }
 
     override fun applyFilesystem() {
@@ -188,7 +188,7 @@ data class CopyAction(
     override val onError: ErrorHandler = ::skipOnError
 ) : FilesystemAction {
     override fun applyView(viewNode: MutablePathNode) {
-        addNodeToView(viewNode, target)
+        addNodeToView(target, viewNode)
     }
 
     override fun applyFilesystem() {
@@ -215,7 +215,7 @@ data class CreateAction(
     override val onError: ErrorHandler = ::skipOnError
 ) : FilesystemAction {
     override fun applyView(viewNode: MutablePathNode) {
-        addNodeToView(viewNode, target)
+        addNodeToView(target, viewNode)
     }
 
     override fun applyFilesystem() {
@@ -245,7 +245,7 @@ data class DeleteAction(
     override val onError: ErrorHandler = ::skipOnError
 ) : FilesystemAction {
     override fun applyView(viewNode: MutablePathNode) {
-        removeNodeFromView(viewNode, target)
+        removeNodeFromView(target, viewNode)
     }
 
     override fun applyFilesystem() {
