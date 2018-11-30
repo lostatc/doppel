@@ -131,9 +131,14 @@ internal fun moveRecursively(
     pathConverter: PathConverter,
     onError: ErrorHandler
 ) {
-    val copyOptions = mutableSetOf<CopyOption>()
-    if (overwrite) copyOptions.add(StandardCopyOption.REPLACE_EXISTING)
-    if (atomic) copyOptions.add(StandardCopyOption.ATOMIC_MOVE)
+    val moveOptions = listOfNotNull(
+        if (overwrite) StandardCopyOption.REPLACE_EXISTING else null,
+        if (atomic) StandardCopyOption.ATOMIC_MOVE else null
+    ).toTypedArray()
+
+    val copyOptions = listOfNotNull(
+        if (overwrite) StandardCopyOption.REPLACE_EXISTING else null
+    ).toTypedArray()
 
     val fileVisitor = object : ErrorHandlingVisitor {
         override val onError = onError
@@ -144,7 +149,7 @@ internal fun moveRecursively(
             return handleWalkErrors(onError, file) {
                 // [Files.move] will not replace a non-empty directory. You need to delete it recursively.
                 if (overwrite) deleteRecursively(destFile, followLinks = followLinks, onError = onError)
-                Files.move(file, destFile, *copyOptions.toTypedArray())
+                Files.move(file, destFile, *moveOptions)
             }
         }
 
@@ -155,13 +160,16 @@ internal fun moveRecursively(
             // descendants and you can skip the subtree. If this fails, copy the directory itself and continue walking
             // its descendants.
             return try {
-                Files.move(dir, destDir, *copyOptions.toTypedArray())
+                Files.move(dir, destDir, *moveOptions)
                 FileVisitResult.SKIP_SUBTREE
             } catch (e: IOException) {
+                // An atomic move didn't happen.
+                if (atomic) return onError(dir, e).visitResult
+
                 handleWalkErrors(onError, dir) {
                     // [Files.copy] will not replace a non-empty directory. You need to delete it recursively.
                     if (overwrite) deleteRecursively(destDir, followLinks = followLinks, onError = onError)
-                    Files.copy(dir, destDir, *copyOptions.toTypedArray())
+                    Files.copy(dir, destDir, *copyOptions)
                 }
             }
         }
@@ -179,8 +187,9 @@ internal fun moveRecursively(
         }
     }
 
-    val walkOptions = mutableSetOf<FileVisitOption>()
-    if (followLinks) walkOptions.add(FileVisitOption.FOLLOW_LINKS)
+    val walkOptions = listOfNotNull(
+        if (followLinks) FileVisitOption.FOLLOW_LINKS else null
+    ).toSet()
 
     Files.walkFileTree(source, walkOptions, Int.MAX_VALUE, fileVisitor)
 }
@@ -196,10 +205,11 @@ internal fun copyRecursively(
     pathConverter: PathConverter,
     onError: ErrorHandler
 ) {
-    val copyOptions = mutableSetOf<CopyOption>()
-    if (overwrite) copyOptions.add(StandardCopyOption.REPLACE_EXISTING)
-    if (copyAttributes) copyOptions.add(StandardCopyOption.COPY_ATTRIBUTES)
-    if (!followLinks) copyOptions.add(LinkOption.NOFOLLOW_LINKS)
+    val copyOptions = listOfNotNull<CopyOption>(
+        if (overwrite) StandardCopyOption.REPLACE_EXISTING else null,
+        if (copyAttributes) StandardCopyOption.COPY_ATTRIBUTES else null,
+        if (!followLinks) LinkOption.NOFOLLOW_LINKS else null
+    ).toTypedArray()
 
     val fileVisitor = object : ErrorHandlingVisitor {
         override val onError = onError
@@ -210,7 +220,7 @@ internal fun copyRecursively(
             return handleWalkErrors(onError, file) {
                 // [Files.copy] will not replace a non-empty directory. You need to delete it recursively.
                 if (overwrite) deleteRecursively(destFile, followLinks = followLinks, onError = onError)
-                Files.copy(file, destFile, *copyOptions.toTypedArray())
+                Files.copy(file, destFile, *copyOptions)
             }
         }
 
@@ -221,7 +231,7 @@ internal fun copyRecursively(
             return handleWalkErrors(onError, dir) {
                 // [Files.copy] will not replace a non-empty directory. You need to delete it recursively.
                 if (overwrite) deleteRecursively(destDir, followLinks = followLinks, onError = onError)
-                Files.copy(dir, destDir, *copyOptions.toTypedArray())
+                Files.copy(dir, destDir, *copyOptions)
             }
         }
 
@@ -236,8 +246,9 @@ internal fun copyRecursively(
         }
     }
 
-    val walkOptions = mutableSetOf<FileVisitOption>()
-    if (followLinks) walkOptions.add(FileVisitOption.FOLLOW_LINKS)
+    val walkOptions = listOfNotNull(
+        if (followLinks) FileVisitOption.FOLLOW_LINKS else null
+    ).toSet()
 
     Files.walkFileTree(source, walkOptions, Int.MAX_VALUE, fileVisitor)
 }
@@ -262,8 +273,9 @@ internal fun deleteRecursively(path: Path, followLinks: Boolean, onError: ErrorH
             }
     }
 
-    val options = mutableSetOf<FileVisitOption>()
-    if (followLinks) options.add(FileVisitOption.FOLLOW_LINKS)
+    val walkOptions = listOfNotNull(
+        if (followLinks) FileVisitOption.FOLLOW_LINKS else null
+    ).toSet()
 
-    Files.walkFileTree(path, options, Int.MAX_VALUE, fileVisitor)
+    Files.walkFileTree(path, walkOptions, Int.MAX_VALUE, fileVisitor)
 }
