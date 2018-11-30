@@ -24,6 +24,7 @@ import com.google.common.jimfs.Jimfs
 import io.kotlintest.Description
 import io.kotlintest.Spec
 import io.kotlintest.extensions.TestListener
+import java.nio.file.FileSystem
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -33,6 +34,11 @@ import java.nio.file.Path
 val DEFAULT_JIMFS_CONFIG: Configuration = Configuration.unix().toBuilder()
     .setWorkingDirectory("/")
     .build()
+
+/**
+ * Convert a path to another filesystem of the same type.
+ */
+fun convertBasicPath(path: Path, filesystem: FileSystem): Path = filesystem.getPath(path.toString())
 
 /**
  * A test listener that creates existing and a nonexistent files for testing.
