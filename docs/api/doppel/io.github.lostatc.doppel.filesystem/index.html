@@ -96,6 +96,30 @@
     </tr>
     </tbody>
 </table>
+<h3>Type Aliases</h3>
+<table>
+    <tbody>
+    <tr>
+        <td>
+            <p><a href="-path-converter.html">PathConverter</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">typealias </span><span class="identifier">PathConverter</span>&nbsp;<span
+                    class="symbol">=</span>&nbsp;<span class="symbol">(</span><a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
+                    class="symbol">,</span>&nbsp;<a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/FileSystem.html"><span
+                    class="identifier">FileSystem</span></a><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a></code>
+            <p>A function which converts a <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html">Path</a>
+                object to a <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html">Path</a> of the
+                given <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/FileSystem.html">FileSystem</a>.
+            </p>
+        </td>
+    </tr>
+    </tbody>
+</table>
 <h3>Functions</h3>
 <table>
     <tbody>
@@ -107,24 +131,45 @@
         <td>
             <code><span class="keyword">fun </span><span class="identifier">addNodeToView</span><span
                     class="symbol">(</span><span class="identifier"
-                                                 id="io.github.lostatc.doppel.filesystem$addNodeToView(io.github.lostatc.doppel.path.MutablePathNode, io.github.lostatc.doppel.path.PathNode)/viewNode">viewNode</span><span
+                                                 id="io.github.lostatc.doppel.filesystem$addNodeToView(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.MutablePathNode)/pathNode">pathNode</span><span
+                    class="symbol">:</span>&nbsp;<a href="../io.github.lostatc.doppel.path/-path-node/index.html"><span
+                    class="identifier">PathNode</span></a><span class="symbol">, </span><span class="identifier"
+                                                                                              id="io.github.lostatc.doppel.filesystem$addNodeToView(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.MutablePathNode)/viewNode">viewNode</span><span
                     class="symbol">:</span>&nbsp;<a
                     href="../io.github.lostatc.doppel.path/-mutable-path-node/index.html"><span class="identifier">MutablePathNode</span></a><span
-                    class="symbol">, </span><span class="identifier"
-                                                  id="io.github.lostatc.doppel.filesystem$addNodeToView(io.github.lostatc.doppel.path.MutablePathNode, io.github.lostatc.doppel.path.PathNode)/pathNode">pathNode</span><span
-                    class="symbol">:</span>&nbsp;<a href="../io.github.lostatc.doppel.path/-path-node/index.html"><span
-                    class="identifier">PathNode</span></a><span class="symbol">)</span><span class="symbol">: </span><a
+                    class="symbol">)</span><span class="symbol">: </span><a
                     href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span
                     class="identifier">Unit</span></a></code>
             <p>Adds <a
-                    href="add-node-to-view.html#io.github.lostatc.doppel.filesystem$addNodeToView(io.github.lostatc.doppel.path.MutablePathNode, io.github.lostatc.doppel.path.PathNode)/pathNode">pathNode</a>
+                    href="add-node-to-view.html#io.github.lostatc.doppel.filesystem$addNodeToView(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.MutablePathNode)/pathNode">pathNode</a>
                 to
-                <a href="add-node-to-view.html#io.github.lostatc.doppel.filesystem$addNodeToView(io.github.lostatc.doppel.path.MutablePathNode, io.github.lostatc.doppel.path.PathNode)/viewNode">viewNode</a>
+                <a href="add-node-to-view.html#io.github.lostatc.doppel.filesystem$addNodeToView(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.MutablePathNode)/viewNode">viewNode</a>
                 if
-                <a href="add-node-to-view.html#io.github.lostatc.doppel.filesystem$addNodeToView(io.github.lostatc.doppel.path.MutablePathNode, io.github.lostatc.doppel.path.PathNode)/pathNode">pathNode</a>
+                <a href="add-node-to-view.html#io.github.lostatc.doppel.filesystem$addNodeToView(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.MutablePathNode)/pathNode">pathNode</a>
                 starts with <a
-                        href="add-node-to-view.html#io.github.lostatc.doppel.filesystem$addNodeToView(io.github.lostatc.doppel.path.MutablePathNode, io.github.lostatc.doppel.path.PathNode)/viewNode">viewNode</a>.
+                        href="add-node-to-view.html#io.github.lostatc.doppel.filesystem$addNodeToView(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.MutablePathNode)/viewNode">viewNode</a>.
             </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="never-convert.html">neverConvert</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">fun </span><span class="identifier">neverConvert</span><span
+                    class="symbol">(</span><span class="identifier"
+                                                 id="io.github.lostatc.doppel.filesystem$neverConvert(java.nio.file.Path, java.nio.file.FileSystem)/path">path</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
+                    class="symbol">, </span><span class="identifier"
+                                                  id="io.github.lostatc.doppel.filesystem$neverConvert(java.nio.file.Path, java.nio.file.FileSystem)/filesystem">filesystem</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/FileSystem.html"><span
+                    class="identifier">FileSystem</span></a><span class="symbol">)</span><span
+                    class="symbol">: </span><a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a></code>
+            <p>A <a href="-path-converter.html">PathConverter</a> that returns the given path without converting it.</p>
         </td>
     </tr>
     <tr>
@@ -135,23 +180,23 @@
         <td>
             <code><span class="keyword">fun </span><span class="identifier">removeNodeFromView</span><span
                     class="symbol">(</span><span class="identifier"
-                                                 id="io.github.lostatc.doppel.filesystem$removeNodeFromView(io.github.lostatc.doppel.path.MutablePathNode, io.github.lostatc.doppel.path.PathNode)/viewNode">viewNode</span><span
+                                                 id="io.github.lostatc.doppel.filesystem$removeNodeFromView(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.MutablePathNode)/pathNode">pathNode</span><span
+                    class="symbol">:</span>&nbsp;<a href="../io.github.lostatc.doppel.path/-path-node/index.html"><span
+                    class="identifier">PathNode</span></a><span class="symbol">, </span><span class="identifier"
+                                                                                              id="io.github.lostatc.doppel.filesystem$removeNodeFromView(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.MutablePathNode)/viewNode">viewNode</span><span
                     class="symbol">:</span>&nbsp;<a
                     href="../io.github.lostatc.doppel.path/-mutable-path-node/index.html"><span class="identifier">MutablePathNode</span></a><span
-                    class="symbol">, </span><span class="identifier"
-                                                  id="io.github.lostatc.doppel.filesystem$removeNodeFromView(io.github.lostatc.doppel.path.MutablePathNode, io.github.lostatc.doppel.path.PathNode)/pathNode">pathNode</span><span
-                    class="symbol">:</span>&nbsp;<a href="../io.github.lostatc.doppel.path/-path-node/index.html"><span
-                    class="identifier">PathNode</span></a><span class="symbol">)</span><span class="symbol">: </span><a
+                    class="symbol">)</span><span class="symbol">: </span><a
                     href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span
                     class="identifier">Unit</span></a></code>
             <p>Removes <a
-                    href="remove-node-from-view.html#io.github.lostatc.doppel.filesystem$removeNodeFromView(io.github.lostatc.doppel.path.MutablePathNode, io.github.lostatc.doppel.path.PathNode)/pathNode">pathNode</a>
+                    href="remove-node-from-view.html#io.github.lostatc.doppel.filesystem$removeNodeFromView(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.MutablePathNode)/pathNode">pathNode</a>
                 from
-                <a href="remove-node-from-view.html#io.github.lostatc.doppel.filesystem$removeNodeFromView(io.github.lostatc.doppel.path.MutablePathNode, io.github.lostatc.doppel.path.PathNode)/viewNode">viewNode</a>
+                <a href="remove-node-from-view.html#io.github.lostatc.doppel.filesystem$removeNodeFromView(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.MutablePathNode)/viewNode">viewNode</a>
                 if
-                <a href="remove-node-from-view.html#io.github.lostatc.doppel.filesystem$removeNodeFromView(io.github.lostatc.doppel.path.MutablePathNode, io.github.lostatc.doppel.path.PathNode)/pathNode">pathNode</a>
+                <a href="remove-node-from-view.html#io.github.lostatc.doppel.filesystem$removeNodeFromView(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.MutablePathNode)/pathNode">pathNode</a>
                 is a descendant of <a
-                        href="remove-node-from-view.html#io.github.lostatc.doppel.filesystem$removeNodeFromView(io.github.lostatc.doppel.path.MutablePathNode, io.github.lostatc.doppel.path.PathNode)/viewNode">viewNode</a>.
+                        href="remove-node-from-view.html#io.github.lostatc.doppel.filesystem$removeNodeFromView(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.MutablePathNode)/viewNode">viewNode</a>.
             </p>
         </td>
     </tr>

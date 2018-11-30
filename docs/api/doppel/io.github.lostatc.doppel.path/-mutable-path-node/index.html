@@ -12,7 +12,7 @@
 <code><span class="keyword">class </span><span class="identifier">MutablePathNode</span>&nbsp;<span
         class="symbol">:</span>&nbsp;<a href="../-path-node/index.html"><span
         class="identifier">PathNode</span></a></code> <a
-        href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/path/PathNode.kt#L283">(source)</a>
+        href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/path/PathNode.kt#L290">(source)</a>
 <p><strong>Platform and version requirements:</strong> JVM</p>
 <p>A mutable representation of a tree of file paths.</p>
 <p>This <a href="../-path-node/index.html">PathNode</a> implementation allows for modifying the tree of nodes in place
@@ -259,6 +259,22 @@
             <p>Returns an immutable representation of the difference between this directory and <a
                     href="../-path-node/diff.html#io.github.lostatc.doppel.path.PathNode$diff(io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/other">other</a>.
             </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="div.html">div</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">operator</span> <span class="keyword">fun </span><span
+                    class="identifier">div</span><span class="symbol">(</span><span class="identifier"
+                                                                                    id="io.github.lostatc.doppel.path.MutablePathNode$div(io.github.lostatc.doppel.path.PathNode)/other">other</span><span
+                    class="symbol">:</span>&nbsp;<a href="../-path-node/index.html"><span
+                    class="identifier">PathNode</span></a><span class="symbol">)</span><span class="symbol">: </span><a
+                    href="./index.html"><span class="identifier">MutablePathNode</span></a></code>
+            <p>Returns a deep copy of <a
+                    href="../-path-node/div.html#io.github.lostatc.doppel.path.PathNode$div(io.github.lostatc.doppel.path.PathNode)/other">other</a>
+                with this node as its ancestor.</p>
         </td>
     </tr>
     <tr>

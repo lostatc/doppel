@@ -11,38 +11,43 @@
         href="index.html">CopyAction</a>&nbsp;/&nbsp;<a href="./-init-.html">&lt;init&gt;</a><br/>
 <br/>
 <h1>&lt;init&gt;</h1>
-<a name="io.github.lostatc.doppel.filesystem.CopyAction$&lt;init&gt;(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Boolean, kotlin.Boolean, kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))"></a>
+<a name="io.github.lostatc.doppel.filesystem.CopyAction$&lt;init&gt;(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Boolean, kotlin.Boolean, kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )), kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))"></a>
 <code><span class="identifier">CopyAction</span><span class="symbol">(</span><span class="identifier"
-                                                                                   id="io.github.lostatc.doppel.filesystem.CopyAction$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Boolean, kotlin.Boolean, kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/source">source</span><span
+                                                                                   id="io.github.lostatc.doppel.filesystem.CopyAction$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Boolean, kotlin.Boolean, kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )), kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/source">source</span><span
         class="symbol">:</span>&nbsp;<a href="../../io.github.lostatc.doppel.path/-path-node/index.html"><span
         class="identifier">PathNode</span></a><span class="symbol">, </span><span class="identifier"
-                                                                                  id="io.github.lostatc.doppel.filesystem.CopyAction$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Boolean, kotlin.Boolean, kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/target">target</span><span
+                                                                                  id="io.github.lostatc.doppel.filesystem.CopyAction$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Boolean, kotlin.Boolean, kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )), kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/target">target</span><span
         class="symbol">:</span>&nbsp;<a href="../../io.github.lostatc.doppel.path/-path-node/index.html"><span
         class="identifier">PathNode</span></a><span class="symbol">, </span><span class="identifier"
-                                                                                  id="io.github.lostatc.doppel.filesystem.CopyAction$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Boolean, kotlin.Boolean, kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/overwrite">overwrite</span><span
+                                                                                  id="io.github.lostatc.doppel.filesystem.CopyAction$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Boolean, kotlin.Boolean, kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )), kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/overwrite">overwrite</span><span
         class="symbol">:</span>&nbsp;<a
         href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
         class="identifier">Boolean</span></a>&nbsp;<span class="symbol">=</span>&nbsp;false<span
         class="symbol">, </span><span class="identifier"
-                                      id="io.github.lostatc.doppel.filesystem.CopyAction$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Boolean, kotlin.Boolean, kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/copyAttributes">copyAttributes</span><span
+                                      id="io.github.lostatc.doppel.filesystem.CopyAction$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Boolean, kotlin.Boolean, kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )), kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/copyAttributes">copyAttributes</span><span
         class="symbol">:</span>&nbsp;<a
         href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
         class="identifier">Boolean</span></a>&nbsp;<span class="symbol">=</span>&nbsp;false<span
         class="symbol">, </span><span class="identifier"
-                                      id="io.github.lostatc.doppel.filesystem.CopyAction$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Boolean, kotlin.Boolean, kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/followLinks">followLinks</span><span
+                                      id="io.github.lostatc.doppel.filesystem.CopyAction$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Boolean, kotlin.Boolean, kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )), kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/followLinks">followLinks</span><span
         class="symbol">:</span>&nbsp;<a
         href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
         class="identifier">Boolean</span></a>&nbsp;<span class="symbol">=</span>&nbsp;false<span
         class="symbol">, </span><span class="identifier"
-                                      id="io.github.lostatc.doppel.filesystem.CopyAction$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Boolean, kotlin.Boolean, kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/onError">onError</span><span
+                                      id="io.github.lostatc.doppel.filesystem.CopyAction$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Boolean, kotlin.Boolean, kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )), kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/pathConverter">pathConverter</span><span
+        class="symbol">:</span>&nbsp;<a href="../-path-converter.html"><span class="identifier">PathConverter</span></a>&nbsp;<span
+        class="symbol">=</span>&nbsp;::neverConvert<span class="symbol">, </span><span class="identifier"
+                                                                                       id="io.github.lostatc.doppel.filesystem.CopyAction$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Boolean, kotlin.Boolean, kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )), kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/onError">onError</span><span
         class="symbol">:</span>&nbsp;<a href="../../io.github.lostatc.doppel.error/-error-handler.html"><span
         class="identifier">ErrorHandler</span></a>&nbsp;<span class="symbol">=</span>&nbsp;::skipOnError<span
         class="symbol">)</span></code>
 <p><strong>Platform and version requirements:</strong> JVM</p>
 <p>An action that recursively copies a file or directory from <a href="source.html">source</a> to <a href="target.html">target</a>.
 </p>
-<p>The files represented by <a href="source.html">source</a> and <a href="target.html">target</a> must belong to the
-    same filesystem.</p>
+<p>By default, the files represented by <a href="source.html">source</a> and <a href="target.html">target</a> must
+    belong to the same filesystem. By passing a function
+    to <a href="path-converter.html">pathConverter</a>, it is possible to recursively copy files between filesystems.
+</p>
 <p>If <a href="source.html">source</a> and <a href="target.html">target</a> represent the same file, then nothing is
     copied.</p>
 <p>If the file to be copied is a symbolic link then the link itself, and not its target, is moved.</p>
