@@ -19,7 +19,8 @@
 
 package io.github.lostatc.doppel.filesystem
 
-import io.github.lostatc.doppel.error.ErrorHandler
+import io.github.lostatc.doppel.handlers.ErrorHandler
+import io.github.lostatc.doppel.handlers.PathConverter
 import java.io.IOException
 import java.nio.file.CopyOption
 import java.nio.file.FileVisitOption

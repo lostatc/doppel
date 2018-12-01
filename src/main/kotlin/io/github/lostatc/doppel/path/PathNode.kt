@@ -19,9 +19,9 @@
 
 package io.github.lostatc.doppel.path
 
-import io.github.lostatc.doppel.error.ErrorHandler
-import io.github.lostatc.doppel.error.ErrorHandlerAction
-import io.github.lostatc.doppel.error.skipOnError
+import io.github.lostatc.doppel.handlers.ErrorHandler
+import io.github.lostatc.doppel.handlers.ErrorHandlerAction
+import io.github.lostatc.doppel.handlers.skipOnError
 import io.github.lostatc.doppel.path.PathNode.Companion.fromFilesystem
 import io.github.lostatc.doppel.path.PathNode.Companion.of
 import java.io.IOException

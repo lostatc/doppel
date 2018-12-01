@@ -19,7 +19,7 @@
 
 package io.github.lostatc.doppel.filesystem
 
-import io.github.lostatc.doppel.error.ErrorHandler
+import io.github.lostatc.doppel.handlers.ErrorHandler
 import io.github.lostatc.doppel.path.PathNode
 import java.util.Deque
 import java.util.LinkedList

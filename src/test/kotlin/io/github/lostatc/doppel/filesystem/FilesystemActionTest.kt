@@ -20,8 +20,8 @@
 package io.github.lostatc.doppel.filesystem
 
 import com.google.common.jimfs.Jimfs
-import io.github.lostatc.doppel.error.skipOnError
-import io.github.lostatc.doppel.error.throwOnError
+import io.github.lostatc.doppel.handlers.skipOnError
+import io.github.lostatc.doppel.handlers.throwOnError
 import io.github.lostatc.doppel.path.MutablePathNode
 import io.github.lostatc.doppel.path.PathNode
 import io.github.lostatc.doppel.path.dir

@@ -17,7 +17,7 @@
  * along with doppel.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.lostatc.doppel.error
+package io.github.lostatc.doppel.handlers
 
 import java.nio.file.FileVisitResult
 import java.nio.file.Path
