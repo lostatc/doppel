@@ -64,7 +64,7 @@ enum class WalkDirection {
  * [type] of a node is a regular file, then it will change to a directory if children are added. Custom file types with
  * custom behavior can be created by implementing [FileType].
  *
- * You can use [diff] to get a comparision of two [PathNode] objects.
+ * You can use [PathDiff] to get a comparision of two [PathNode] objects.
  *
  * [PathNode] objects can be created using the builder method [of] which provides a DSL for specifying what the
  * directory tree should look like. They can also be created by walking a directory tree in the filesystem using
@@ -213,18 +213,6 @@ sealed class PathNode {
      * @see [Path.toAbsolutePath]
      */
     abstract fun toAbsoluteNode(): PathNode
-
-    /**
-     * Returns an immutable representation of the difference between this directory and [other].
-     *
-     * The following exceptions can be passed to [onError]:
-     * - [NoSuchFileException] A file in one of the directories was not found in the filesystem.
-     * - [IOException]: Some other I/O error occurred.
-     *
-     * @param [other] The path node to compare this node with.
-     * @param [onError] A function that is called for each error that occurs and determines how to handle them.
-     */
-    abstract fun diff(other: PathNode, onError: ErrorHandler = ::skipOnError): PathDiff
 
     /**
      * Returns whether the file represented by this path node exists in the filesystem.
@@ -452,9 +440,6 @@ class MutablePathNode(
         val newAncestor = MutablePathNode.of(root.path.toAbsolutePath())
         return newAncestor.parent?.resolve(this) ?: toMutablePathNode()
     }
-
-    override fun diff(other: PathNode, onError: ErrorHandler): PathDiff =
-        PathDiff.fromNodes(this, other, onError)
 
     override fun exists(checkType: Boolean, recursive: Boolean): Boolean {
         val fileExists = if (checkType) type.checkType(path) else Files.exists(path)
