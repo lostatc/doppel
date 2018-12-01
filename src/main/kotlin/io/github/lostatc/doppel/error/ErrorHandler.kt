@@ -19,14 +19,15 @@
 
 package io.github.lostatc.doppel.error
 
-import java.io.IOException
 import java.nio.file.FileVisitResult
 import java.nio.file.Path
 
 /**
  * A value which determines how an error that occurs during a filesystem operation is handled.
+ *
+ * @property [visitResult] The corresponding [FileVisitResult] to return when walking a file tree.
  */
-enum class ErrorHandlerAction(internal val visitResult: FileVisitResult) {
+enum class ErrorHandlerAction(val visitResult: FileVisitResult) {
     /**
      * Skip the file that caused the error.
      */
@@ -45,26 +46,26 @@ enum class ErrorHandlerAction(internal val visitResult: FileVisitResult) {
  * value which determines how that error is handled. If the error involves both a source file and a target file, then
  * the source file is passed in.
  */
-typealias ErrorHandler = (Path, IOException) -> ErrorHandlerAction
+typealias ErrorHandler = (Path, Exception) -> ErrorHandlerAction
 
 /**
  * Handles filesystem errors by always skipping the file that caused the error.
  */
 @Suppress("UNUSED_PARAMETER")
-fun skipOnError(file: Path, exception: IOException): ErrorHandlerAction =
+fun skipOnError(file: Path, exception: Exception): ErrorHandlerAction =
     ErrorHandlerAction.SKIP
 
 /**
  * Handles filesystem errors by always terminating the operation when there is an error.
  */
 @Suppress("UNUSED_PARAMETER")
-fun terminateOnError(file: Path, exception: IOException): ErrorHandlerAction =
+fun terminateOnError(file: Path, exception: Exception): ErrorHandlerAction =
     ErrorHandlerAction.TERMINATE
 
 /**
  * Handles filesystem errors by always throwing the exception.
  */
 @Suppress("UNUSED_PARAMETER")
-fun throwOnError(file: Path, exception: IOException): Nothing {
+fun throwOnError(file: Path, exception: Exception): Nothing {
     throw exception
 }

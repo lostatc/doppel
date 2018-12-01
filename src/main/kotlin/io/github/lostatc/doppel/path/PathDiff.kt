@@ -58,7 +58,7 @@ data class PathDiff(
          * - [NoSuchFileException] A descendant of one of the path nodes was not found in the filesystem.
          * - [IOException]: Some other I/O error occurred.
          *
-         * @param [onError] A function that is called for each I/O error that occurs and determines how to handle them.
+         * @param [onError] A function that is called for each error that occurs and determines how to handle them.
          */
         fun fromPathNodes(left: PathNode, right: PathNode, onError: ErrorHandler = ::skipOnError): PathDiff {
             val leftDescendants = left.relativeDescendants.keys

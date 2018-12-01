@@ -26,6 +26,7 @@ import java.nio.file.FileVisitOption
 import java.nio.file.FileVisitResult
 import java.nio.file.FileVisitor
 import java.nio.file.Files
+import java.nio.file.InvalidPathException
 import java.nio.file.LinkOption
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
@@ -144,7 +145,11 @@ internal fun moveRecursively(
         override val onError = onError
 
         override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
-            val destFile = target.resolve(pathConverter(source.relativize(file), target.fileSystem))
+            val destFile = try {
+                target.resolve(pathConverter(source.relativize(file), target.fileSystem))
+            } catch (e: InvalidPathException) {
+                return onError(file, e).visitResult
+            }
 
             return handleWalkErrors(onError, file) {
                 // [Files.move] will not replace a non-empty directory. You need to delete it recursively.
@@ -154,7 +159,11 @@ internal fun moveRecursively(
         }
 
         override fun preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult {
-            val destDir = target.resolve(pathConverter(source.relativize(dir), target.fileSystem))
+            val destDir = try {
+                target.resolve(pathConverter(source.relativize(dir), target.fileSystem))
+            } catch (e: InvalidPathException) {
+                return onError(dir, e).visitResult
+            }
 
             // Attempt to move the whole directory in one operation. If this succeeds, there's no need to move its
             // descendants and you can skip the subtree. If this fails, copy the directory itself and continue walking
@@ -175,7 +184,11 @@ internal fun moveRecursively(
         }
 
         override fun postVisitDirectory(dir: Path, exc: IOException?): FileVisitResult {
-            val destDir = target.resolve(pathConverter(source.relativize(dir), target.fileSystem))
+            val destDir = try {
+                target.resolve(pathConverter(source.relativize(dir), target.fileSystem))
+            } catch (e: InvalidPathException) {
+                return onError(dir, e).visitResult
+            }
 
             // Adding files to the directory may change its attributes, so they need to be copied after it is visited.
             // The directory must be removed from [source] after all its contents have been moved.
@@ -215,7 +228,11 @@ internal fun copyRecursively(
         override val onError = onError
 
         override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
-            val destFile = target.resolve(pathConverter(source.relativize(file), target.fileSystem))
+            val destFile = try {
+                target.resolve(pathConverter(source.relativize(file), target.fileSystem))
+            } catch (e: InvalidPathException) {
+                return onError(file, e).visitResult
+            }
 
             return handleWalkErrors(onError, file) {
                 // [Files.copy] will not replace a non-empty directory. You need to delete it recursively.
@@ -225,7 +242,11 @@ internal fun copyRecursively(
         }
 
         override fun preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult {
-            val destDir = target.resolve(pathConverter(source.relativize(dir), target.fileSystem))
+            val destDir = try {
+                target.resolve(pathConverter(source.relativize(dir), target.fileSystem))
+            } catch (e: InvalidPathException) {
+                return onError(dir, e).visitResult
+            }
 
             // Copy the directory itself with its attributes if necessary.
             return handleWalkErrors(onError, dir) {
@@ -236,7 +257,11 @@ internal fun copyRecursively(
         }
 
         override fun postVisitDirectory(dir: Path, exc: IOException?): FileVisitResult {
-            val destDir = target.resolve(pathConverter(source.relativize(dir), target.fileSystem))
+            val destDir = try {
+                target.resolve(pathConverter(source.relativize(dir), target.fileSystem))
+            } catch (e: InvalidPathException) {
+                return onError(dir, e).visitResult
+            }
 
             // Adding files to the directory may change its attributes, so they need to be copied after it is visited.
             return handleWalkErrors(onError, dir) {

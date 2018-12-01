@@ -222,7 +222,7 @@ sealed class PathNode {
      * - [IOException]: Some other I/O error occurred.
      *
      * @param [other] The path node to compare this node with.
-     * @param [onError] A function that is called for each I/O error that occurs and determines how to handle them.
+     * @param [onError] A function that is called for each error that occurs and determines how to handle them.
      */
     abstract fun diff(other: PathNode, onError: ErrorHandler = ::skipOnError): PathDiff
 
@@ -252,7 +252,7 @@ sealed class PathNode {
      * - [IOException]: Some I/O error occurred while creating the file.
      *
      * @param [recursive] Create this file and all its descendants.
-     * @param [onError] A function that is called for each I/O error that occurs and determines how to handle them.
+     * @param [onError] A function that is called for each error that occurs and determines how to handle them.
      */
     abstract fun createFile(recursive: Boolean = false, onError: ErrorHandler = ::skipOnError)
 

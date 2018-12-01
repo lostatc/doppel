@@ -21,6 +21,7 @@ package io.github.lostatc.doppel.filesystem
 
 import com.google.common.jimfs.Jimfs
 import io.github.lostatc.doppel.error.skipOnError
+import io.github.lostatc.doppel.error.throwOnError
 import io.github.lostatc.doppel.path.MutablePathNode
 import io.github.lostatc.doppel.path.PathNode
 import io.github.lostatc.doppel.path.dir
@@ -36,7 +37,7 @@ import io.kotlintest.matchers.maps.shouldNotContainKey
 import io.kotlintest.shouldThrow
 import io.kotlintest.specs.WordSpec
 import java.nio.file.Files
-import java.nio.file.ProviderMismatchException
+import java.nio.file.InvalidPathException
 
 class FilesystemActionKtTest : WordSpec() {
     init {
@@ -111,9 +112,9 @@ class MoveActionTest : WordSpec() {
                 val targetNode = PathNode.of(targetFs.getPath("target"))
                 sourceNode.createFile(recursive = true)
 
-                val action = MoveAction(sourceNode, targetNode)
+                val action = MoveAction(sourceNode, targetNode, onError = ::throwOnError)
 
-                shouldThrow<ProviderMismatchException> {
+                shouldThrow<InvalidPathException> {
                     action.applyFilesystem()
                 }
             }
@@ -298,9 +299,9 @@ class CopyActionTest : WordSpec() {
                 val targetNode = PathNode.of(targetFs.getPath("target"))
                 sourceNode.createFile(recursive = true)
 
-                val action = CopyAction(sourceNode, targetNode)
+                val action = CopyAction(sourceNode, targetNode, onError = ::throwOnError)
 
-                shouldThrow<ProviderMismatchException> {
+                shouldThrow<InvalidPathException> {
                     action.applyFilesystem()
                 }
             }

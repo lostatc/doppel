@@ -27,8 +27,8 @@ import java.io.IOException
 import java.nio.file.AtomicMoveNotSupportedException
 import java.nio.file.FileSystem
 import java.nio.file.FileSystemLoopException
+import java.nio.file.InvalidPathException
 import java.nio.file.Path
-import java.nio.file.ProviderMismatchException
 
 /**
  * Adds [pathNode] to [viewNode] if [pathNode] starts with [viewNode].
@@ -52,15 +52,26 @@ fun removeNodeFromView(pathNode: PathNode, viewNode: MutablePathNode) {
 /**
  * A function which converts a [Path] object to a [Path] of the given [FileSystem].
  *
- * This only needs to handle relative paths.
+ * This is only required to handle relative paths.
+ *
+ * @return A [Path] that is equivalent to the given [Path] and associated with the given [FileSystem].
+ *
+ * @throws [InvalidPathException] The given [Path] cannot be converted to a [Path] of the given [FileSystem].
  */
 typealias PathConverter = (Path, FileSystem) -> Path
 
 /**
- * A [PathConverter] that returns the given path without converting it.
+ * A [PathConverter] that doesn't convert paths between filesystems.
+ *
+ * @throws [InvalidPathException] [path] is not associated with [filesystem].
  */
-@Suppress("UNUSED_PARAMETER")
-fun neverConvert(path: Path, filesystem: FileSystem): Path = path
+fun neverConvert(path: Path, filesystem: FileSystem): Path {
+    if (path.fileSystem == filesystem) {
+        return path
+    } else {
+        throw InvalidPathException(path.toString(), "The given path can not be converted to the given filesystem.")
+    }
+}
 
 /**
  * A change to apply to the filesystem.
@@ -86,9 +97,6 @@ interface FilesystemAction {
 
     /**
      * Applies the change to the filesystem.
-     *
-     * @throws [ProviderMismatchException] The action attempted to act on two [Path] objects that are associated with
-     * different file system providers.
      */
     fun applyFilesystem()
 }
@@ -109,13 +117,14 @@ interface FilesystemAction {
  * not defined.
  *
  * The following exceptions can be passed to [onError]:
+ * - [InvalidPathException]: A path could not be converted by [pathConverter].
  * - [NoSuchFileException]: There was an attempt to move a nonexistent file.
  * - [FileAlreadyExistsException]: The destination file already exists and [overwrite] is `false`.
  * - [AccessDeniedException]: There was an attempt to open a directory that didn't succeed.
  * - [FileSystemLoopException]: [followLinks] is `true` and a cycle of symbolic links was detected.
  * - [AtomicMoveNotSupportedException]: [atomic] is `true` but the move cannot be performed as an atomic filesystem
  *   operation.
- * - [IOException]: Some other problem occurred while moving.
+ * - [IOException]: Some other I/O error occurred while moving.
  *
  * @property [source] A path node representing file or directory to move.
  * @property [target] A path node representing file or directory to move [source] to.
@@ -162,11 +171,12 @@ data class MoveAction(
  * filesystem is undefined.
  *
  * The following exceptions can be passed to [onError]:
+ * - [InvalidPathException]: A path could not be converted by [pathConverter].
  * - [NoSuchFileException]: There was an attempt to copy a nonexistent file.
  * - [FileAlreadyExistsException]: The destination file already exists and [overwrite] is `false`.
  * - [AccessDeniedException]: There was an attempt to open a directory that didn't succeed.
  * - [FileSystemLoopException]: [followLinks] is `true` and a cycle of symbolic links was detected.
- * - [IOException]: Some other problem occurred while copying.
+ * - [IOException]: Some other I/O error occurred while copying.
  *
  * @property [source] A path node representing the file or directory to copy.
  * @property [target] A path node representing the file or directory to copy [source] to.
@@ -204,7 +214,7 @@ data class CopyAction(
  * An action that creates the file represented by [target].
  *
  * The following exceptions can be passed to [onError]:
- * - [IOException]: Some problem occurred while creating the file.
+ * - [IOException]: Some I/O error occurred while creating the file.
  *
  * @property [target] The path node representing the file to create.
  * @property [recursive] Create this file and all its descendants.
@@ -234,7 +244,7 @@ data class CreateAction(
  * - [NoSuchFileException]: There was an attempt to delete a nonexistent file.
  * - [AccessDeniedException]: There was an attempt to open a directory that didn't succeed.
  * - [FileSystemLoopException]: [followLinks] is `true` and a cycle of symbolic links was detected.
- * - [IOException]: Some other problem occurred while deleting.
+ * - [IOException]: Some other I/O error occurred while deleting.
  *
  * @property [target] A path node representing the file or directory to delete.
  * @property [followLinks] Follow symbolic links when walking the directory tree.
