@@ -1,6 +1,6 @@
 $dokka.format:html
 $dokka.linkExtension:html
 
-io.github.lostatc.doppel.error
 io.github.lostatc.doppel.filesystem
+io.github.lostatc.doppel.handlers
 io.github.lostatc.doppel.path

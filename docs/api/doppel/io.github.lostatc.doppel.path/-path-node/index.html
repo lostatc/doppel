@@ -36,7 +36,8 @@
     <a href="type.html">type</a> of a node is a regular file, then it will change to a directory if children are added.
     Custom file types with
     custom behavior can be created by implementing <a href="../-file-type/index.html">FileType</a>.</p>
-<p>You can use <a href="diff.html">diff</a> to get a comparision of two <a href="./index.html">PathNode</a> objects.</p>
+<p>You can use <a href="../-path-diff/index.html">PathDiff</a> to get a comparision of two <a href="./index.html">PathNode</a>
+    objects.</p>
 <p><a href="./index.html">PathNode</a> objects can be created using the builder method <a
         href="-companion/of.html">of</a> which provides a DSL for specifying what the
     directory tree should look like. They can also be created by walking a directory tree in the filesystem using
@@ -171,39 +172,19 @@
         <td>
             <code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">createFile</span><span
                     class="symbol">(</span><span class="identifier"
-                                                 id="io.github.lostatc.doppel.path.PathNode$createFile(kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/recursive">recursive</span><span
+                                                 id="io.github.lostatc.doppel.path.PathNode$createFile(kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)))/recursive">recursive</span><span
                     class="symbol">:</span>&nbsp;<a
                     href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
                     class="identifier">Boolean</span></a>&nbsp;<span class="symbol">=</span>&nbsp;false<span
                     class="symbol">, </span><span class="identifier"
-                                                  id="io.github.lostatc.doppel.path.PathNode$createFile(kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/onError">onError</span><span
+                                                  id="io.github.lostatc.doppel.path.PathNode$createFile(kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)))/onError">onError</span><span
                     class="symbol">:</span>&nbsp;<a
-                    href="../../io.github.lostatc.doppel.error/-error-handler.html"><span class="identifier">ErrorHandler</span></a>&nbsp;<span
+                    href="../../io.github.lostatc.doppel.handlers/-error-handler.html"><span class="identifier">ErrorHandler</span></a>&nbsp;<span
                     class="symbol">=</span>&nbsp;::skipOnError<span class="symbol">)</span><span
                     class="symbol">: </span><a
                     href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span
                     class="identifier">Unit</span></a></code>
             <p>Creates the file represented by this path node in the filesystem.</p>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <p><a href="diff.html">diff</a></p>
-        </td>
-        <td>
-            <code><span class="keyword">abstract</span> <span class="keyword">fun </span><span
-                    class="identifier">diff</span><span class="symbol">(</span><span class="identifier"
-                                                                                     id="io.github.lostatc.doppel.path.PathNode$diff(io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/other">other</span><span
-                    class="symbol">:</span>&nbsp;<a href="./index.html"><span
-                    class="identifier">PathNode</span></a><span class="symbol">, </span><span class="identifier"
-                                                                                              id="io.github.lostatc.doppel.path.PathNode$diff(io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/onError">onError</span><span
-                    class="symbol">:</span>&nbsp;<a
-                    href="../../io.github.lostatc.doppel.error/-error-handler.html"><span class="identifier">ErrorHandler</span></a>&nbsp;<span
-                    class="symbol">=</span>&nbsp;::skipOnError<span class="symbol">)</span><span
-                    class="symbol">: </span><a href="../-path-diff/index.html"><span class="identifier">PathDiff</span></a></code>
-            <p>Returns an immutable representation of the difference between this directory and <a
-                    href="diff.html#io.github.lostatc.doppel.path.PathNode$diff(io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/other">other</a>.
-            </p>
         </td>
     </tr>
     <tr>

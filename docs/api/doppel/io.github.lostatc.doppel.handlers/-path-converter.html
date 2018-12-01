@@ -1,0 +1,36 @@
+<HTML>
+<HEAD>
+    <meta charset="UTF-8">
+    <title>PathConverter - doppel</title>
+    <link rel="stylesheet" href="../../style.css">
+</HEAD>
+<BODY>
+<a href="../index.html">doppel</a>&nbsp;/&nbsp;<a href="index.html">io.github.lostatc.doppel.handlers</a>&nbsp;/&nbsp;<a
+        href="./-path-converter.html">PathConverter</a><br/>
+<br/>
+<h1>PathConverter</h1>
+<code><span class="keyword">typealias </span><span class="identifier">PathConverter</span>&nbsp;<span
+        class="symbol">=</span>&nbsp;<span class="symbol">(</span><a
+        href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
+        class="symbol">,</span>&nbsp;<a
+        href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/FileSystem.html"><span class="identifier">FileSystem</span></a><span
+        class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a
+        href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a></code>
+<a href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/handlers/PathConverter.kt#L35">(source)</a>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>A function which converts a <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html">Path</a>
+    object to a <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html">Path</a> of the given <a
+            href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/FileSystem.html">FileSystem</a>.</p>
+<p>This is only required to handle relative paths.</p>
+<h3>Exceptions</h3>
+<p><a name="InvalidPathException"></a>
+    <code>InvalidPathException</code> - The given <a
+            href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html">Path</a> cannot be converted to a <a
+            href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html">Path</a> of the given <a
+            href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/FileSystem.html">FileSystem</a>.</p>
+<p><strong>Return</strong><br/>
+    A <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html">Path</a> that is equivalent to the
+    given <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html">Path</a> and associated with the
+    given <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/FileSystem.html">FileSystem</a>.</p>
+</BODY>
+</HTML>

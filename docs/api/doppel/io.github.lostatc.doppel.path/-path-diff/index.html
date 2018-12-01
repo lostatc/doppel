@@ -11,7 +11,7 @@
 <h1>PathDiff</h1>
 <code><span class="keyword">data</span> <span class="keyword">class </span><span
         class="identifier">PathDiff</span></code> <a
-        href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/path/PathDiff.kt#L46">(source)</a>
+        href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/path/PathDiff.kt#L49">(source)</a>
 <p><strong>Platform and version requirements:</strong> JVM</p>
 <p>An immutable comparison of two path nodes.</p>
 <h3>Constructors</h3>
@@ -216,26 +216,30 @@
     <tbody>
     <tr>
         <td>
-            <p><a href="from-path-nodes.html">fromPathNodes</a></p>
+            <p><a href="from-nodes.html">fromNodes</a></p>
         </td>
         <td>
-            <code><span class="keyword">fun </span><span class="identifier">fromPathNodes</span><span
+            <code><span class="keyword">fun </span><span class="identifier">fromNodes</span><span
                     class="symbol">(</span><span class="identifier"
-                                                 id="io.github.lostatc.doppel.path.PathDiff.Companion$fromPathNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/left">left</span><span
+                                                 id="io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)), kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )))/left">left</span><span
                     class="symbol">:</span>&nbsp;<a href="../-path-node/index.html"><span
                     class="identifier">PathNode</span></a><span class="symbol">, </span><span class="identifier"
-                                                                                              id="io.github.lostatc.doppel.path.PathDiff.Companion$fromPathNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/right">right</span><span
+                                                                                              id="io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)), kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )))/right">right</span><span
                     class="symbol">:</span>&nbsp;<a href="../-path-node/index.html"><span
                     class="identifier">PathNode</span></a><span class="symbol">, </span><span class="identifier"
-                                                                                              id="io.github.lostatc.doppel.path.PathDiff.Companion$fromPathNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/onError">onError</span><span
+                                                                                              id="io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)), kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )))/onError">onError</span><span
                     class="symbol">:</span>&nbsp;<a
-                    href="../../io.github.lostatc.doppel.error/-error-handler.html"><span class="identifier">ErrorHandler</span></a>&nbsp;<span
-                    class="symbol">=</span>&nbsp;::skipOnError<span class="symbol">)</span><span
+                    href="../../io.github.lostatc.doppel.handlers/-error-handler.html"><span class="identifier">ErrorHandler</span></a>&nbsp;<span
+                    class="symbol">=</span>&nbsp;::skipOnError<span class="symbol">, </span><span class="identifier"
+                                                                                                  id="io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)), kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )))/pathConverter">pathConverter</span><span
+                    class="symbol">:</span>&nbsp;<a href="../../io.github.lostatc.doppel.handlers/-path-converter.html"><span
+                    class="identifier">PathConverter</span></a>&nbsp;<span
+                    class="symbol">=</span>&nbsp;::neverConvert<span class="symbol">)</span><span
                     class="symbol">: </span><a href="./index.html"><span class="identifier">PathDiff</span></a></code>
             <p>Constructs a new <a href="./index.html">PathDiff</a> from a <a
-                    href="from-path-nodes.html#io.github.lostatc.doppel.path.PathDiff.Companion$fromPathNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/left">left</a>
+                    href="from-nodes.html#io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)), kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )))/left">left</a>
                 and
-                <a href="from-path-nodes.html#io.github.lostatc.doppel.path.PathDiff.Companion$fromPathNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/right">right</a>
+                <a href="from-nodes.html#io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)), kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )))/right">right</a>
                 path node.</p>
         </td>
     </tr>

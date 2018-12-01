@@ -3,13 +3,16 @@
 Doppel is a library for manipulating the filesystem in memory. It works on top of Java NIO to reduce the need for
 expensive filesystem access.
 
-# Package io.github.lostatc.doppel.error
+# Package io.github.lostatc.doppel.handlers
 
-Tools for handling errors that occur when accessing the filesystem.
+Functions for handling different kinds of events.
 
 Many functions, methods and classes that access or modify the filesystem accept an [ErrorHandler] to determine how
 errors are handled on a file-by-file basis. This package provides the default error handlers [skipOnError],
 [terminateOnError] and [throwOnError].
+
+Some functions, methods and classes that access or modify the filesystem can work between filesystems if a
+[PathConverter] is provided. This package provides the default path converter [neverConvert].
 
 # Package io.github.lostatc.doppel.filesystem
 
@@ -23,4 +26,5 @@ applied all at once. Different types of changes that can be applied are represen
 
 In-memory representations of directory trees.
 
-This package allows directory trees to be represented in memory using [PathNode] and [MutablePathNode].
+This package allows directory trees to be represented in memory using [PathNode] and [MutablePathNode]. It also allows
+for comparing them using [PathDiff].

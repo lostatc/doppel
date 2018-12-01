@@ -11,18 +11,18 @@
         href="index.html">DeleteAction</a>&nbsp;/&nbsp;<a href="./-init-.html">&lt;init&gt;</a><br/>
 <br/>
 <h1>&lt;init&gt;</h1>
-<a name="io.github.lostatc.doppel.filesystem.DeleteAction$&lt;init&gt;(io.github.lostatc.doppel.path.PathNode, kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))"></a>
+<a name="io.github.lostatc.doppel.filesystem.DeleteAction$&lt;init&gt;(io.github.lostatc.doppel.path.PathNode, kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)))"></a>
 <code><span class="identifier">DeleteAction</span><span class="symbol">(</span><span class="identifier"
-                                                                                     id="io.github.lostatc.doppel.filesystem.DeleteAction$<init>(io.github.lostatc.doppel.path.PathNode, kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/target">target</span><span
+                                                                                     id="io.github.lostatc.doppel.filesystem.DeleteAction$<init>(io.github.lostatc.doppel.path.PathNode, kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)))/target">target</span><span
         class="symbol">:</span>&nbsp;<a href="../../io.github.lostatc.doppel.path/-path-node/index.html"><span
         class="identifier">PathNode</span></a><span class="symbol">, </span><span class="identifier"
-                                                                                  id="io.github.lostatc.doppel.filesystem.DeleteAction$<init>(io.github.lostatc.doppel.path.PathNode, kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/followLinks">followLinks</span><span
+                                                                                  id="io.github.lostatc.doppel.filesystem.DeleteAction$<init>(io.github.lostatc.doppel.path.PathNode, kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)))/followLinks">followLinks</span><span
         class="symbol">:</span>&nbsp;<a
         href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
         class="identifier">Boolean</span></a>&nbsp;<span class="symbol">=</span>&nbsp;false<span
         class="symbol">, </span><span class="identifier"
-                                      id="io.github.lostatc.doppel.filesystem.DeleteAction$<init>(io.github.lostatc.doppel.path.PathNode, kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/onError">onError</span><span
-        class="symbol">:</span>&nbsp;<a href="../../io.github.lostatc.doppel.error/-error-handler.html"><span
+                                      id="io.github.lostatc.doppel.filesystem.DeleteAction$<init>(io.github.lostatc.doppel.path.PathNode, kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)))/onError">onError</span><span
+        class="symbol">:</span>&nbsp;<a href="../../io.github.lostatc.doppel.handlers/-error-handler.html"><span
         class="identifier">ErrorHandler</span></a>&nbsp;<span class="symbol">=</span>&nbsp;::skipOnError<span
         class="symbol">)</span></code>
 <p><strong>Platform and version requirements:</strong> JVM</p>
@@ -40,8 +40,8 @@
     <li><a href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/FileSystemLoopException.html">FileSystemLoopException</a>:
         <a href="follow-links.html">followLinks</a> is <code>true</code> and a cycle of symbolic links was detected.
     </li>
-    <li><a href="http://docs.oracle.com/javase/8/docs/api/java/io/IOException.html">IOException</a>: Some other problem
-        occurred while deleting.
+    <li><a href="http://docs.oracle.com/javase/8/docs/api/java/io/IOException.html">IOException</a>: Some other I/O
+        error occurred while deleting.
     </li>
 </ul>
 </BODY>

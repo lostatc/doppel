@@ -12,7 +12,7 @@
 <code><span class="keyword">class </span><span class="identifier">MutablePathNode</span>&nbsp;<span
         class="symbol">:</span>&nbsp;<a href="../-path-node/index.html"><span
         class="identifier">PathNode</span></a></code> <a
-        href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/path/PathNode.kt#L290">(source)</a>
+        href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/path/PathNode.kt#L278">(source)</a>
 <p><strong>Platform and version requirements:</strong> JVM</p>
 <p>A mutable representation of a tree of file paths.</p>
 <p>This <a href="../-path-node/index.html">PathNode</a> implementation allows for modifying the tree of nodes in place
@@ -228,37 +228,17 @@
         <td>
             <code><span class="keyword">fun </span><span class="identifier">createFile</span><span
                     class="symbol">(</span><span class="identifier"
-                                                 id="io.github.lostatc.doppel.path.MutablePathNode$createFile(kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/recursive">recursive</span><span
+                                                 id="io.github.lostatc.doppel.path.MutablePathNode$createFile(kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)))/recursive">recursive</span><span
                     class="symbol">:</span>&nbsp;<a
                     href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
                     class="identifier">Boolean</span></a><span class="symbol">, </span><span class="identifier"
-                                                                                             id="io.github.lostatc.doppel.path.MutablePathNode$createFile(kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/onError">onError</span><span
+                                                                                             id="io.github.lostatc.doppel.path.MutablePathNode$createFile(kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)))/onError">onError</span><span
                     class="symbol">:</span>&nbsp;<a
-                    href="../../io.github.lostatc.doppel.error/-error-handler.html"><span class="identifier">ErrorHandler</span></a><span
+                    href="../../io.github.lostatc.doppel.handlers/-error-handler.html"><span class="identifier">ErrorHandler</span></a><span
                     class="symbol">)</span><span class="symbol">: </span><a
                     href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span
                     class="identifier">Unit</span></a></code>
             <p>Creates the file represented by this path node in the filesystem.</p>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <p><a href="diff.html">diff</a></p>
-        </td>
-        <td>
-            <code><span class="keyword">fun </span><span class="identifier">diff</span><span
-                    class="symbol">(</span><span class="identifier"
-                                                 id="io.github.lostatc.doppel.path.MutablePathNode$diff(io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/other">other</span><span
-                    class="symbol">:</span>&nbsp;<a href="../-path-node/index.html"><span
-                    class="identifier">PathNode</span></a><span class="symbol">, </span><span class="identifier"
-                                                                                              id="io.github.lostatc.doppel.path.MutablePathNode$diff(io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/onError">onError</span><span
-                    class="symbol">:</span>&nbsp;<a
-                    href="../../io.github.lostatc.doppel.error/-error-handler.html"><span class="identifier">ErrorHandler</span></a><span
-                    class="symbol">)</span><span class="symbol">: </span><a href="../-path-diff/index.html"><span
-                    class="identifier">PathDiff</span></a></code>
-            <p>Returns an immutable representation of the difference between this directory and <a
-                    href="../-path-node/diff.html#io.github.lostatc.doppel.path.PathNode$diff(io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.io.IOException, io.github.lostatc.doppel.error.ErrorHandlerAction)))/other">other</a>.
-            </p>
         </td>
     </tr>
     <tr>
