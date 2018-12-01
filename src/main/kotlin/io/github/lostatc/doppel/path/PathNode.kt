@@ -454,7 +454,7 @@ class MutablePathNode(
     }
 
     override fun diff(other: PathNode, onError: ErrorHandler): PathDiff =
-        PathDiff.fromPathNodes(this, other, onError)
+        PathDiff.fromNodes(this, other, onError)
 
     override fun exists(checkType: Boolean, recursive: Boolean): Boolean {
         val fileExists = if (checkType) type.checkType(path) else Files.exists(path)

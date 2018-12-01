@@ -21,9 +21,12 @@ package io.github.lostatc.doppel.path
 
 import io.github.lostatc.doppel.handlers.ErrorHandler
 import io.github.lostatc.doppel.handlers.ErrorHandlerAction
+import io.github.lostatc.doppel.handlers.PathConverter
+import io.github.lostatc.doppel.handlers.neverConvert
 import io.github.lostatc.doppel.handlers.skipOnError
 import java.io.IOException
 import java.nio.file.Files
+import java.nio.file.InvalidPathException
 import java.nio.file.Path
 
 /**
@@ -54,15 +57,37 @@ data class PathDiff(
         /**
          * Constructs a new [PathDiff] from a [left] and [right] path node.
          *
+         * All the paths in this diff will be associated with the filesystem of [left]. If [left] and [right] are
+         * associated with different filesystems, [pathConverter] will be invoked to convert them.
+         *
          * The following exceptions can be passed to [onError]:
+         * - [InvalidPathException]: A path could not be converted by [pathConverter].
          * - [NoSuchFileException] A descendant of one of the path nodes was not found in the filesystem.
          * - [IOException]: Some other I/O error occurred.
          *
          * @param [onError] A function that is called for each error that occurs and determines how to handle them.
+         * @property [pathConverter] A function which is used to convert [Path] objects between filesystems.
          */
-        fun fromPathNodes(left: PathNode, right: PathNode, onError: ErrorHandler = ::skipOnError): PathDiff {
+        fun fromNodes(
+            left: PathNode, right: PathNode,
+            onError: ErrorHandler = ::skipOnError,
+            pathConverter: PathConverter = ::neverConvert
+        ): PathDiff {
+            // Convert the paths of the descendants of right node to the filesystem of the left node.
+            val convertedPaths = mutableMapOf<Path, Path>()
+            associate@ for (descendant in right.relativeDescendants.keys) {
+                try {
+                    convertedPaths[pathConverter(descendant, left.path.fileSystem)] = descendant
+                } catch (e: InvalidPathException) {
+                    when (onError(descendant, e)) {
+                        ErrorHandlerAction.SKIP -> continue@associate
+                        ErrorHandlerAction.TERMINATE -> break@associate
+                    }
+                }
+            }
+
             val leftDescendants = left.relativeDescendants.keys
-            val rightDescendants = right.relativeDescendants.keys
+            val rightDescendants = convertedPaths.keys
 
             // Compare file paths.
             val common = leftDescendants intersect rightDescendants
@@ -77,7 +102,7 @@ data class PathDiff(
 
             compare@ for (commonPath in common) {
                 val leftNode = left.relativeDescendants[commonPath] ?: continue
-                val rightNode = right.relativeDescendants[commonPath] ?: continue
+                val rightNode = right.relativeDescendants[convertedPaths[commonPath]] ?: continue
 
                 try {
                     // Compare the contents of files in the directories.

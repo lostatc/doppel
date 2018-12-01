@@ -20,17 +20,58 @@
 package io.github.lostatc.doppel.path
 
 import com.google.common.jimfs.Jimfs
+import io.github.lostatc.doppel.handlers.throwOnError
 import io.github.lostatc.doppel.testing.DEFAULT_JIMFS_CONFIG
+import io.github.lostatc.doppel.testing.convertBasicPath
 import io.kotlintest.assertSoftly
 import io.kotlintest.matchers.collections.shouldContainExactly
+import io.kotlintest.shouldThrow
 import io.kotlintest.specs.WordSpec
 import java.nio.file.Files
+import java.nio.file.InvalidPathException
 import java.nio.file.Paths
 import java.nio.file.attribute.FileTime
 
 class PathDiffTest : WordSpec() {
     init {
-        "PathDiff.fromPathNodes" should {
+        "PathDiff.fromNodes" should {
+            "throw when the nodes belong to different filesystems" {
+                val leftFs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
+                val rightFs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
+
+                val leftNode = PathNode.of(leftFs.getPath("left")) {
+                    file("a")
+                }
+                val rightNode = PathNode.of(rightFs.getPath("right")) {
+                    file("a")
+                }
+
+                shouldThrow<InvalidPathException> {
+                    PathDiff.fromNodes(leftNode, rightNode, onError = ::throwOnError)
+                }
+            }
+
+            "property convert paths" {
+                val leftFs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
+                val rightFs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
+
+                val leftNode = PathNode.of(leftFs.getPath("left")) {
+                    file("a")
+                }
+                leftNode.createFile(recursive = true)
+
+                val rightNode = PathNode.of(rightFs.getPath("right")) {
+                    file("a")
+                }
+                rightNode.createFile(recursive = true)
+
+                // This should not throw an exception.
+                PathDiff.fromNodes(
+                    leftNode, rightNode,
+                    onError = ::throwOnError, pathConverter = ::convertBasicPath
+                )
+            }
+
             "correctly compare paths" {
                 val leftNode = PathNode.of("left") {
                     file("b")
@@ -45,7 +86,7 @@ class PathDiffTest : WordSpec() {
                     }
                 }
 
-                val diff = leftNode.diff(rightNode)
+                val diff = PathDiff.fromNodes(leftNode, rightNode)
 
                 assertSoftly {
                     diff.common.shouldContainExactly(Paths.get("b"), Paths.get("c"))
@@ -74,7 +115,7 @@ class PathDiffTest : WordSpec() {
                 Files.write(fs.getPath("left", "different"), listOf("left"))
                 Files.write(fs.getPath("right", "different"), listOf("right"))
 
-                val diff = leftNode.diff(rightNode)
+                val diff = PathDiff.fromNodes(leftNode, rightNode)
 
                 assertSoftly {
                     diff.same.shouldContainExactly(fs.getPath("same"))
@@ -102,7 +143,7 @@ class PathDiffTest : WordSpec() {
                 Files.setLastModifiedTime(fs.getPath("right", "leftNewer"), FileTime.fromMillis(1))
                 Files.setLastModifiedTime(fs.getPath("right", "rightNewer"), FileTime.fromMillis(100))
 
-                val diff = leftNode.diff(rightNode)
+                val diff = PathDiff.fromNodes(leftNode, rightNode)
 
                 assertSoftly {
                     diff.leftNewer.shouldContainExactly(fs.getPath("leftNewer"))
