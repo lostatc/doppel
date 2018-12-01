@@ -23,7 +23,7 @@ import io.github.lostatc.doppel.handlers.ErrorHandler
 import io.github.lostatc.doppel.handlers.ErrorHandlerAction
 import io.github.lostatc.doppel.handlers.PathConverter
 import io.github.lostatc.doppel.handlers.neverConvert
-import io.github.lostatc.doppel.handlers.skipOnError
+import io.github.lostatc.doppel.handlers.throwOnError
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.InvalidPathException
@@ -70,7 +70,7 @@ data class PathDiff(
          */
         fun fromNodes(
             left: PathNode, right: PathNode,
-            onError: ErrorHandler = ::skipOnError,
+            onError: ErrorHandler = ::throwOnError,
             pathConverter: PathConverter = ::neverConvert
         ): PathDiff {
             // Convert the paths of the descendants of right node to the filesystem of the left node.

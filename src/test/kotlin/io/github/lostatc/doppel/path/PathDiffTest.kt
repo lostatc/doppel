@@ -20,6 +20,7 @@
 package io.github.lostatc.doppel.path
 
 import com.google.common.jimfs.Jimfs
+import io.github.lostatc.doppel.handlers.skipOnError
 import io.github.lostatc.doppel.handlers.throwOnError
 import io.github.lostatc.doppel.testing.DEFAULT_JIMFS_CONFIG
 import io.github.lostatc.doppel.testing.convertBasicPath
@@ -86,7 +87,7 @@ class PathDiffTest : WordSpec() {
                     }
                 }
 
-                val diff = PathDiff.fromNodes(leftNode, rightNode)
+                val diff = PathDiff.fromNodes(leftNode, rightNode, onError = ::skipOnError)
 
                 assertSoftly {
                     diff.common.shouldContainExactly(Paths.get("b"), Paths.get("c"))

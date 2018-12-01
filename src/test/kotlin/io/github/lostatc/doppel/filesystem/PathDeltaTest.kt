@@ -20,6 +20,7 @@
 package io.github.lostatc.doppel.filesystem
 
 import com.google.common.jimfs.Jimfs
+import io.github.lostatc.doppel.handlers.skipOnError
 import io.github.lostatc.doppel.path.PathNode
 import io.github.lostatc.doppel.path.RegularFileType
 import io.github.lostatc.doppel.path.dir
@@ -92,7 +93,7 @@ class PathDeltaTest : WordSpec() {
                 val testNode = PathNode.of(fs.getPath("/")) {
                     dir("source")
                 }
-                testNode.createFile(recursive = true)
+                testNode.createFile(recursive = true, onError = ::skipOnError)
 
                 val expectedNode = PathNode.of(fs.getPath("/")) {
                     dir("target") {

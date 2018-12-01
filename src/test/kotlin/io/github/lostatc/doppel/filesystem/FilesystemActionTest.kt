@@ -36,6 +36,7 @@ import io.kotlintest.matchers.maps.shouldContainKey
 import io.kotlintest.matchers.maps.shouldNotContainKey
 import io.kotlintest.shouldThrow
 import io.kotlintest.specs.WordSpec
+import java.nio.file.FileAlreadyExistsException
 import java.nio.file.Files
 import java.nio.file.InvalidPathException
 
@@ -229,7 +230,10 @@ class MoveActionTest : WordSpec() {
                 }
 
                 val action = MoveAction(sourceNode, targetNode)
-                action.applyFilesystem()
+
+                shouldThrow<FileAlreadyExistsException> {
+                    action.applyFilesystem()
+                }
 
                 expectedTargetNode.exists(recursive = true).shouldBeTrue()
             }
@@ -442,7 +446,10 @@ class CopyActionTest : WordSpec() {
                 }
 
                 val action = CopyAction(sourceNode, targetNode)
-                action.applyFilesystem()
+
+                shouldThrow<FileAlreadyExistsException> {
+                    action.applyFilesystem()
+                }
 
                 expectedTargetNode.exists(recursive = true).shouldBeTrue()
             }

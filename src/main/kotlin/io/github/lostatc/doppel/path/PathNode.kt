@@ -21,7 +21,7 @@ package io.github.lostatc.doppel.path
 
 import io.github.lostatc.doppel.handlers.ErrorHandler
 import io.github.lostatc.doppel.handlers.ErrorHandlerAction
-import io.github.lostatc.doppel.handlers.skipOnError
+import io.github.lostatc.doppel.handlers.throwOnError
 import io.github.lostatc.doppel.path.PathNode.Companion.fromFilesystem
 import io.github.lostatc.doppel.path.PathNode.Companion.of
 import java.io.IOException
@@ -242,7 +242,7 @@ sealed class PathNode {
      * @param [recursive] Create this file and all its descendants.
      * @param [onError] A function that is called for each error that occurs and determines how to handle them.
      */
-    abstract fun createFile(recursive: Boolean = false, onError: ErrorHandler = ::skipOnError)
+    abstract fun createFile(recursive: Boolean = false, onError: ErrorHandler = ::throwOnError)
 
     companion object : PathNodeFactory {
         override fun of(path: Path, type: FileType, init: MutablePathNode.() -> Unit): PathNode =

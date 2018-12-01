@@ -22,7 +22,7 @@ package io.github.lostatc.doppel.filesystem
 import io.github.lostatc.doppel.handlers.ErrorHandler
 import io.github.lostatc.doppel.handlers.PathConverter
 import io.github.lostatc.doppel.handlers.neverConvert
-import io.github.lostatc.doppel.handlers.skipOnError
+import io.github.lostatc.doppel.handlers.throwOnError
 import io.github.lostatc.doppel.path.MutablePathNode
 import io.github.lostatc.doppel.path.PathNode
 import java.io.IOException
@@ -118,7 +118,7 @@ data class MoveAction(
     val atomic: Boolean = false,
     val followLinks: Boolean = false,
     val pathConverter: PathConverter = ::neverConvert,
-    override val onError: ErrorHandler = ::skipOnError
+    override val onError: ErrorHandler = ::throwOnError
 ) : FilesystemAction {
     override fun applyView(viewNode: MutablePathNode) {
         removeNodeFromView(source, viewNode)
@@ -172,7 +172,7 @@ data class CopyAction(
     val copyAttributes: Boolean = false,
     val followLinks: Boolean = false,
     val pathConverter: PathConverter = ::neverConvert,
-    override val onError: ErrorHandler = ::skipOnError
+    override val onError: ErrorHandler = ::throwOnError
 ) : FilesystemAction {
     override fun applyView(viewNode: MutablePathNode) {
         addNodeToView(target, viewNode)
@@ -199,7 +199,7 @@ data class CopyAction(
 data class CreateAction(
     val target: PathNode,
     val recursive: Boolean = false,
-    override val onError: ErrorHandler = ::skipOnError
+    override val onError: ErrorHandler = ::throwOnError
 ) : FilesystemAction {
     override fun applyView(viewNode: MutablePathNode) {
         addNodeToView(target, viewNode)
@@ -229,7 +229,7 @@ data class CreateAction(
 data class DeleteAction(
     val target: PathNode,
     val followLinks: Boolean = false,
-    override val onError: ErrorHandler = ::skipOnError
+    override val onError: ErrorHandler = ::throwOnError
 ) : FilesystemAction {
     override fun applyView(viewNode: MutablePathNode) {
         removeNodeFromView(target, viewNode)
