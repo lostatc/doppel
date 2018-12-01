@@ -52,6 +52,16 @@ class PathDelta {
     override fun hashCode(): Int = Objects.hash(actions)
 
     /**
+     * Returns a delta containing all the changes in this delta first and [other] second.
+     */
+    operator fun plus(other: PathDelta): PathDelta {
+        val newDelta = PathDelta()
+        newDelta.add(*actions.toTypedArray())
+        newDelta.add(*other.actions.toTypedArray())
+        return newDelta
+    }
+
+    /**
      * Adds the given [changes] to the queue.
      *
      * These changes are not applied to the filesystem until the [apply] method is called.
