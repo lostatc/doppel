@@ -40,14 +40,14 @@
         class="symbol">, </span><span class="identifier"
                                       id="io.github.lostatc.doppel.filesystem.CopyAction$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Boolean, kotlin.Boolean, kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )), kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)))/onError">onError</span><span
         class="symbol">:</span>&nbsp;<a href="../../io.github.lostatc.doppel.handlers/-error-handler.html"><span
-        class="identifier">ErrorHandler</span></a>&nbsp;<span class="symbol">=</span>&nbsp;::skipOnError<span
+        class="identifier">ErrorHandler</span></a>&nbsp;<span class="symbol">=</span>&nbsp;::throwOnError<span
         class="symbol">)</span></code>
 <p><strong>Platform and version requirements:</strong> JVM</p>
 <p>An action that recursively copies a file or directory from <a href="source.html">source</a> to <a href="target.html">target</a>.
 </p>
 <p>By default, the files represented by <a href="source.html">source</a> and <a href="target.html">target</a> must
-    belong to the same filesystem. By passing a function
-    to <a href="path-converter.html">pathConverter</a>, it is possible to recursively copy files between filesystems.
+    belong to the same file system. By passing a function
+    to <a href="path-converter.html">pathConverter</a>, it is possible to recursively copy files between file systems.
 </p>
 <p>If <a href="source.html">source</a> and <a href="target.html">target</a> represent the same file, then nothing is
     copied.</p>
@@ -55,7 +55,7 @@
 <p>Copying a file or directory is not an atomic operation. If an <a
         href="http://docs.oracle.com/javase/8/docs/api/java/io/IOException.html">IOException</a> is thrown, then the
     state of the
-    filesystem is undefined.</p>
+    file system is undefined.</p>
 <p>The following exceptions can be passed to <a href="on-error.html">onError</a>:</p>
 <ul>
     <li>

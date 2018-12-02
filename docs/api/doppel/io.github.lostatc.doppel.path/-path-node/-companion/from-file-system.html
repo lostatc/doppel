@@ -1,0 +1,46 @@
+<HTML>
+<HEAD>
+    <meta charset="UTF-8">
+    <title>PathNode.Companion.fromFileSystem - doppel</title>
+    <link rel="stylesheet" href="../../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../../index.html">doppel</a>&nbsp;/&nbsp;<a href="../../index.html">io.github.lostatc.doppel.path</a>&nbsp;/&nbsp;<a
+        href="../index.html">PathNode</a>&nbsp;/&nbsp;<a href="index.html">Companion</a>&nbsp;/&nbsp;<a
+        href="./from-file-system.html">fromFileSystem</a><br/>
+<br/>
+<h1>fromFileSystem</h1>
+<a name="io.github.lostatc.doppel.path.PathNode.Companion$fromFileSystem(java.nio.file.Path, kotlin.Boolean, kotlin.Function1((java.nio.file.Path, io.github.lostatc.doppel.path.FileType)))"></a>
+<code><span class="keyword">fun </span><span class="identifier">fromFileSystem</span><span class="symbol">(</span><span
+        class="identifier"
+        id="io.github.lostatc.doppel.path.PathNode.Companion$fromFileSystem(java.nio.file.Path, kotlin.Boolean, kotlin.Function1((java.nio.file.Path, io.github.lostatc.doppel.path.FileType)))/path">path</span><span
+        class="symbol">:</span>&nbsp;<a href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span
+        class="identifier">Path</span></a><span class="symbol">, </span><span class="identifier"
+                                                                              id="io.github.lostatc.doppel.path.PathNode.Companion$fromFileSystem(java.nio.file.Path, kotlin.Boolean, kotlin.Function1((java.nio.file.Path, io.github.lostatc.doppel.path.FileType)))/recursive">recursive</span><span
+        class="symbol">:</span>&nbsp;<a
+        href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
+        class="identifier">Boolean</span></a><span class="symbol">, </span><span class="identifier"
+                                                                                 id="io.github.lostatc.doppel.path.PathNode.Companion$fromFileSystem(java.nio.file.Path, kotlin.Boolean, kotlin.Function1((java.nio.file.Path, io.github.lostatc.doppel.path.FileType)))/typeFactory">typeFactory</span><span
+        class="symbol">:</span>&nbsp;<span class="symbol">(</span><a
+        href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
+        class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="../../-file-type/index.html"><span
+        class="identifier">FileType</span></a><span class="symbol">)</span><span class="symbol">: </span><a
+        href="../index.html"><span class="identifier">PathNode</span></a></code> <a
+        href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/path/PathNode.kt#L259">(source)</a>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>Constructs a new path node from files in the file system.</p>
+<p>This method constructs a new node from the given <a href="#">path</a> and gets the <a href="../type.html">type</a> of
+    the node from the
+    file system. If <a href="#">recursive</a> is <code>true</code> it also gets all descendants of the given <a
+            href="#">path</a> from the file system and
+    creates nodes for them, returning a tree of nodes.</p>
+<h3>Parameters</h3>
+<p><a name="path"></a>
+    <code>path</code> - The path to construct the new node from.</p>
+<p><a name="recursive"></a>
+    <code>recursive</code> - Create a tree of nodes recursively.</p>
+<p><a name="typeFactory"></a>
+    <code>typeFactory</code> - A function that determines which <a href="../../-file-type/index.html">FileType</a> to
+    assign to each path node.</p>
+</BODY>
+</HTML>

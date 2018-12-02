@@ -1,0 +1,126 @@
+<HTML>
+<HEAD>
+    <meta charset="UTF-8">
+    <title>FileSystemAction - doppel</title>
+    <link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">doppel</a>&nbsp;/&nbsp;<a href="../index.html">io.github.lostatc.doppel.filesystem</a>&nbsp;/&nbsp;<a
+        href="./index.html">FileSystemAction</a><br/>
+<br/>
+<h1>FileSystemAction</h1>
+<code><span class="keyword">interface </span><span class="identifier">FileSystemAction</span></code> <a
+        href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/filesystem/FileSystemAction.kt#L58">(source)</a>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>A change to apply to the file system.</p>
+<p>Implementations of this interface are immutable.</p>
+<h3>Properties</h3>
+<table>
+    <tbody>
+    <tr>
+        <td>
+            <p><a href="on-error.html">onError</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">onError</span><span
+                    class="symbol">: </span><a href="../../io.github.lostatc.doppel.handlers/-error-handler.html"><span
+                    class="identifier">ErrorHandler</span></a></code>
+            <p>A function that is called for each error that occurs while changes are being applied which determines how
+                to
+                handle them.</p>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<h3>Functions</h3>
+<table>
+    <tbody>
+    <tr>
+        <td>
+            <p><a href="apply-file-system.html">applyFileSystem</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">applyFileSystem</span><span
+                    class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span
+                    class="identifier">Unit</span></a></code>
+            <p>Applies the change to the file system.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="apply-view.html">applyView</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">applyView</span><span
+                    class="symbol">(</span><span class="identifier"
+                                                 id="io.github.lostatc.doppel.filesystem.FileSystemAction$applyView(io.github.lostatc.doppel.path.MutablePathNode)/viewNode">viewNode</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="../../io.github.lostatc.doppel.path/-mutable-path-node/index.html"><span class="identifier">MutablePathNode</span></a><span
+                    class="symbol">)</span><span class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span
+                    class="identifier">Unit</span></a></code>
+            <p>Modifies <a
+                    href="apply-view.html#io.github.lostatc.doppel.filesystem.FileSystemAction$applyView(io.github.lostatc.doppel.path.MutablePathNode)/viewNode">viewNode</a>
+                to provide a view of what the file system will look like after <a href="apply-file-system.html">applyFileSystem</a>
+                is called.</p>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<h3>Inheritors</h3>
+<table>
+    <tbody>
+    <tr>
+        <td>
+            <p><a href="../-copy-action/index.html">CopyAction</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">data</span> <span class="keyword">class </span><span class="identifier">CopyAction</span>&nbsp;<span
+                    class="symbol">:</span>&nbsp;<a href="./index.html"><span class="identifier">FileSystemAction</span></a></code>
+            <p>An action that recursively copies a file or directory from <a
+                    href="../-copy-action/source.html">source</a> to <a href="../-copy-action/target.html">target</a>.
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="../-create-action/index.html">CreateAction</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">data</span> <span class="keyword">class </span><span class="identifier">CreateAction</span>&nbsp;<span
+                    class="symbol">:</span>&nbsp;<a href="./index.html"><span class="identifier">FileSystemAction</span></a></code>
+            <p>An action that creates the file represented by <a href="../-create-action/target.html">target</a>.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="../-delete-action/index.html">DeleteAction</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">data</span> <span class="keyword">class </span><span class="identifier">DeleteAction</span>&nbsp;<span
+                    class="symbol">:</span>&nbsp;<a href="./index.html"><span class="identifier">FileSystemAction</span></a></code>
+            <p>An action that recursively deletes the file or directory represented by <a
+                    href="../-delete-action/target.html">target</a>.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="../-move-action/index.html">MoveAction</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">data</span> <span class="keyword">class </span><span class="identifier">MoveAction</span>&nbsp;<span
+                    class="symbol">:</span>&nbsp;<a href="./index.html"><span class="identifier">FileSystemAction</span></a></code>
+            <p>An action that recursively moves a file or directory from <a
+                    href="../-move-action/source.html">source</a> to <a href="../-move-action/target.html">target</a>.
+            </p>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</BODY>
+</HTML>

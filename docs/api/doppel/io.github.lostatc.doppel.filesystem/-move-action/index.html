@@ -10,20 +10,20 @@
 <br/>
 <h1>MoveAction</h1>
 <code><span class="keyword">data</span> <span class="keyword">class </span><span class="identifier">MoveAction</span>&nbsp;<span
-        class="symbol">:</span>&nbsp;<a href="../-filesystem-action/index.html"><span class="identifier">FilesystemAction</span></a></code>
-<a href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/filesystem/FilesystemAction.kt#L115">(source)</a>
+        class="symbol">:</span>&nbsp;<a href="../-file-system-action/index.html"><span class="identifier">FileSystemAction</span></a></code>
+<a href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/filesystem/FileSystemAction.kt#L115">(source)</a>
 <p><strong>Platform and version requirements:</strong> JVM</p>
 <p>An action that recursively moves a file or directory from <a href="source.html">source</a> to <a href="target.html">target</a>.
 </p>
 <p>By default, the files represented by <a href="source.html">source</a> and <a href="target.html">target</a> must
-    belong to the same filesystem. By passing a function
-    to <a href="path-converter.html">pathConverter</a>, it is possible to recursively move files between filesystems.
+    belong to the same file system. By passing a function
+    to <a href="path-converter.html">pathConverter</a>, it is possible to recursively move files between file systems.
 </p>
 <p>If <a href="source.html">source</a> and <a href="target.html">target</a> represent the same file, then nothing is
     moved.</p>
 <p>If the file to be moved is a symbolic link then the link itself, and not its target, is moved.</p>
 <p>Moving a file will copy its last modified time if supported by both file stores.</p>
-<p>This move may or may not be atomic. If it is not atomic and an exception is thrown, the state of the filesystem is
+<p>This move may or may not be atomic. If it is not atomic and an exception is thrown, the state of the file system is
     not defined.</p>
 <p>The following exceptions can be passed to <a href="on-error.html">onError</a>:</p>
 <ul>
@@ -44,7 +44,7 @@
         <a href="follow-links.html">followLinks</a> is <code>true</code> and a cycle of symbolic links was detected.
     </li>
     <li><a href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/AtomicMoveNotSupportedException.html">AtomicMoveNotSupportedException</a>:
-        <a href="atomic.html">atomic</a> is <code>true</code> but the move cannot be performed as an atomic filesystem
+        <a href="atomic.html">atomic</a> is <code>true</code> but the move cannot be performed as an atomic file system
         operation.
     </li>
     <li><a href="http://docs.oracle.com/javase/8/docs/api/java/io/IOException.html">IOException</a>: Some other I/O
@@ -90,7 +90,7 @@
                                                                                                    id="io.github.lostatc.doppel.filesystem.MoveAction$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Boolean, kotlin.Boolean, kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )), kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)))/onError">onError</span><span
                     class="symbol">:</span>&nbsp;<a
                     href="../../io.github.lostatc.doppel.handlers/-error-handler.html"><span class="identifier">ErrorHandler</span></a>&nbsp;<span
-                    class="symbol">=</span>&nbsp;::skipOnError<span class="symbol">)</span></code>
+                    class="symbol">=</span>&nbsp;::throwOnError<span class="symbol">)</span></code>
             <p>An action that recursively moves a file or directory from <a href="source.html">source</a> to <a
                     href="target.html">target</a>.</p>
         </td>
@@ -109,7 +109,7 @@
                     class="symbol">: </span><a
                     href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
                     class="identifier">Boolean</span></a></code>
-            <p>Perform the move as an atomic filesystem operation. If this is <code>true</code>, <a
+            <p>Perform the move as an atomic file system operation. If this is <code>true</code>, <a
                     href="overwrite.html">overwrite</a> is ignored. If
                 the file at <a href="target.html">target</a> exists, it is implementation-specific if it is replaced or
                 an <a href="http://docs.oracle.com/javase/8/docs/api/java/io/IOException.html">IOException</a> is
@@ -164,7 +164,7 @@
                     class="identifier">PathConverter</span></a></code>
             <p>A function which is used to convert <a
                     href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html">Path</a> objects between
-                filesystems.</p>
+                file systems.</p>
         </td>
     </tr>
     <tr>
@@ -196,14 +196,14 @@
     <tbody>
     <tr>
         <td>
-            <p><a href="apply-filesystem.html">applyFilesystem</a></p>
+            <p><a href="apply-file-system.html">applyFileSystem</a></p>
         </td>
         <td>
-            <code><span class="keyword">fun </span><span class="identifier">applyFilesystem</span><span
+            <code><span class="keyword">fun </span><span class="identifier">applyFileSystem</span><span
                     class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a
                     href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span
                     class="identifier">Unit</span></a></code>
-            <p>Applies the change to the filesystem.</p>
+            <p>Applies the change to the file system.</p>
         </td>
     </tr>
     <tr>
@@ -220,9 +220,9 @@
                     href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span
                     class="identifier">Unit</span></a></code>
             <p>Modifies <a
-                    href="../-filesystem-action/apply-view.html#io.github.lostatc.doppel.filesystem.FilesystemAction$applyView(io.github.lostatc.doppel.path.MutablePathNode)/viewNode">viewNode</a>
-                to provide a view of what the filesystem will look like after <a
-                        href="../-filesystem-action/apply-filesystem.html">applyFilesystem</a> is called.</p>
+                    href="../-file-system-action/apply-view.html#io.github.lostatc.doppel.filesystem.FileSystemAction$applyView(io.github.lostatc.doppel.path.MutablePathNode)/viewNode">viewNode</a>
+                to provide a view of what the file system will look like after <a
+                        href="../-file-system-action/apply-file-system.html">applyFileSystem</a> is called.</p>
         </td>
     </tr>
     </tbody>

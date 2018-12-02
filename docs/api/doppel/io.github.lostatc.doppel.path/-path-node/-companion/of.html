@@ -35,7 +35,7 @@
     create new path nodes as children of this node. Builder methods can be created for custom <a
             href="../../-file-type/index.html">FileType</a>
     implementations using <a href="../../path-node.html">pathNode</a>.</p>
-<p>The whole tree of path nodes will be associated with the same filesystem as <a href="#">path</a>.</p>
+<p>The whole tree of path nodes will be associated with the same file system as <a href="#">path</a>.</p>
 <p>Example:</p>
 <pre><code>val path = Paths.get("/", "home", "user")
 
@@ -82,7 +82,7 @@ val pathNode = PathNode.of(path) {
 <p>Constructs a new path node from the given path segments.</p>
 <p>This is an overload of <a href="#">of</a> that accepts strings that form a path when joined. The constructed file
     node is
-    associated with the default filesystem.</p>
+    associated with the default file system.</p>
 <p><strong>See Also</strong><br/>
 <p>
     <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Paths.html#get(java.lang.String, java.lang.String...)">Paths.get</a>

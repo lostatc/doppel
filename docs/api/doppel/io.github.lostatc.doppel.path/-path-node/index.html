@@ -31,7 +31,7 @@
     node by
     their <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html">Path</a>.</p>
 <p>Each <a href="./index.html">PathNode</a> has a <a href="type.html">type</a>, which indicates the type of file the
-    node represents in the filesystem. An initial type
+    node represents in the file system. An initial type
     is provided through the constructor, but this type can change based on the state of the node. For example, if the
     <a href="type.html">type</a> of a node is a regular file, then it will change to a directory if children are added.
     Custom file types with
@@ -40,8 +40,8 @@
     objects.</p>
 <p><a href="./index.html">PathNode</a> objects can be created using the builder method <a
         href="-companion/of.html">of</a> which provides a DSL for specifying what the
-    directory tree should look like. They can also be created by walking a directory tree in the filesystem using
-    <a href="-companion/from-filesystem.html">fromFilesystem</a>.</p>
+    directory tree should look like. They can also be created by walking a directory tree in the file system using
+    <a href="-companion/from-file-system.html">fromFileSystem</a>.</p>
 <h3>Types</h3>
 <table>
     <tbody>
@@ -180,11 +180,11 @@
                                                   id="io.github.lostatc.doppel.path.PathNode$createFile(kotlin.Boolean, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)))/onError">onError</span><span
                     class="symbol">:</span>&nbsp;<a
                     href="../../io.github.lostatc.doppel.handlers/-error-handler.html"><span class="identifier">ErrorHandler</span></a>&nbsp;<span
-                    class="symbol">=</span>&nbsp;::skipOnError<span class="symbol">)</span><span
+                    class="symbol">=</span>&nbsp;::throwOnError<span class="symbol">)</span><span
                     class="symbol">: </span><a
                     href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span
                     class="identifier">Unit</span></a></code>
-            <p>Creates the file represented by this path node in the filesystem.</p>
+            <p>Creates the file represented by this path node in the file system.</p>
         </td>
     </tr>
     <tr>
@@ -258,7 +258,7 @@
                     class="symbol">)</span><span class="symbol">: </span><a
                     href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
                     class="identifier">Boolean</span></a></code>
-            <p>Returns whether the file represented by this path node exists in the filesystem.</p>
+            <p>Returns whether the file represented by this path node exists in the file system.</p>
         </td>
     </tr>
     <tr>
@@ -425,27 +425,27 @@
     <tbody>
     <tr>
         <td>
-            <p><a href="from-filesystem.html">fromFilesystem</a></p>
+            <p><a href="from-file-system.html">fromFileSystem</a></p>
         </td>
         <td>
-            <code><span class="keyword">fun </span><span class="identifier">fromFilesystem</span><span
+            <code><span class="keyword">fun </span><span class="identifier">fromFileSystem</span><span
                     class="symbol">(</span><span class="identifier"
-                                                 id="io.github.lostatc.doppel.path.PathNode.Companion$fromFilesystem(java.nio.file.Path, kotlin.Boolean, kotlin.Function1((java.nio.file.Path, io.github.lostatc.doppel.path.FileType)))/path">path</span><span
+                                                 id="io.github.lostatc.doppel.path.PathNode.Companion$fromFileSystem(java.nio.file.Path, kotlin.Boolean, kotlin.Function1((java.nio.file.Path, io.github.lostatc.doppel.path.FileType)))/path">path</span><span
                     class="symbol">:</span>&nbsp;<a
                     href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
                     class="symbol">, </span><span class="identifier"
-                                                  id="io.github.lostatc.doppel.path.PathNode.Companion$fromFilesystem(java.nio.file.Path, kotlin.Boolean, kotlin.Function1((java.nio.file.Path, io.github.lostatc.doppel.path.FileType)))/recursive">recursive</span><span
+                                                  id="io.github.lostatc.doppel.path.PathNode.Companion$fromFileSystem(java.nio.file.Path, kotlin.Boolean, kotlin.Function1((java.nio.file.Path, io.github.lostatc.doppel.path.FileType)))/recursive">recursive</span><span
                     class="symbol">:</span>&nbsp;<a
                     href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span
                     class="identifier">Boolean</span></a><span class="symbol">, </span><span class="identifier"
-                                                                                             id="io.github.lostatc.doppel.path.PathNode.Companion$fromFilesystem(java.nio.file.Path, kotlin.Boolean, kotlin.Function1((java.nio.file.Path, io.github.lostatc.doppel.path.FileType)))/typeFactory">typeFactory</span><span
+                                                                                             id="io.github.lostatc.doppel.path.PathNode.Companion$fromFileSystem(java.nio.file.Path, kotlin.Boolean, kotlin.Function1((java.nio.file.Path, io.github.lostatc.doppel.path.FileType)))/typeFactory">typeFactory</span><span
                     class="symbol">:</span>&nbsp;<span class="symbol">(</span><a
                     href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
                     class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a
                     href="../-file-type/index.html"><span class="identifier">FileType</span></a><span
                     class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span
                     class="identifier">PathNode</span></a></code>
-            <p>Constructs a new path node from files in the filesystem.</p>
+            <p>Constructs a new path node from files in the file system.</p>
         </td>
     </tr>
     <tr>

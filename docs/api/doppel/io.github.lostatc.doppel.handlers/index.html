@@ -28,7 +28,7 @@
         </td>
         <td>
             <code><span class="keyword">enum</span> <span class="keyword">class </span><span class="identifier">ErrorHandlerAction</span></code>
-            <p>A value which determines how an error that occurs during a filesystem operation is handled.</p>
+            <p>A value which determines how an error that occurs during a file system operation is handled.</p>
         </td>
     </tr>
     </tbody>
@@ -50,7 +50,7 @@
                     class="identifier">Exception</span></a><span class="symbol">)</span>&nbsp;<span
                     class="symbol">-&gt;</span>&nbsp;<a href="-error-handler-action/index.html"><span
                     class="identifier">ErrorHandlerAction</span></a></code>
-            <p>A function that is called for each error that occurs during a filesystem operation.</p>
+            <p>A function that is called for each error that occurs during a file system operation.</p>
         </td>
     </tr>
     <tr>
@@ -89,13 +89,13 @@
                     class="symbol">:</span>&nbsp;<a
                     href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
                     class="symbol">, </span><span class="identifier"
-                                                  id="io.github.lostatc.doppel.handlers$neverConvert(java.nio.file.Path, java.nio.file.FileSystem)/filesystem">filesystem</span><span
+                                                  id="io.github.lostatc.doppel.handlers$neverConvert(java.nio.file.Path, java.nio.file.FileSystem)/fileSystem">fileSystem</span><span
                     class="symbol">:</span>&nbsp;<a
                     href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/FileSystem.html"><span
                     class="identifier">FileSystem</span></a><span class="symbol">)</span><span
                     class="symbol">: </span><a
                     href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a></code>
-            <p>A <a href="-path-converter.html">PathConverter</a> that doesn't convert paths between filesystems.</p>
+            <p>A <a href="-path-converter.html">PathConverter</a> that doesn't convert paths between file systems.</p>
         </td>
     </tr>
     <tr>
@@ -116,7 +116,7 @@
                     class="identifier">Exception</span></a><span class="symbol">)</span><span class="symbol">: </span><a
                     href="-error-handler-action/index.html"><span
                     class="identifier">ErrorHandlerAction</span></a></code>
-            <p>Handles filesystem errors by always skipping the file that caused the error.</p>
+            <p>Handles file system errors by always skipping the file that caused the error.</p>
         </td>
     </tr>
     <tr>
@@ -137,7 +137,7 @@
                     class="identifier">Exception</span></a><span class="symbol">)</span><span class="symbol">: </span><a
                     href="-error-handler-action/index.html"><span
                     class="identifier">ErrorHandlerAction</span></a></code>
-            <p>Handles filesystem errors by always terminating the operation when there is an error.</p>
+            <p>Handles file system errors by always terminating the operation when there is an error.</p>
         </td>
     </tr>
     <tr>
@@ -158,7 +158,7 @@
                     class="identifier">Exception</span></a><span class="symbol">)</span><span class="symbol">: </span><a
                     href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-nothing/index.html"><span
                     class="identifier">Nothing</span></a></code>
-            <p>Handles filesystem errors by always throwing the exception.</p>
+            <p>Handles file system errors by always throwing the exception.</p>
         </td>
     </tr>
     </tbody>

@@ -20,7 +20,7 @@
         class="identifier">PathNode</span></a><span class="symbol">, </span><span class="identifier"
                                                                                   id="io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)), kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )))/onError">onError</span><span
         class="symbol">:</span>&nbsp;<a href="../../io.github.lostatc.doppel.handlers/-error-handler.html"><span
-        class="identifier">ErrorHandler</span></a>&nbsp;<span class="symbol">=</span>&nbsp;::skipOnError<span
+        class="identifier">ErrorHandler</span></a>&nbsp;<span class="symbol">=</span>&nbsp;::throwOnError<span
         class="symbol">, </span><span class="identifier"
                                       id="io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)), kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )))/pathConverter">pathConverter</span><span
         class="symbol">:</span>&nbsp;<a href="../../io.github.lostatc.doppel.handlers/-path-converter.html"><span
@@ -34,14 +34,14 @@
     and
     <a href="from-nodes.html#io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)), kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )))/right">right</a>
     path node.</p>
-<p>All the paths in this diff will be associated with the filesystem of <a
+<p>All the paths in this diff will be associated with the file system of <a
         href="from-nodes.html#io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)), kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )))/left">left</a>.
     If
     <a href="from-nodes.html#io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)), kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )))/left">left</a>
     and
     <a href="from-nodes.html#io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)), kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )))/right">right</a>
     are
-    associated with different filesystems, <a
+    associated with different file systems, <a
             href="from-nodes.html#io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)), kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )))/pathConverter">pathConverter</a>
     will be invoked to convert them.</p>
 <p>The following exceptions can be passed to <a
@@ -54,7 +54,7 @@
             href="from-nodes.html#io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)), kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )))/pathConverter">pathConverter</a>.
     </li>
     <li><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.io/-no-such-file-exception/index.html">NoSuchFileException</a>
-        A descendant of one of the path nodes was not found in the filesystem.
+        A descendant of one of the path nodes was not found in the file system.
     </li>
     <li><a href="http://docs.oracle.com/javase/8/docs/api/java/io/IOException.html">IOException</a>: Some other I/O
         error occurred.

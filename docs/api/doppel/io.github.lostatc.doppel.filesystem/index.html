@@ -13,7 +13,7 @@
 <p>This package provides the <a href="-path-delta/index.html">PathDelta</a> class which allows changes to the filesystem
     to be queued up in memory and then
     applied all at once. Different types of changes that can be applied are represented by implementations of
-    <a href="-filesystem-action/index.html">FilesystemAction</a>.</p>
+    <a href="#">FilesystemAction</a>.</p>
 <h3>Types</h3>
 <table>
     <tbody>
@@ -24,7 +24,7 @@
         </td>
         <td>
             <code><span class="keyword">data</span> <span class="keyword">class </span><span class="identifier">CopyAction</span>&nbsp;<span
-                    class="symbol">:</span>&nbsp;<a href="-filesystem-action/index.html"><span class="identifier">FilesystemAction</span></a></code>
+                    class="symbol">:</span>&nbsp;<a href="-file-system-action/index.html"><span class="identifier">FileSystemAction</span></a></code>
             <p>An action that recursively copies a file or directory from <a href="-copy-action/source.html">source</a>
                 to <a href="-copy-action/target.html">target</a>.</p>
         </td>
@@ -36,7 +36,7 @@
         </td>
         <td>
             <code><span class="keyword">data</span> <span class="keyword">class </span><span class="identifier">CreateAction</span>&nbsp;<span
-                    class="symbol">:</span>&nbsp;<a href="-filesystem-action/index.html"><span class="identifier">FilesystemAction</span></a></code>
+                    class="symbol">:</span>&nbsp;<a href="-file-system-action/index.html"><span class="identifier">FileSystemAction</span></a></code>
             <p>An action that creates the file represented by <a href="-create-action/target.html">target</a>.</p>
         </td>
     </tr>
@@ -47,7 +47,7 @@
         </td>
         <td>
             <code><span class="keyword">data</span> <span class="keyword">class </span><span class="identifier">DeleteAction</span>&nbsp;<span
-                    class="symbol">:</span>&nbsp;<a href="-filesystem-action/index.html"><span class="identifier">FilesystemAction</span></a></code>
+                    class="symbol">:</span>&nbsp;<a href="-file-system-action/index.html"><span class="identifier">FileSystemAction</span></a></code>
             <p>An action that recursively deletes the file or directory represented by <a
                     href="-delete-action/target.html">target</a>.</p>
         </td>
@@ -64,12 +64,12 @@
     </tr>
     <tr>
         <td>
-            <p><a href="-filesystem-action/index.html">FilesystemAction</a><br/>
+            <p><a href="-file-system-action/index.html">FileSystemAction</a><br/>
                 (JVM)</p>
         </td>
         <td>
-            <code><span class="keyword">interface </span><span class="identifier">FilesystemAction</span></code>
-            <p>A change to apply to the filesystem.</p>
+            <code><span class="keyword">interface </span><span class="identifier">FileSystemAction</span></code>
+            <p>A change to apply to the file system.</p>
         </td>
     </tr>
     <tr>
@@ -79,7 +79,7 @@
         </td>
         <td>
             <code><span class="keyword">data</span> <span class="keyword">class </span><span class="identifier">MoveAction</span>&nbsp;<span
-                    class="symbol">:</span>&nbsp;<a href="-filesystem-action/index.html"><span class="identifier">FilesystemAction</span></a></code>
+                    class="symbol">:</span>&nbsp;<a href="-file-system-action/index.html"><span class="identifier">FileSystemAction</span></a></code>
             <p>An action that recursively moves a file or directory from <a href="-move-action/source.html">source</a>
                 to <a href="-move-action/target.html">target</a>.</p>
         </td>
@@ -91,7 +91,7 @@
         </td>
         <td>
             <code><span class="keyword">class </span><span class="identifier">PathDelta</span></code>
-            <p>A set of changes to apply to the filesystem.</p>
+            <p>A set of changes to apply to the file system.</p>
         </td>
     </tr>
     </tbody>
