@@ -35,14 +35,14 @@ import java.nio.file.Path
 typealias PathConverter = (Path, FileSystem) -> Path
 
 /**
- * A [PathConverter] that doesn't convert paths between filesystems.
+ * A [PathConverter] that doesn't convert paths between file systems.
  *
- * @throws [InvalidPathException] [path] is not associated with [filesystem].
+ * @throws [InvalidPathException] [path] is not associated with [fileSystem].
  */
-fun neverConvert(path: Path, filesystem: FileSystem): Path {
-    if (path.fileSystem == filesystem) {
+fun neverConvert(path: Path, fileSystem: FileSystem): Path {
+    if (path.fileSystem == fileSystem) {
         return path
     } else {
-        throw InvalidPathException(path.toString(), "The given path can not be converted to the given filesystem.")
+        throw InvalidPathException(path.toString(), "The given path can not be converted to the given file system.")
     }
 }

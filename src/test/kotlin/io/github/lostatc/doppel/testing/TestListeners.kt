@@ -29,33 +29,33 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 /**
- * The default configuration to use for in-memory filesystems used for testing.
+ * The default configuration to use for in-memory file systems used for testing.
  */
 val DEFAULT_JIMFS_CONFIG: Configuration = Configuration.unix().toBuilder()
     .setWorkingDirectory("/")
     .build()
 
 /**
- * Convert a path to another filesystem of the same type.
+ * Convert a path to another file system of the same type.
  */
-fun convertBasicPath(path: Path, filesystem: FileSystem): Path = filesystem.getPath(path.toString())
+fun convertBasicPath(path: Path, fileSystem: FileSystem): Path = fileSystem.getPath(path.toString())
 
 /**
  * A test listener that creates existing and a nonexistent files for testing.
  */
 class NonexistentFileListener : TestListener {
     /**
-     * A file that exists in the filesystem.
+     * A file that exists in the file system.
      */
     lateinit var existingFile: Path
 
     /**
-     * A directory that exists in the filesystem.
+     * A directory that exists in the file system.
      */
     lateinit var existingDir: Path
 
     /**
-     * A file that does not exist in the filesystem.
+     * A file that does not exist in the file system.
      */
     lateinit var nonexistentFile: Path
 

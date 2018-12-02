@@ -66,7 +66,7 @@ class PathDeltaTest : WordSpec() {
         }
 
         "PathDelta.view" should {
-            "return a view of the filesystem" {
+            "return a view of the file system" {
                 val delta = PathDelta()
                 val fs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
 

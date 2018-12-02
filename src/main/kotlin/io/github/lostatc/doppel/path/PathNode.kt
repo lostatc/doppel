@@ -22,7 +22,7 @@ package io.github.lostatc.doppel.path
 import io.github.lostatc.doppel.handlers.ErrorHandler
 import io.github.lostatc.doppel.handlers.ErrorHandlerAction
 import io.github.lostatc.doppel.handlers.throwOnError
-import io.github.lostatc.doppel.path.PathNode.Companion.fromFilesystem
+import io.github.lostatc.doppel.path.PathNode.Companion.fromFileSystem
 import io.github.lostatc.doppel.path.PathNode.Companion.of
 import java.io.IOException
 import java.nio.file.Files
@@ -59,7 +59,7 @@ enum class WalkDirection {
  * The properties [descendants] and [relativeDescendants] can be used to efficiently find descendants of this node by
  * their [Path].
  *
- * Each [PathNode] has a [type], which indicates the type of file the node represents in the filesystem. An initial type
+ * Each [PathNode] has a [type], which indicates the type of file the node represents in the file system. An initial type
  * is provided through the constructor, but this type can change based on the state of the node. For example, if the
  * [type] of a node is a regular file, then it will change to a directory if children are added. Custom file types with
  * custom behavior can be created by implementing [FileType].
@@ -67,8 +67,8 @@ enum class WalkDirection {
  * You can use [PathDiff] to get a comparision of two [PathNode] objects.
  *
  * [PathNode] objects can be created using the builder method [of] which provides a DSL for specifying what the
- * directory tree should look like. They can also be created by walking a directory tree in the filesystem using
- * [fromFilesystem].
+ * directory tree should look like. They can also be created by walking a directory tree in the file system using
+ * [fromFileSystem].
  */
 sealed class PathNode {
     /**
@@ -215,7 +215,7 @@ sealed class PathNode {
     abstract fun toAbsoluteNode(): PathNode
 
     /**
-     * Returns whether the file represented by this path node exists in the filesystem.
+     * Returns whether the file represented by this path node exists in the file system.
      *
      * @param [checkType] Check not only whether the file exists, but also whether the type of file matches the [type]
      * of its node.
@@ -232,7 +232,7 @@ sealed class PathNode {
     abstract fun sameContentsAs(other: PathNode): Boolean
 
     /**
-     * Creates the file represented by this path node in the filesystem.
+     * Creates the file represented by this path node in the file system.
      *
      * What type of file is created is determined by the [type].
      *
@@ -256,8 +256,8 @@ sealed class PathNode {
             return MutablePathNode.of(firstSegment, *segments, type = type, init = init)
         }
 
-        override fun fromFilesystem(path: Path, recursive: Boolean, typeFactory: (Path) -> FileType): PathNode =
-            MutablePathNode.fromFilesystem(path, recursive, typeFactory)
+        override fun fromFileSystem(path: Path, recursive: Boolean, typeFactory: (Path) -> FileType): PathNode =
+            MutablePathNode.fromFileSystem(path, recursive, typeFactory)
 
     }
 }
@@ -284,7 +284,7 @@ class MutablePathNode(
         require(fileName.parent == null) { "The given file name must not have a parent." }
 
         require(parent?.let { fileName.fileSystem == it.path.fileSystem } ?: true) {
-            "The given file name must be associated with the same filesystem as the given parent."
+            "The given file name must be associated with the same file system as the given parent."
         }
 
         // Make this path a child of its parent.
@@ -570,7 +570,7 @@ class MutablePathNode(
             return of(path, type = type, init = init)
         }
 
-        override fun fromFilesystem(path: Path, recursive: Boolean, typeFactory: (Path) -> FileType): MutablePathNode {
+        override fun fromFileSystem(path: Path, recursive: Boolean, typeFactory: (Path) -> FileType): MutablePathNode {
             val newNode = of(path, type = typeFactory(path))
 
             if (recursive) {
@@ -598,7 +598,7 @@ internal interface PathNodeFactory {
      * create new path nodes as children of this node. Builder methods can be created for custom [FileType]
      * implementations using [pathNode].
      *
-     * The whole tree of path nodes will be associated with the same filesystem as [path].
+     * The whole tree of path nodes will be associated with the same file system as [path].
      *
      * Example:
      * ```
@@ -629,7 +629,7 @@ internal interface PathNodeFactory {
      * Constructs a new path node from the given path segments.
      *
      * This is an overload of [of] that accepts strings that form a path when joined. The constructed file node is
-     * associated with the default filesystem.
+     * associated with the default file system.
      *
      * @see [Paths.get]
      */
@@ -640,19 +640,19 @@ internal interface PathNodeFactory {
     ): PathNode
 
     /**
-     * Constructs a new path node from files in the filesystem.
+     * Constructs a new path node from files in the file system.
      *
      * This method constructs a new node from the given [path] and gets the [type][PathNode.type] of the node from the
-     * filesystem. If [recursive] is `true` it also gets all descendants of the given [path] from the filesystem and
+     * file system. If [recursive] is `true` it also gets all descendants of the given [path] from the file system and
      * creates nodes for them, returning a tree of nodes.
      *
      * @param [path] The path to construct the new node from.
      * @param [recursive] Create a tree of nodes recursively.
      * @param [typeFactory] A function that determines which [FileType] to assign to each path node.
      */
-    fun fromFilesystem(
+    fun fromFileSystem(
         path: Path,
         recursive: Boolean = false,
-        typeFactory: (Path) -> FileType = ::fileTypeFromFilesystem
+        typeFactory: (Path) -> FileType = ::fileTypeFromFileSystem
     ): PathNode
 }

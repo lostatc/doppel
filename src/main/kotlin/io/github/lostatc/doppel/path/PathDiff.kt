@@ -57,23 +57,23 @@ data class PathDiff(
         /**
          * Constructs a new [PathDiff] from a [left] and [right] path node.
          *
-         * All the paths in this diff will be associated with the filesystem of [left]. If [left] and [right] are
-         * associated with different filesystems, [pathConverter] will be invoked to convert them.
+         * All the paths in this diff will be associated with the file system of [left]. If [left] and [right] are
+         * associated with different file systems, [pathConverter] will be invoked to convert them.
          *
          * The following exceptions can be passed to [onError]:
          * - [InvalidPathException]: A path could not be converted by [pathConverter].
-         * - [NoSuchFileException] A descendant of one of the path nodes was not found in the filesystem.
+         * - [NoSuchFileException] A descendant of one of the path nodes was not found in the file system.
          * - [IOException]: Some other I/O error occurred.
          *
          * @param [onError] A function that is called for each error that occurs and determines how to handle them.
-         * @property [pathConverter] A function which is used to convert [Path] objects between filesystems.
+         * @property [pathConverter] A function which is used to convert [Path] objects between file systems.
          */
         fun fromNodes(
             left: PathNode, right: PathNode,
             onError: ErrorHandler = ::throwOnError,
             pathConverter: PathConverter = ::neverConvert
         ): PathDiff {
-            // Convert the paths of the descendants of right node to the filesystem of the left node.
+            // Convert the paths of the descendants of right node to the file system of the left node.
             val convertedPaths = mutableMapOf<Path, Path>()
             associate@ for (descendant in right.relativeDescendants.keys) {
                 try {
@@ -94,7 +94,7 @@ data class PathDiff(
             val leftOnly = leftDescendants - rightDescendants
             val rightOnly = rightDescendants - leftDescendants
 
-            // Compare files in the filesystem.
+            // Compare files in the file system.
             val same = mutableSetOf<Path>()
             val different = mutableSetOf<Path>()
             val leftNewer = mutableSetOf<Path>()

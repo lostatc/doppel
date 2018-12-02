@@ -23,7 +23,7 @@ import java.nio.file.FileVisitResult
 import java.nio.file.Path
 
 /**
- * A value which determines how an error that occurs during a filesystem operation is handled.
+ * A value which determines how an error that occurs during a file system operation is handled.
  *
  * @property [visitResult] The corresponding [FileVisitResult] to return when walking a file tree.
  */
@@ -34,13 +34,13 @@ enum class ErrorHandlerAction(val visitResult: FileVisitResult) {
     SKIP(FileVisitResult.CONTINUE),
 
     /**
-     * Terminate the filesystem operation.
+     * Terminate the file system operation.
      */
     TERMINATE(FileVisitResult.TERMINATE)
 }
 
 /**
- * A function that is called for each error that occurs during a filesystem operation.
+ * A function that is called for each error that occurs during a file system operation.
  *
  * Functions of this type are passed the file that caused the error and the exception that was thrown. They return a
  * value which determines how that error is handled. If the error involves both a source file and a target file, then
@@ -49,21 +49,21 @@ enum class ErrorHandlerAction(val visitResult: FileVisitResult) {
 typealias ErrorHandler = (Path, Exception) -> ErrorHandlerAction
 
 /**
- * Handles filesystem errors by always skipping the file that caused the error.
+ * Handles file system errors by always skipping the file that caused the error.
  */
 @Suppress("UNUSED_PARAMETER")
 fun skipOnError(file: Path, exception: Exception): ErrorHandlerAction =
     ErrorHandlerAction.SKIP
 
 /**
- * Handles filesystem errors by always terminating the operation when there is an error.
+ * Handles file system errors by always terminating the operation when there is an error.
  */
 @Suppress("UNUSED_PARAMETER")
 fun terminateOnError(file: Path, exception: Exception): ErrorHandlerAction =
     ErrorHandlerAction.TERMINATE
 
 /**
- * Handles filesystem errors by always throwing the exception.
+ * Handles file system errors by always throwing the exception.
  */
 @Suppress("UNUSED_PARAMETER")
 fun throwOnError(file: Path, exception: Exception): Nothing {

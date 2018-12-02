@@ -26,9 +26,9 @@ import java.nio.file.LinkOption
 import java.nio.file.Path
 
 /**
- * A type of file in the filesystem.
+ * A type of file in the file system.
  *
- * This interface is for interacting with the filesystem in a way that is dependent on the type of file being
+ * This interface is for interacting with the file system in a way that is dependent on the type of file being
  * represented. Implementations of this interface are immutable.
  */
 interface FileType {
@@ -52,7 +52,7 @@ interface FileType {
     fun checkSame(left: Path, right: Path): Boolean
 
     /**
-     * Creates a file of this type at the given [path] in the filesystem.
+     * Creates a file of this type at the given [path] in the file system.
      *
      * @throws [IOException] An I/O error occurred while creating the file.
      */
@@ -169,7 +169,7 @@ class UnknownType : FileType {
  *
  * @throws [IOException] An I/O error occurred.
  */
-fun fileTypeFromFilesystem(path: Path): FileType = when {
+fun fileTypeFromFileSystem(path: Path): FileType = when {
     Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS) -> RegularFileType()
     Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS) -> DirectoryType()
     Files.isSymbolicLink(path) -> SymbolicLinkType(Files.readSymbolicLink(path))

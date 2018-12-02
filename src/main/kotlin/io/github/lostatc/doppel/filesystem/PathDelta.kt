@@ -26,22 +26,22 @@ import java.util.LinkedList
 import java.util.Objects
 
 /**
- * A set of changes to apply to the filesystem.
+ * A set of changes to apply to the file system.
  *
- * This class allows for creating a set of changes that can be applied to the filesystem. Changes are stored in a queue
- * and can be applied to the filesystem all at once. New changes can be queued up by passing instances of
- * [FilesystemAction] to the [add] method, but the filesystem is not modified until [apply] is called. There are actions
+ * This class allows for creating a set of changes that can be applied to the file system. Changes are stored in a queue
+ * and can be applied to the file system all at once. New changes can be queued up by passing instances of
+ * [FileSystemAction] to the [add] method, but the file system is not modified until [apply] is called. There are actions
  * for moving, copying, creating and deleting files and directories. Custom actions can be created by implementing
- * [FilesystemAction].
+ * [FileSystemAction].
  *
  * The [view] method can be used to see what a directory will look like after all changes are applied. The [clear] and
  * [undo] methods can be used to undo changes before they're applied.
  */
 class PathDelta {
     /**
-     * A queue of actions to apply to the filesystem.
+     * A queue of actions to apply to the file system.
      */
-    private val actions: Deque<FilesystemAction> = LinkedList()
+    private val actions: Deque<FileSystemAction> = LinkedList()
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -64,9 +64,9 @@ class PathDelta {
     /**
      * Adds the given [changes] to the queue.
      *
-     * These changes are not applied to the filesystem until the [apply] method is called.
+     * These changes are not applied to the file system until the [apply] method is called.
      */
-    fun add(vararg changes: FilesystemAction) {
+    fun add(vararg changes: FileSystemAction) {
         for (change in changes) {
             actions.addLast(change)
         }
@@ -95,10 +95,10 @@ class PathDelta {
     }
 
     /**
-     * Shows what the filesystem will look like after all changes are applied.
+     * Shows what the file system will look like after all changes are applied.
      *
-     * This returns a deep copy of [viewNode] that represents what the filesystem will look like after [apply] is called
-     * assuming there are no errors. This method does not modify the filesystem.
+     * This returns a deep copy of [viewNode] that represents what the file system will look like after [apply] is called
+     * assuming there are no errors. This method does not modify the file system.
      */
     fun view(viewNode: PathNode): PathNode {
         val outputNode = viewNode.toMutablePathNode()
@@ -109,14 +109,14 @@ class PathDelta {
     }
 
     /**
-     * Applies the changes in the queue to the filesystem in the order they were made.
+     * Applies the changes in the queue to the file system in the order they were made.
      *
-     * Applying the changes does not consume them. If an [ErrorHandler] that was passed to a [FilesystemAction] instance
+     * Applying the changes does not consume them. If an [ErrorHandler] that was passed to a [FileSystemAction] instance
      * throws an exception, it will be thrown here.
      */
     fun apply() {
         for (action in actions) {
-            action.applyFilesystem()
+            action.applyFileSystem()
         }
     }
 }

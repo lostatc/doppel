@@ -36,7 +36,7 @@ import java.nio.file.attribute.FileTime
 class PathDiffTest : WordSpec() {
     init {
         "PathDiff.fromNodes" should {
-            "throw when the nodes belong to different filesystems" {
+            "throw when the nodes belong to different file systems" {
                 val leftFs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
                 val rightFs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
 

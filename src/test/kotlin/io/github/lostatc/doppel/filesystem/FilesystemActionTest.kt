@@ -40,7 +40,7 @@ import java.nio.file.FileAlreadyExistsException
 import java.nio.file.Files
 import java.nio.file.InvalidPathException
 
-class FilesystemActionKtTest : WordSpec() {
+class FileSystemActionKtTest : WordSpec() {
     init {
         "addNodeToView" should {
             "add the node if it is a descendant" {
@@ -59,7 +59,7 @@ class FilesystemActionKtTest : WordSpec() {
                 viewNode.descendants.shouldNotContainKey(pathNode.path)
             }
 
-            "not add the node if it belongs to a different filesystem" {
+            "not add the node if it belongs to a different file system" {
                 val viewNodeFs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
                 val viewNode = MutablePathNode.of(viewNodeFs.getPath("/", "a"))
 
@@ -83,7 +83,7 @@ class FilesystemActionKtTest : WordSpec() {
                 viewNode.descendants.shouldNotContainKey(pathNode.path)
             }
 
-            "not remove the node if it belongs to a different filesystem" {
+            "not remove the node if it belongs to a different file system" {
                 val viewNodeFs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
                 val viewNode = MutablePathNode.of(viewNodeFs.getPath("/", "a"))
                 val testPath = viewNodeFs.getPath("/", "a", "b")
@@ -102,8 +102,8 @@ class FilesystemActionKtTest : WordSpec() {
 
 class MoveActionTest : WordSpec() {
     init {
-        "MoveAction.applyFilesystem" should {
-            "throw if source and target belong to different filesystems" {
+        "MoveAction.applyFileSystem" should {
+            "throw if source and target belong to different file systems" {
                 val sourceFs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
                 val targetFs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
 
@@ -116,11 +116,11 @@ class MoveActionTest : WordSpec() {
                 val action = MoveAction(sourceNode, targetNode, onError = ::throwOnError)
 
                 shouldThrow<InvalidPathException> {
-                    action.applyFilesystem()
+                    action.applyFileSystem()
                 }
             }
 
-            "recursively move files on the same filesystem" {
+            "recursively move files on the same file system" {
                 val fs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
 
                 val sourceNode = PathNode.of(fs.getPath("source")) {
@@ -142,7 +142,7 @@ class MoveActionTest : WordSpec() {
                 }
 
                 val action = MoveAction(sourceNode, targetNode)
-                action.applyFilesystem()
+                action.applyFileSystem()
 
                 assertSoftly {
                     expectedTargetNode.exists(recursive = true).shouldBeTrue()
@@ -150,7 +150,7 @@ class MoveActionTest : WordSpec() {
                 }
             }
 
-            "recursively move files between filesystems" {
+            "recursively move files between file systems" {
                 val sourceFs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
                 val targetFs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
 
@@ -174,7 +174,7 @@ class MoveActionTest : WordSpec() {
 
 
                 val action = MoveAction(sourceNode, targetNode, pathConverter = ::convertBasicPath)
-                action.applyFilesystem()
+                action.applyFileSystem()
 
                 assertSoftly {
                     expectedTargetNode.exists(recursive = true).shouldBeTrue()
@@ -200,7 +200,7 @@ class MoveActionTest : WordSpec() {
                 }
 
                 val action = MoveAction(sourceNode, targetNode)
-                action.applyFilesystem()
+                action.applyFileSystem()
 
                 expectedTargetNode.exists(recursive = true).shouldBeTrue()
             }
@@ -232,7 +232,7 @@ class MoveActionTest : WordSpec() {
                 val action = MoveAction(sourceNode, targetNode)
 
                 shouldThrow<FileAlreadyExistsException> {
-                    action.applyFilesystem()
+                    action.applyFileSystem()
                 }
 
                 expectedTargetNode.exists(recursive = true).shouldBeTrue()
@@ -261,12 +261,12 @@ class MoveActionTest : WordSpec() {
                 }
 
                 val action = MoveAction(sourceNode, targetNode, overwrite = true, onError = ::skipOnError)
-                action.applyFilesystem()
+                action.applyFileSystem()
 
                 expectedTargetNode.exists(recursive = true).shouldBeTrue()
             }
 
-            "move files atomically on the same filesystem" {
+            "move files atomically on the same file system" {
                 val fs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
 
                 val sourceNode = PathNode.of(fs.getPath("source")) {
@@ -282,7 +282,7 @@ class MoveActionTest : WordSpec() {
                 }
 
                 val action = MoveAction(sourceNode, targetNode, atomic = true)
-                action.applyFilesystem()
+                action.applyFileSystem()
 
                 expectedTargetNode.exists(recursive = true).shouldBeTrue()
             }
@@ -292,8 +292,8 @@ class MoveActionTest : WordSpec() {
 
 class CopyActionTest : WordSpec() {
     init {
-        "CopyAction.applyFilesystem" should {
-            "throw if source and target belong to different filesystems" {
+        "CopyAction.applyFileSystem" should {
+            "throw if source and target belong to different file systems" {
                 val sourceFs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
                 val targetFs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
 
@@ -306,11 +306,11 @@ class CopyActionTest : WordSpec() {
                 val action = CopyAction(sourceNode, targetNode, onError = ::throwOnError)
 
                 shouldThrow<InvalidPathException> {
-                    action.applyFilesystem()
+                    action.applyFileSystem()
                 }
             }
 
-            "recursively copy files on the same filesystem" {
+            "recursively copy files on the same file system" {
                 val fs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
 
                 val sourceNode = PathNode.of(fs.getPath("source")) {
@@ -332,7 +332,7 @@ class CopyActionTest : WordSpec() {
                 }
 
                 val action = CopyAction(sourceNode, targetNode)
-                action.applyFilesystem()
+                action.applyFileSystem()
 
                 assertSoftly {
                     expectedTargetNode.exists(recursive = true).shouldBeTrue()
@@ -341,7 +341,7 @@ class CopyActionTest : WordSpec() {
 
             }
 
-            "recursively copy files between filesystems" {
+            "recursively copy files between file systems" {
                 val sourceFs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
                 val targetFs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
 
@@ -365,7 +365,7 @@ class CopyActionTest : WordSpec() {
 
 
                 val action = CopyAction(sourceNode, targetNode, pathConverter = ::convertBasicPath)
-                action.applyFilesystem()
+                action.applyFileSystem()
 
                 assertSoftly {
                     expectedTargetNode.exists(recursive = true).shouldBeTrue()
@@ -391,7 +391,7 @@ class CopyActionTest : WordSpec() {
                 }
 
                 val action = CopyAction(sourceNode, targetNode)
-                action.applyFilesystem()
+                action.applyFileSystem()
 
                 expectedTargetNode.exists(recursive = true).shouldBeTrue()
             }
@@ -416,7 +416,7 @@ class CopyActionTest : WordSpec() {
                 }
 
                 val action = CopyAction(sourceNode, targetNode, followLinks = true)
-                action.applyFilesystem()
+                action.applyFileSystem()
 
                 expectedTargetNode.exists(recursive = true).shouldBeTrue()
             }
@@ -448,7 +448,7 @@ class CopyActionTest : WordSpec() {
                 val action = CopyAction(sourceNode, targetNode)
 
                 shouldThrow<FileAlreadyExistsException> {
-                    action.applyFilesystem()
+                    action.applyFileSystem()
                 }
 
                 expectedTargetNode.exists(recursive = true).shouldBeTrue()
@@ -477,7 +477,7 @@ class CopyActionTest : WordSpec() {
                 }
 
                 val action = CopyAction(sourceNode, targetNode, overwrite = true, onError = ::skipOnError)
-                action.applyFilesystem()
+                action.applyFileSystem()
 
                 expectedTargetNode.exists(recursive = true).shouldBeTrue()
             }
@@ -487,7 +487,7 @@ class CopyActionTest : WordSpec() {
 
 class DeleteActionTest : WordSpec() {
     init {
-        "DeleteAction.applyFilesystem" should {
+        "DeleteAction.applyFileSystem" should {
             "recursively delete files" {
                 val fs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
                 val targetNode = PathNode.of(fs.getPath("target")) {
@@ -502,7 +502,7 @@ class DeleteActionTest : WordSpec() {
                 targetNode.createFile(recursive = true)
 
                 val action = DeleteAction(targetNode)
-                action.applyFilesystem()
+                action.applyFileSystem()
 
                 Files.notExists(fs.getPath("target")).shouldBeTrue()
             }
@@ -519,7 +519,7 @@ class DeleteActionTest : WordSpec() {
                 targetNode.createFile(recursive = true)
 
                 val action = DeleteAction(targetNode)
-                action.applyFilesystem()
+                action.applyFileSystem()
 
                 Files.exists(linkTarget).shouldBeTrue()
             }

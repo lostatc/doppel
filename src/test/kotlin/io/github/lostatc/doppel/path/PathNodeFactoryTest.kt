@@ -80,8 +80,8 @@ class PathNodeFactoryTest : WordSpec() {
             }
         }
 
-        "PathNodeFactory.fromFilesystem" should {
-            "create a tree of nodes from the filesystem" {
+        "PathNodeFactory.fromFileSystem" should {
+            "create a tree of nodes from the file system" {
                 val fs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
                 val testPath = fs.getPath("a")
 
@@ -97,7 +97,7 @@ class PathNodeFactoryTest : WordSpec() {
                 expectedNode.createFile(recursive = true)
 
                 val testNode =
-                    PathNode.fromFilesystem(testPath, recursive = true)
+                    PathNode.fromFileSystem(testPath, recursive = true)
                 testNode.shouldBe(expectedNode)
             }
         }

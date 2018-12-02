@@ -52,7 +52,7 @@ class MutablePathNodeTest : WordSpec() {
                 }
             }
 
-            "throw if the file name and parent filesystems are different" {
+            "throw if the file name and parent file systems are different" {
                 val nameFs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
                 val parentFs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
 
