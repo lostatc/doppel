@@ -30,9 +30,9 @@ import java.util.Objects
  *
  * This class allows for creating a set of changes that can be applied to the file system. Changes are stored in a queue
  * and can be applied to the file system all at once. New changes can be queued up by passing instances of
- * [FileSystemAction] to the [add] method, but the file system is not modified until [apply] is called. There are actions
- * for moving, copying, creating and deleting files and directories. Custom actions can be created by implementing
- * [FileSystemAction].
+ * [FileSystemAction] to the [add] method, but the file system is not modified until [apply] is called. There are
+ * actions for moving, copying, creating and deleting files and directories. Custom actions can be created by
+ * implementing [FileSystemAction].
  *
  * The [view] method can be used to see what a directory will look like after all changes are applied. The [clear] and
  * [undo] methods can be used to undo changes before they're applied.
@@ -99,8 +99,8 @@ class PathDelta {
     /**
      * Shows what the file system will look like after all changes are applied.
      *
-     * This returns a deep copy of [viewNode] that represents what the file system will look like after [apply] is called
-     * assuming there are no errors. This method does not modify the file system.
+     * This returns a deep copy of [viewNode] that represents what the file system will look like after [apply] is
+     * called assuming there are no errors. This method does not modify the file system.
      */
     fun view(viewNode: PathNode): PathNode {
         val outputNode = viewNode.toMutablePathNode()

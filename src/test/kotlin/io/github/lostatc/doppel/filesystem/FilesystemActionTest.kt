@@ -20,8 +20,7 @@
 package io.github.lostatc.doppel.filesystem
 
 import com.google.common.jimfs.Jimfs
-import io.github.lostatc.doppel.handlers.skipOnError
-import io.github.lostatc.doppel.handlers.throwOnError
+import io.github.lostatc.doppel.handlers.SkipHandler
 import io.github.lostatc.doppel.path.MutablePathNode
 import io.github.lostatc.doppel.path.PathNode
 import io.github.lostatc.doppel.path.dir
@@ -113,7 +112,7 @@ class MoveActionTest : WordSpec() {
                 val targetNode = PathNode.of(targetFs.getPath("target"))
                 sourceNode.createFile(recursive = true)
 
-                val action = MoveAction(sourceNode, targetNode, onError = ::throwOnError)
+                val action = MoveAction(sourceNode, targetNode)
 
                 shouldThrow<InvalidPathException> {
                     action.applyFileSystem()
@@ -260,7 +259,10 @@ class MoveActionTest : WordSpec() {
                     file("b")
                 }
 
-                val action = MoveAction(sourceNode, targetNode, overwrite = true, onError = ::skipOnError)
+                val action = MoveAction(
+                    sourceNode, targetNode,
+                    overwrite = true, errorHandler = SkipHandler()
+                )
                 action.applyFileSystem()
 
                 expectedTargetNode.exists(recursive = true).shouldBeTrue()
@@ -303,7 +305,7 @@ class CopyActionTest : WordSpec() {
                 val targetNode = PathNode.of(targetFs.getPath("target"))
                 sourceNode.createFile(recursive = true)
 
-                val action = CopyAction(sourceNode, targetNode, onError = ::throwOnError)
+                val action = CopyAction(sourceNode, targetNode)
 
                 shouldThrow<InvalidPathException> {
                     action.applyFileSystem()
@@ -476,7 +478,10 @@ class CopyActionTest : WordSpec() {
                     file("b")
                 }
 
-                val action = CopyAction(sourceNode, targetNode, overwrite = true, onError = ::skipOnError)
+                val action = CopyAction(
+                    sourceNode, targetNode,
+                    overwrite = true, errorHandler = SkipHandler()
+                )
                 action.applyFileSystem()
 
                 expectedTargetNode.exists(recursive = true).shouldBeTrue()

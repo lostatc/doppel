@@ -21,8 +21,8 @@ package io.github.lostatc.doppel.filesystem
 
 import io.github.lostatc.doppel.handlers.ErrorHandler
 import io.github.lostatc.doppel.handlers.PathConverter
+import io.github.lostatc.doppel.handlers.ThrowHandler
 import io.github.lostatc.doppel.handlers.neverConvert
-import io.github.lostatc.doppel.handlers.throwOnError
 import io.github.lostatc.doppel.path.MutablePathNode
 import io.github.lostatc.doppel.path.PathNode
 import java.io.IOException
@@ -60,7 +60,7 @@ interface FileSystemAction {
      * A function that is called for each error that occurs while changes are being applied which determines how to
      * handle them.
      */
-    val onError: ErrorHandler
+    val errorHandler: ErrorHandler
 
     /**
      * Modifies [viewNode] to provide a view of what the file system will look like after [applyFileSystem] is called.
@@ -93,7 +93,7 @@ interface FileSystemAction {
  * This move may or may not be atomic. If it is not atomic and an exception is thrown, the state of the file system is
  * not defined.
  *
- * The following exceptions can be passed to [onError]:
+ * The following exceptions can be passed to [errorHandler]:
  * - [InvalidPathException]: A path could not be converted by [pathConverter].
  * - [NoSuchFileException]: There was an attempt to move a nonexistent file.
  * - [FileAlreadyExistsException]: The destination file already exists and [overwrite] is `false`.
@@ -118,7 +118,7 @@ data class MoveAction(
     val atomic: Boolean = false,
     val followLinks: Boolean = false,
     val pathConverter: PathConverter = ::neverConvert,
-    override val onError: ErrorHandler = ::throwOnError
+    override val errorHandler: ErrorHandler = ThrowHandler()
 ) : FileSystemAction {
     override fun applyView(viewNode: MutablePathNode) {
         removeNodeFromView(source, viewNode)
@@ -129,7 +129,7 @@ data class MoveAction(
         moveRecursively(
             source.path, target.path,
             overwrite = overwrite, atomic = atomic, followLinks = followLinks,
-            pathConverter = pathConverter, onError = onError
+            pathConverter = pathConverter, errorHandler = errorHandler
         )
     }
 }
@@ -147,7 +147,7 @@ data class MoveAction(
  * Copying a file or directory is not an atomic operation. If an [IOException] is thrown, then the state of the
  * file system is undefined.
  *
- * The following exceptions can be passed to [onError]:
+ * The following exceptions can be passed to [errorHandler]:
  * - [InvalidPathException]: A path could not be converted by [pathConverter].
  * - [NoSuchFileException]: There was an attempt to copy a nonexistent file.
  * - [FileAlreadyExistsException]: The destination file already exists and [overwrite] is `false`.
@@ -172,7 +172,7 @@ data class CopyAction(
     val copyAttributes: Boolean = false,
     val followLinks: Boolean = false,
     val pathConverter: PathConverter = ::neverConvert,
-    override val onError: ErrorHandler = ::throwOnError
+    override val errorHandler: ErrorHandler = ThrowHandler()
 ) : FileSystemAction {
     override fun applyView(viewNode: MutablePathNode) {
         addNodeToView(target, viewNode)
@@ -182,7 +182,7 @@ data class CopyAction(
         copyRecursively(
             source.path, target.path,
             overwrite = overwrite, copyAttributes = copyAttributes, followLinks = followLinks,
-            pathConverter = pathConverter, onError = onError
+            pathConverter = pathConverter, errorHandler = errorHandler
         )
     }
 }
@@ -190,7 +190,7 @@ data class CopyAction(
 /**
  * An action that creates the file represented by [target].
  *
- * The following exceptions can be passed to [onError]:
+ * The following exceptions can be passed to [errorHandler]:
  * - [IOException]: Some I/O error occurred while creating the file.
  *
  * @property [target] The path node representing the file to create.
@@ -199,14 +199,14 @@ data class CopyAction(
 data class CreateAction(
     val target: PathNode,
     val recursive: Boolean = false,
-    override val onError: ErrorHandler = ::throwOnError
+    override val errorHandler: ErrorHandler = ThrowHandler()
 ) : FileSystemAction {
     override fun applyView(viewNode: MutablePathNode) {
         addNodeToView(target, viewNode)
     }
 
     override fun applyFileSystem() {
-        target.createFile(recursive = recursive, onError = onError)
+        target.createFile(recursive = recursive, errorHandler = errorHandler)
     }
 }
 
@@ -217,7 +217,7 @@ data class CreateAction(
  *
  * If the file to be deleted is a symbolic link then the link itself, and not its target, is deleted.
  *
- * The following exceptions can be passed to [onError]:
+ * The following exceptions can be passed to [errorHandler]:
  * - [NoSuchFileException]: There was an attempt to delete a nonexistent file.
  * - [AccessDeniedException]: There was an attempt to open a directory that didn't succeed.
  * - [FileSystemLoopException]: [followLinks] is `true` and a cycle of symbolic links was detected.
@@ -229,13 +229,13 @@ data class CreateAction(
 data class DeleteAction(
     val target: PathNode,
     val followLinks: Boolean = false,
-    override val onError: ErrorHandler = ::throwOnError
+    override val errorHandler: ErrorHandler = ThrowHandler()
 ) : FileSystemAction {
     override fun applyView(viewNode: MutablePathNode) {
         removeNodeFromView(target, viewNode)
     }
 
     override fun applyFileSystem() {
-        deleteRecursively(target.path, followLinks = followLinks, onError = onError)
+        deleteRecursively(target.path, followLinks = followLinks, errorHandler = errorHandler)
     }
 }

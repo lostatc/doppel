@@ -22,8 +22,8 @@ package io.github.lostatc.doppel.path
 import io.github.lostatc.doppel.handlers.ErrorHandler
 import io.github.lostatc.doppel.handlers.ErrorHandlerAction
 import io.github.lostatc.doppel.handlers.PathConverter
+import io.github.lostatc.doppel.handlers.ThrowHandler
 import io.github.lostatc.doppel.handlers.neverConvert
-import io.github.lostatc.doppel.handlers.throwOnError
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.InvalidPathException
@@ -83,17 +83,17 @@ data class PathDiff(
          * If [left] and [right] are associated with different file systems, [pathConverter] will be invoked to convert
          * them.
          *
-         * The following exceptions can be passed to [onError]:
+         * The following exceptions can be passed to [errorHandler]:
          * - [InvalidPathException]: A path could not be converted by [pathConverter].
          * - [NoSuchFileException] A descendant of one of the path nodes was not found in the file system.
          * - [IOException]: Some other I/O error occurred.
          *
-         * @param [onError] A function that is called for each error that occurs and determines how to handle them.
+         * @param [errorHandler] A function that is called for each error that occurs and determines how to handle them.
          * @property [pathConverter] A function which is used to convert [Path] objects between file systems.
          */
         fun fromNodes(
             left: PathNode, right: PathNode,
-            onError: ErrorHandler = ::throwOnError,
+            errorHandler: ErrorHandler = ThrowHandler(),
             pathConverter: PathConverter = ::neverConvert
         ): PathDiff {
             // Convert the paths of the descendants of right node to the file system of the left node.
@@ -102,7 +102,7 @@ data class PathDiff(
                 try {
                     convertedPaths[pathConverter(descendant, left.path.fileSystem)] = descendant
                 } catch (e: InvalidPathException) {
-                    when (onError(descendant, e)) {
+                    when (errorHandler.handle(descendant, e)) {
                         ErrorHandlerAction.SKIP -> continue@associate
                         ErrorHandlerAction.TERMINATE -> break@associate
                     }
@@ -145,7 +145,7 @@ data class PathDiff(
                     if (leftTime > rightTime) leftNewer.add(commonPath) else rightNewer.add(commonPath)
 
                 } catch (e: IOException) {
-                    when (onError(commonPath, e)) {
+                    when (errorHandler.handle(commonPath, e)) {
                         ErrorHandlerAction.SKIP -> continue@compare
                         ErrorHandlerAction.TERMINATE -> break@compare
                     }

@@ -40,32 +40,38 @@ enum class ErrorHandlerAction(val visitResult: FileVisitResult) {
 }
 
 /**
- * A function that is called for each error that occurs during a file system operation.
- *
- * Functions of this type are passed the file that caused the error and the exception that was thrown. They return a
- * value which determines how that error is handled. If the error involves both a source file and a target file, then
- * the source file is passed in.
+ * A class which determines how errors that occur during a file system operation are handled.
  */
-typealias ErrorHandler = (Path, Exception) -> ErrorHandlerAction
+interface ErrorHandler {
+    /**
+     * This function is called for each error that occurs.
+     *
+     * @param [path] The path of the file that caused the error. If the error involves both a source file and a target
+     * file, then the source file is passed in.
+     * @param [exception] An exception that describes the error.
+     *
+     * @return A value which determines how the error is handled.
+     */
+    fun handle(path: Path, exception: Exception): ErrorHandlerAction
+}
 
 /**
- * Handles file system errors by always skipping the file that caused the error.
+ * An error handler that handles file system errors by always skipping the file that caused the error.
  */
-@Suppress("UNUSED_PARAMETER")
-fun skipOnError(file: Path, exception: Exception): ErrorHandlerAction =
-    ErrorHandlerAction.SKIP
+class SkipHandler : ErrorHandler {
+    override fun handle(path: Path, exception: Exception): ErrorHandlerAction = ErrorHandlerAction.SKIP
+}
 
 /**
- * Handles file system errors by always terminating the operation when there is an error.
+ * An error handler that handles file system errors by always terminating the operation.
  */
-@Suppress("UNUSED_PARAMETER")
-fun terminateOnError(file: Path, exception: Exception): ErrorHandlerAction =
-    ErrorHandlerAction.TERMINATE
+class TerminateHandler : ErrorHandler {
+    override fun handle(path: Path, exception: Exception): ErrorHandlerAction = ErrorHandlerAction.TERMINATE
+}
 
 /**
- * Handles file system errors by always throwing the exception.
+ * An error handler that handles file system errors by always throwing the exception.
  */
-@Suppress("UNUSED_PARAMETER")
-fun throwOnError(file: Path, exception: Exception): Nothing {
-    throw exception
+class ThrowHandler : ErrorHandler {
+    override fun handle(path: Path, exception: Exception): Nothing = throw exception
 }

@@ -21,7 +21,7 @@ package io.github.lostatc.doppel.path
 
 import io.github.lostatc.doppel.handlers.ErrorHandler
 import io.github.lostatc.doppel.handlers.ErrorHandlerAction
-import io.github.lostatc.doppel.handlers.throwOnError
+import io.github.lostatc.doppel.handlers.ThrowHandler
 import io.github.lostatc.doppel.path.PathNode.Companion.fromFileSystem
 import io.github.lostatc.doppel.path.PathNode.Companion.of
 import java.io.IOException
@@ -236,13 +236,13 @@ sealed class PathNode {
      *
      * What type of file is created is determined by the [type].
      *
-     * The following exceptions can be passed to [onError]:
+     * The following exceptions can be passed to [errorHandler]:
      * - [IOException]: Some I/O error occurred while creating the file.
      *
      * @param [recursive] Create this file and all its descendants.
-     * @param [onError] A function that is called for each error that occurs and determines how to handle them.
+     * @param [errorHandler] A function that is called for each error that occurs and determines how to handle them.
      */
-    abstract fun createFile(recursive: Boolean = false, onError: ErrorHandler = ::throwOnError)
+    abstract fun createFile(recursive: Boolean = false, errorHandler: ErrorHandler = ThrowHandler())
 
     companion object : PathNodeFactory {
         override fun of(path: Path, type: FileType, init: MutablePathNode.() -> Unit): PathNode =
@@ -456,7 +456,7 @@ class MutablePathNode(
         return type.checkSame(path, other.path)
     }
 
-    override fun createFile(recursive: Boolean, onError: ErrorHandler) {
+    override fun createFile(recursive: Boolean, errorHandler: ErrorHandler) {
         var nodesToCreate = sequenceOf(this)
         if (recursive) nodesToCreate += walkChildren()
 
@@ -464,7 +464,7 @@ class MutablePathNode(
             try {
                 node.type.createFile(node.path)
             } catch (e: IOException) {
-                when (onError(node.path, e)) {
+                when (errorHandler.handle(node.path, e)) {
                     ErrorHandlerAction.SKIP -> continue@create
                     ErrorHandlerAction.TERMINATE -> break@create
                 }
@@ -589,7 +589,7 @@ class MutablePathNode(
 /**
  * A factory for creating [PathNode] instances.
  */
-internal interface PathNodeFactory {
+private interface PathNodeFactory {
     /**
      * Constructs a new path node from the given [path] and its children.
      *

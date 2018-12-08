@@ -96,29 +96,30 @@ private interface ErrorHandlingVisitor : FileVisitor<Path> {
     /**
      * A function that determines how errors are handled.
      */
-    val onError: ErrorHandler
+    val errorHandler: ErrorHandler
 
     override fun preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult = FileVisitResult.CONTINUE
 
     override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult = FileVisitResult.CONTINUE
 
-    override fun visitFileFailed(file: Path, exc: IOException): FileVisitResult = onError(file, exc).visitResult
+    override fun visitFileFailed(file: Path, exc: IOException): FileVisitResult =
+        errorHandler.handle(file, exc).visitResult
 
     override fun postVisitDirectory(dir: Path, exc: IOException?): FileVisitResult =
-        if (exc == null) FileVisitResult.CONTINUE else onError(dir, exc).visitResult
+        if (exc == null) FileVisitResult.CONTINUE else errorHandler.handle(dir, exc).visitResult
 }
 
 /**
- * Calls [tryFunc] and passes any thrown [IOException] with [file] to [onError].
+ * Calls [tryFunc] and passes any thrown [IOException] with [file] to [errorHandler].
  *
  * @return How the file walk should be handled.
  */
-private fun handleWalkErrors(onError: ErrorHandler, file: Path, tryFunc: () -> Unit): FileVisitResult {
+private fun handleWalkErrors(errorHandler: ErrorHandler, file: Path, tryFunc: () -> Unit): FileVisitResult {
     return try {
         tryFunc()
         FileVisitResult.CONTINUE
     } catch (e: IOException) {
-        onError(file, e).visitResult
+        errorHandler.handle(file, e).visitResult
     }
 }
 
@@ -131,7 +132,7 @@ internal fun moveRecursively(
     source: Path, target: Path,
     overwrite: Boolean, atomic: Boolean, followLinks: Boolean,
     pathConverter: PathConverter,
-    onError: ErrorHandler
+    errorHandler: ErrorHandler
 ) {
     val moveOptions = listOfNotNull(
         if (overwrite) StandardCopyOption.REPLACE_EXISTING else null,
@@ -143,18 +144,18 @@ internal fun moveRecursively(
     ).toTypedArray()
 
     val fileVisitor = object : ErrorHandlingVisitor {
-        override val onError = onError
+        override val errorHandler = errorHandler
 
         override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
             val destFile = try {
                 target.resolve(pathConverter(source.relativize(file), target.fileSystem))
             } catch (e: InvalidPathException) {
-                return onError(file, e).visitResult
+                return errorHandler.handle(file, e).visitResult
             }
 
-            return handleWalkErrors(onError, file) {
+            return handleWalkErrors(errorHandler, file) {
                 // [Files.move] will not replace a non-empty directory. You need to delete it recursively.
-                if (overwrite) deleteRecursively(destFile, followLinks = followLinks, onError = onError)
+                if (overwrite) deleteRecursively(destFile, followLinks = followLinks, errorHandler = errorHandler)
                 Files.move(file, destFile, *moveOptions)
             }
         }
@@ -163,7 +164,7 @@ internal fun moveRecursively(
             val destDir = try {
                 target.resolve(pathConverter(source.relativize(dir), target.fileSystem))
             } catch (e: InvalidPathException) {
-                return onError(dir, e).visitResult
+                return errorHandler.handle(dir, e).visitResult
             }
 
             // Attempt to move the whole directory in one operation. If this succeeds, there's no need to move its
@@ -174,11 +175,11 @@ internal fun moveRecursively(
                 FileVisitResult.SKIP_SUBTREE
             } catch (e: IOException) {
                 // An atomic move didn't happen.
-                if (atomic) return onError(dir, e).visitResult
+                if (atomic) return errorHandler.handle(dir, e).visitResult
 
-                handleWalkErrors(onError, dir) {
+                handleWalkErrors(errorHandler, dir) {
                     // [Files.copy] will not replace a non-empty directory. You need to delete it recursively.
-                    if (overwrite) deleteRecursively(destDir, followLinks = followLinks, onError = onError)
+                    if (overwrite) deleteRecursively(destDir, followLinks = followLinks, errorHandler = errorHandler)
                     Files.copy(dir, destDir, *copyOptions)
                 }
             }
@@ -188,12 +189,12 @@ internal fun moveRecursively(
             val destDir = try {
                 target.resolve(pathConverter(source.relativize(dir), target.fileSystem))
             } catch (e: InvalidPathException) {
-                return onError(dir, e).visitResult
+                return errorHandler.handle(dir, e).visitResult
             }
 
             // Adding files to the directory may change its attributes, so they need to be copied after it is visited.
             // The directory must be removed from [source] after all its contents have been moved.
-            return handleWalkErrors(onError, dir) {
+            return handleWalkErrors(errorHandler, dir) {
                 copyFileAttributes(dir, destDir)
                 Files.deleteIfExists(dir)
                 super.postVisitDirectory(dir, exc)
@@ -217,7 +218,7 @@ internal fun copyRecursively(
     source: Path, target: Path,
     overwrite: Boolean, copyAttributes: Boolean, followLinks: Boolean,
     pathConverter: PathConverter,
-    onError: ErrorHandler
+    errorHandler: ErrorHandler
 ) {
     val copyOptions = listOfNotNull<CopyOption>(
         if (overwrite) StandardCopyOption.REPLACE_EXISTING else null,
@@ -226,18 +227,18 @@ internal fun copyRecursively(
     ).toTypedArray()
 
     val fileVisitor = object : ErrorHandlingVisitor {
-        override val onError = onError
+        override val errorHandler = errorHandler
 
         override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
             val destFile = try {
                 target.resolve(pathConverter(source.relativize(file), target.fileSystem))
             } catch (e: InvalidPathException) {
-                return onError(file, e).visitResult
+                return errorHandler.handle(file, e).visitResult
             }
 
-            return handleWalkErrors(onError, file) {
+            return handleWalkErrors(errorHandler, file) {
                 // [Files.copy] will not replace a non-empty directory. You need to delete it recursively.
-                if (overwrite) deleteRecursively(destFile, followLinks = followLinks, onError = onError)
+                if (overwrite) deleteRecursively(destFile, followLinks = followLinks, errorHandler = errorHandler)
                 Files.copy(file, destFile, *copyOptions)
             }
         }
@@ -246,13 +247,13 @@ internal fun copyRecursively(
             val destDir = try {
                 target.resolve(pathConverter(source.relativize(dir), target.fileSystem))
             } catch (e: InvalidPathException) {
-                return onError(dir, e).visitResult
+                return errorHandler.handle(dir, e).visitResult
             }
 
             // Copy the directory itself with its attributes if necessary.
-            return handleWalkErrors(onError, dir) {
+            return handleWalkErrors(errorHandler, dir) {
                 // [Files.copy] will not replace a non-empty directory. You need to delete it recursively.
-                if (overwrite) deleteRecursively(destDir, followLinks = followLinks, onError = onError)
+                if (overwrite) deleteRecursively(destDir, followLinks = followLinks, errorHandler = errorHandler)
                 Files.copy(dir, destDir, *copyOptions)
             }
         }
@@ -261,11 +262,11 @@ internal fun copyRecursively(
             val destDir = try {
                 target.resolve(pathConverter(source.relativize(dir), target.fileSystem))
             } catch (e: InvalidPathException) {
-                return onError(dir, e).visitResult
+                return errorHandler.handle(dir, e).visitResult
             }
 
             // Adding files to the directory may change its attributes, so they need to be copied after it is visited.
-            return handleWalkErrors(onError, dir) {
+            return handleWalkErrors(errorHandler, dir) {
                 if (copyAttributes) copyFileAttributes(dir, destDir)
                 super.postVisitDirectory(dir, exc)
             }
@@ -284,16 +285,16 @@ internal fun copyRecursively(
  *
  * @see [DeleteAction]
  */
-internal fun deleteRecursively(path: Path, followLinks: Boolean, onError: ErrorHandler) {
+internal fun deleteRecursively(path: Path, followLinks: Boolean, errorHandler: ErrorHandler) {
     val fileVisitor = object : ErrorHandlingVisitor {
-        override val onError = onError
+        override val errorHandler = errorHandler
 
         override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult =
-            handleWalkErrors(onError, file) { Files.delete(file) }
+            handleWalkErrors(errorHandler, file) { Files.delete(file) }
 
         override fun postVisitDirectory(dir: Path, exc: IOException?): FileVisitResult =
         // The directory cannot be deleted until all its contents have been deleted.
-            handleWalkErrors(onError, dir) {
+            handleWalkErrors(errorHandler, dir) {
                 Files.delete(dir)
                 super.postVisitDirectory(dir, exc)
             }
