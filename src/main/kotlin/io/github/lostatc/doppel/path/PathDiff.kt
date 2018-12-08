@@ -30,35 +30,58 @@ import java.nio.file.InvalidPathException
 import java.nio.file.Path
 
 /**
+ * A pair of file paths.
+ *
+ * @property [left] The first path.
+ * @property [right] The second path.
+ */
+data class PathPair(val left: Path?, val right: Path?)
+
+/**
  * An immutable comparison of two path nodes.
  *
+ * Unless otherwise specified, the paths in these properties are associated with the filesystem of [left].
+ *
  * @property [left] The first path node to compare.
+ *
  * @property [right] The second path node to compare.
+ *
  * @property [common] The relative paths of descendants that exist in both [left] and [right].
+ *
  * @property [leftOnly] The relative paths of descendants that exist in [left] but not [right].
+ *
  * @property [rightOnly] The relative paths of descendants that exist in [right] but not [left].
+ *
  * @property [same] The relative paths of descendants that are the same in both [left] and [right]. Files are the same
  * if they have the same relative path and the same contents. How file contents are compared is determined by the
  * [type][PathNode.type].
+ *
  * @property [different] The relative paths of descendants that are different in both [left] and [right]. Files are
  * different if they have the same relative path and different contents. How file contents are compared is determined by
  * the [type][PathNode.type].
+ *
  * @property [leftNewer] The relative paths of descendants that were modified more recently in [left] than in [right].
+ *
  * @property [rightNewer] The relative paths of descendants that were modified more recently in [right] than in [left].
+ *
+ * @property [pairs] Pairs of absolute paths of descendants. If a path exists in one node but not the other, the missing
+ * path will be `null`. The left path is associated with the filesystem of [left], and the right path is associated with
+ * the filesystem of [right].
  */
 data class PathDiff(
     val left: PathNode, val right: PathNode,
     val common: Set<Path>,
     val leftOnly: Set<Path>, val rightOnly: Set<Path>,
     val same: Set<Path>, val different: Set<Path>,
-    val leftNewer: Set<Path>, val rightNewer: Set<Path>
+    val leftNewer: Set<Path>, val rightNewer: Set<Path>,
+    val pairs: Set<PathPair>
 ) {
     companion object {
         /**
          * Constructs a new [PathDiff] from a [left] and [right] path node.
          *
-         * All the paths in this diff will be associated with the file system of [left]. If [left] and [right] are
-         * associated with different file systems, [pathConverter] will be invoked to convert them.
+         * If [left] and [right] are associated with different file systems, [pathConverter] will be invoked to convert
+         * them.
          *
          * The following exceptions can be passed to [onError]:
          * - [InvalidPathException]: A path could not be converted by [pathConverter].
@@ -94,6 +117,14 @@ data class PathDiff(
             val leftOnly = leftDescendants - rightDescendants
             val rightOnly = rightDescendants - leftDescendants
 
+            // Create absolute path pairs.
+            val pairs = (leftDescendants union rightDescendants).map {
+                val leftDescendant = left.relativeDescendants[it]?.path
+                val rightDescendant = right.relativeDescendants[convertedPaths[it]]?.path
+
+                PathPair(leftDescendant, rightDescendant)
+            }.toSet()
+
             // Compare files in the file system.
             val same = mutableSetOf<Path>()
             val different = mutableSetOf<Path>()
@@ -126,7 +157,8 @@ data class PathDiff(
                 common = common,
                 leftOnly = leftOnly, rightOnly = rightOnly,
                 same = same, different = different,
-                leftNewer = leftNewer, rightNewer = rightNewer
+                leftNewer = leftNewer, rightNewer = rightNewer,
+                pairs = pairs
             )
         }
     }

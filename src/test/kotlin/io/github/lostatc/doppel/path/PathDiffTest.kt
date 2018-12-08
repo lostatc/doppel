@@ -26,11 +26,11 @@ import io.github.lostatc.doppel.testing.DEFAULT_JIMFS_CONFIG
 import io.github.lostatc.doppel.testing.convertBasicPath
 import io.kotlintest.assertSoftly
 import io.kotlintest.matchers.collections.shouldContainExactly
+import io.kotlintest.shouldBe
 import io.kotlintest.shouldThrow
 import io.kotlintest.specs.WordSpec
 import java.nio.file.Files
 import java.nio.file.InvalidPathException
-import java.nio.file.Paths
 import java.nio.file.attribute.FileTime
 
 class PathDiffTest : WordSpec() {
@@ -74,25 +74,39 @@ class PathDiffTest : WordSpec() {
             }
 
             "correctly compare paths" {
-                val leftNode = PathNode.of("left") {
+                val leftFs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
+                val rightFs = Jimfs.newFileSystem(DEFAULT_JIMFS_CONFIG)
+
+                val leftNode = PathNode.of(leftFs.getPath("left")) {
                     file("b")
                     dir("c") {
                         file("d")
                     }
                 }
-                val rightNode = PathNode.of("right") {
+                val rightNode = PathNode.of(rightFs.getPath("right")) {
                     file("b")
                     dir("c") {
                         file("e")
                     }
                 }
 
-                val diff = PathDiff.fromNodes(leftNode, rightNode, onError = ::skipOnError)
+                val diff = PathDiff.fromNodes(
+                    leftNode, rightNode,
+                    onError = ::skipOnError, pathConverter = ::convertBasicPath
+                )
+
+                val expectedPairs = setOf(
+                    PathPair(leftFs.getPath("left", "b"), rightFs.getPath("right", "b")),
+                    PathPair(leftFs.getPath("left", "c"), rightFs.getPath("right", "c")),
+                    PathPair(leftFs.getPath("left", "c", "d"), null),
+                    PathPair(null, rightFs.getPath("right", "c", "e"))
+                )
 
                 assertSoftly {
-                    diff.common.shouldContainExactly(Paths.get("b"), Paths.get("c"))
-                    diff.leftOnly.shouldContainExactly(Paths.get("c", "d"))
-                    diff.rightOnly.shouldContainExactly(Paths.get("c", "e"))
+                    diff.common.shouldContainExactly(leftFs.getPath("b"), leftFs.getPath("c"))
+                    diff.leftOnly.shouldContainExactly(leftFs.getPath("c", "d"))
+                    diff.rightOnly.shouldContainExactly(leftFs.getPath("c", "e"))
+                    diff.pairs.shouldBe(expectedPairs)
                 }
             }
 
