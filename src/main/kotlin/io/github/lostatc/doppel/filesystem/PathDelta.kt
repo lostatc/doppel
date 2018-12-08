@@ -51,6 +51,8 @@ class PathDelta {
 
     override fun hashCode(): Int = Objects.hash(actions)
 
+    override fun toString(): String = actions.joinToString(separator = "\n")
+
     /**
      * Returns a delta containing all the changes in this delta first and [other] second.
      */
