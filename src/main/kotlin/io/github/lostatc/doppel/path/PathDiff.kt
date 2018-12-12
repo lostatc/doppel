@@ -22,8 +22,8 @@ package io.github.lostatc.doppel.path
 import io.github.lostatc.doppel.handlers.ErrorHandler
 import io.github.lostatc.doppel.handlers.ErrorHandlerAction
 import io.github.lostatc.doppel.handlers.PathConverter
+import io.github.lostatc.doppel.handlers.SimplePathConverter
 import io.github.lostatc.doppel.handlers.ThrowHandler
-import io.github.lostatc.doppel.handlers.neverConvert
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.InvalidPathException
@@ -94,13 +94,13 @@ data class PathDiff(
         fun fromNodes(
             left: PathNode, right: PathNode,
             errorHandler: ErrorHandler = ThrowHandler(),
-            pathConverter: PathConverter = ::neverConvert
+            pathConverter: PathConverter = SimplePathConverter()
         ): PathDiff {
             // Convert the paths of the descendants of right node to the file system of the left node.
             val convertedPaths = mutableMapOf<Path, Path>()
             associate@ for (descendant in right.relativeDescendants.keys) {
                 try {
-                    convertedPaths[pathConverter(descendant, left.path.fileSystem)] = descendant
+                    convertedPaths[pathConverter.convert(descendant, left.path.fileSystem)] = descendant
                 } catch (e: InvalidPathException) {
                     when (errorHandler.handle(descendant, e)) {
                         ErrorHandlerAction.SKIP -> continue@associate

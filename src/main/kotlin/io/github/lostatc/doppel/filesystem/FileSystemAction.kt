@@ -21,8 +21,8 @@ package io.github.lostatc.doppel.filesystem
 
 import io.github.lostatc.doppel.handlers.ErrorHandler
 import io.github.lostatc.doppel.handlers.PathConverter
+import io.github.lostatc.doppel.handlers.SimplePathConverter
 import io.github.lostatc.doppel.handlers.ThrowHandler
-import io.github.lostatc.doppel.handlers.neverConvert
 import io.github.lostatc.doppel.path.MutablePathNode
 import io.github.lostatc.doppel.path.PathNode
 import java.io.IOException
@@ -117,7 +117,7 @@ data class MoveAction(
     val overwrite: Boolean = false,
     val atomic: Boolean = false,
     val followLinks: Boolean = false,
-    val pathConverter: PathConverter = ::neverConvert,
+    val pathConverter: PathConverter = SimplePathConverter(),
     override val errorHandler: ErrorHandler = ThrowHandler()
 ) : FileSystemAction {
     override fun applyView(viewNode: MutablePathNode) {
@@ -171,7 +171,7 @@ data class CopyAction(
     val overwrite: Boolean = false,
     val copyAttributes: Boolean = false,
     val followLinks: Boolean = false,
-    val pathConverter: PathConverter = ::neverConvert,
+    val pathConverter: PathConverter = SimplePathConverter(),
     override val errorHandler: ErrorHandler = ThrowHandler()
 ) : FileSystemAction {
     override fun applyView(viewNode: MutablePathNode) {

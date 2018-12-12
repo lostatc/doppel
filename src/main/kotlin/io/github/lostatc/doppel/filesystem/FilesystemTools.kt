@@ -148,7 +148,7 @@ internal fun moveRecursively(
 
         override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
             val destFile = try {
-                target.resolve(pathConverter(source.relativize(file), target.fileSystem))
+                target.resolve(pathConverter.convert(source.relativize(file), target.fileSystem))
             } catch (e: InvalidPathException) {
                 return errorHandler.handle(file, e).visitResult
             }
@@ -162,7 +162,7 @@ internal fun moveRecursively(
 
         override fun preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult {
             val destDir = try {
-                target.resolve(pathConverter(source.relativize(dir), target.fileSystem))
+                target.resolve(pathConverter.convert(source.relativize(dir), target.fileSystem))
             } catch (e: InvalidPathException) {
                 return errorHandler.handle(dir, e).visitResult
             }
@@ -187,7 +187,7 @@ internal fun moveRecursively(
 
         override fun postVisitDirectory(dir: Path, exc: IOException?): FileVisitResult {
             val destDir = try {
-                target.resolve(pathConverter(source.relativize(dir), target.fileSystem))
+                target.resolve(pathConverter.convert(source.relativize(dir), target.fileSystem))
             } catch (e: InvalidPathException) {
                 return errorHandler.handle(dir, e).visitResult
             }
@@ -231,7 +231,7 @@ internal fun copyRecursively(
 
         override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
             val destFile = try {
-                target.resolve(pathConverter(source.relativize(file), target.fileSystem))
+                target.resolve(pathConverter.convert(source.relativize(file), target.fileSystem))
             } catch (e: InvalidPathException) {
                 return errorHandler.handle(file, e).visitResult
             }
@@ -245,7 +245,7 @@ internal fun copyRecursively(
 
         override fun preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult {
             val destDir = try {
-                target.resolve(pathConverter(source.relativize(dir), target.fileSystem))
+                target.resolve(pathConverter.convert(source.relativize(dir), target.fileSystem))
             } catch (e: InvalidPathException) {
                 return errorHandler.handle(dir, e).visitResult
             }
@@ -260,7 +260,7 @@ internal fun copyRecursively(
 
         override fun postVisitDirectory(dir: Path, exc: IOException?): FileVisitResult {
             val destDir = try {
-                target.resolve(pathConverter(source.relativize(dir), target.fileSystem))
+                target.resolve(pathConverter.convert(source.relativize(dir), target.fileSystem))
             } catch (e: InvalidPathException) {
                 return errorHandler.handle(dir, e).visitResult
             }

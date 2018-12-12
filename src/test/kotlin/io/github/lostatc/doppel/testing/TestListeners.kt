@@ -21,6 +21,7 @@ package io.github.lostatc.doppel.testing
 
 import com.google.common.jimfs.Configuration
 import com.google.common.jimfs.Jimfs
+import io.github.lostatc.doppel.handlers.PathConverter
 import io.kotlintest.Description
 import io.kotlintest.Spec
 import io.kotlintest.extensions.TestListener
@@ -36,9 +37,11 @@ val DEFAULT_JIMFS_CONFIG: Configuration = Configuration.unix().toBuilder()
     .build()
 
 /**
- * Convert a path to another file system of the same type.
+ * A [PathConverter] that converts a path to another file system of the same type.
  */
-fun convertBasicPath(path: Path, fileSystem: FileSystem): Path = fileSystem.getPath(path.toString())
+class BasicPathConverter : PathConverter {
+    override fun convert(path: Path, fileSystem: FileSystem): Path = fileSystem.getPath(path.toString())
+}
 
 /**
  * A test listener that creates existing and a nonexistent files for testing.

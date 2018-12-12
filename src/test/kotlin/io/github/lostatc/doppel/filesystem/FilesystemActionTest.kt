@@ -26,8 +26,8 @@ import io.github.lostatc.doppel.path.PathNode
 import io.github.lostatc.doppel.path.dir
 import io.github.lostatc.doppel.path.file
 import io.github.lostatc.doppel.path.symlink
+import io.github.lostatc.doppel.testing.BasicPathConverter
 import io.github.lostatc.doppel.testing.DEFAULT_JIMFS_CONFIG
-import io.github.lostatc.doppel.testing.convertBasicPath
 import io.kotlintest.assertSoftly
 import io.kotlintest.matchers.boolean.shouldBeTrue
 import io.kotlintest.matchers.collections.shouldBeEmpty
@@ -172,7 +172,7 @@ class MoveActionTest : WordSpec() {
                 }
 
 
-                val action = MoveAction(sourceNode, targetNode, pathConverter = ::convertBasicPath)
+                val action = MoveAction(sourceNode, targetNode, pathConverter = BasicPathConverter())
                 action.applyFileSystem()
 
                 assertSoftly {
@@ -366,7 +366,7 @@ class CopyActionTest : WordSpec() {
                 }
 
 
-                val action = CopyAction(sourceNode, targetNode, pathConverter = ::convertBasicPath)
+                val action = CopyAction(sourceNode, targetNode, pathConverter = BasicPathConverter())
                 action.applyFileSystem()
 
                 assertSoftly {

@@ -21,8 +21,8 @@ package io.github.lostatc.doppel.path
 
 import com.google.common.jimfs.Jimfs
 import io.github.lostatc.doppel.handlers.SkipHandler
+import io.github.lostatc.doppel.testing.BasicPathConverter
 import io.github.lostatc.doppel.testing.DEFAULT_JIMFS_CONFIG
-import io.github.lostatc.doppel.testing.convertBasicPath
 import io.kotlintest.assertSoftly
 import io.kotlintest.matchers.collections.shouldContainExactly
 import io.kotlintest.shouldBe
@@ -66,7 +66,7 @@ class PathDiffTest : WordSpec() {
                 rightNode.createFile(recursive = true)
 
                 // This should not throw an exception.
-                PathDiff.fromNodes(leftNode, rightNode, pathConverter = ::convertBasicPath)
+                PathDiff.fromNodes(leftNode, rightNode, pathConverter = BasicPathConverter())
             }
 
             "correctly compare paths" {
@@ -88,7 +88,7 @@ class PathDiffTest : WordSpec() {
 
                 val diff = PathDiff.fromNodes(
                     leftNode, rightNode,
-                    errorHandler = SkipHandler(), pathConverter = ::convertBasicPath
+                    errorHandler = SkipHandler(), pathConverter = BasicPathConverter()
                 )
 
                 val expectedPairs = setOf(

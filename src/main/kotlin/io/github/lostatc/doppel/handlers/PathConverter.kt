@@ -24,25 +24,30 @@ import java.nio.file.InvalidPathException
 import java.nio.file.Path
 
 /**
- * A function which converts a [Path] object to a [Path] of the given [FileSystem].
- *
- * This is only required to handle relative paths.
- *
- * @return A [Path] that is equivalent to the given [Path] and associated with the given [FileSystem].
- *
- * @throws [InvalidPathException] The given [Path] cannot be converted to a [Path] of the given [FileSystem].
+ * A class which converts [Path] objects between different [FileSystem] implementations.
  */
-typealias PathConverter = (Path, FileSystem) -> Path
+interface PathConverter {
+    /**
+     * Converts [path] to a [Path] associated with [fileSystem].
+     *
+     * This is only required to handle relative paths.
+     *
+     * @return A [Path] that is equivalent to [path] but associated with [fileSystem].
+     *
+     * @throws [InvalidPathException] The given [Path] cannot be converted to a [Path] of the given [FileSystem].
+     */
+    fun convert(path: Path, fileSystem: FileSystem): Path
+}
 
 /**
- * A [PathConverter] that doesn't convert paths between file systems.
- *
- * @throws [InvalidPathException] [path] is not associated with [fileSystem].
+ * A [PathConverter] that doesn't attempt to convert paths between file systems.
  */
-fun neverConvert(path: Path, fileSystem: FileSystem): Path {
-    if (path.fileSystem == fileSystem) {
-        return path
-    } else {
-        throw InvalidPathException(path.toString(), "The given path can not be converted to the given file system.")
+class SimplePathConverter : PathConverter {
+    override fun convert(path: Path, fileSystem: FileSystem): Path {
+        if (path.fileSystem == fileSystem) {
+            return path
+        } else {
+            throw InvalidPathException(path.toString(), "The given path can not be converted to the given file system.")
+        }
     }
 }
