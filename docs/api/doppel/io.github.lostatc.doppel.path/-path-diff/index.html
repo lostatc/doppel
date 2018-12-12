@@ -11,9 +11,11 @@
 <h1>PathDiff</h1>
 <code><span class="keyword">data</span> <span class="keyword">class </span><span
         class="identifier">PathDiff</span></code> <a
-        href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/path/PathDiff.kt#L49">(source)</a>
+        href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/path/PathDiff.kt#L71">(source)</a>
 <p><strong>Platform and version requirements:</strong> JVM</p>
 <p>An immutable comparison of two path nodes.</p>
+<p>Unless otherwise specified, the paths in these properties are associated with the filesystem of <a href="left.html">left</a>.
+</p>
 <h3>Constructors</h3>
 <table>
     <tbody>
@@ -23,54 +25,59 @@
         </td>
         <td>
             <code><span class="identifier">PathDiff</span><span class="symbol">(</span><span class="identifier"
-                                                                                             id="io.github.lostatc.doppel.path.PathDiff$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)))/left">left</span><span
+                                                                                             id="io.github.lostatc.doppel.path.PathDiff$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((io.github.lostatc.doppel.path.PathPair)))/left">left</span><span
                     class="symbol">:</span>&nbsp;<a href="../-path-node/index.html"><span
                     class="identifier">PathNode</span></a><span class="symbol">, </span><span class="identifier"
-                                                                                              id="io.github.lostatc.doppel.path.PathDiff$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)))/right">right</span><span
+                                                                                              id="io.github.lostatc.doppel.path.PathDiff$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((io.github.lostatc.doppel.path.PathPair)))/right">right</span><span
                     class="symbol">:</span>&nbsp;<a href="../-path-node/index.html"><span
                     class="identifier">PathNode</span></a><span class="symbol">, </span><span class="identifier"
-                                                                                              id="io.github.lostatc.doppel.path.PathDiff$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)))/common">common</span><span
+                                                                                              id="io.github.lostatc.doppel.path.PathDiff$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((io.github.lostatc.doppel.path.PathPair)))/common">common</span><span
                     class="symbol">:</span>&nbsp;<a
                     href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html"><span
                     class="identifier">Set</span></a><span class="symbol">&lt;</span><a
                     href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
                     class="symbol">&gt;</span><span class="symbol">, </span><span class="identifier"
-                                                                                  id="io.github.lostatc.doppel.path.PathDiff$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)))/leftOnly">leftOnly</span><span
+                                                                                  id="io.github.lostatc.doppel.path.PathDiff$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((io.github.lostatc.doppel.path.PathPair)))/leftOnly">leftOnly</span><span
                     class="symbol">:</span>&nbsp;<a
                     href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html"><span
                     class="identifier">Set</span></a><span class="symbol">&lt;</span><a
                     href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
                     class="symbol">&gt;</span><span class="symbol">, </span><span class="identifier"
-                                                                                  id="io.github.lostatc.doppel.path.PathDiff$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)))/rightOnly">rightOnly</span><span
+                                                                                  id="io.github.lostatc.doppel.path.PathDiff$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((io.github.lostatc.doppel.path.PathPair)))/rightOnly">rightOnly</span><span
                     class="symbol">:</span>&nbsp;<a
                     href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html"><span
                     class="identifier">Set</span></a><span class="symbol">&lt;</span><a
                     href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
                     class="symbol">&gt;</span><span class="symbol">, </span><span class="identifier"
-                                                                                  id="io.github.lostatc.doppel.path.PathDiff$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)))/same">same</span><span
+                                                                                  id="io.github.lostatc.doppel.path.PathDiff$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((io.github.lostatc.doppel.path.PathPair)))/same">same</span><span
                     class="symbol">:</span>&nbsp;<a
                     href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html"><span
                     class="identifier">Set</span></a><span class="symbol">&lt;</span><a
                     href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
                     class="symbol">&gt;</span><span class="symbol">, </span><span class="identifier"
-                                                                                  id="io.github.lostatc.doppel.path.PathDiff$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)))/different">different</span><span
+                                                                                  id="io.github.lostatc.doppel.path.PathDiff$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((io.github.lostatc.doppel.path.PathPair)))/different">different</span><span
                     class="symbol">:</span>&nbsp;<a
                     href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html"><span
                     class="identifier">Set</span></a><span class="symbol">&lt;</span><a
                     href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
                     class="symbol">&gt;</span><span class="symbol">, </span><span class="identifier"
-                                                                                  id="io.github.lostatc.doppel.path.PathDiff$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)))/leftNewer">leftNewer</span><span
+                                                                                  id="io.github.lostatc.doppel.path.PathDiff$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((io.github.lostatc.doppel.path.PathPair)))/leftNewer">leftNewer</span><span
                     class="symbol">:</span>&nbsp;<a
                     href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html"><span
                     class="identifier">Set</span></a><span class="symbol">&lt;</span><a
                     href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
                     class="symbol">&gt;</span><span class="symbol">, </span><span class="identifier"
-                                                                                  id="io.github.lostatc.doppel.path.PathDiff$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)))/rightNewer">rightNewer</span><span
+                                                                                  id="io.github.lostatc.doppel.path.PathDiff$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((io.github.lostatc.doppel.path.PathPair)))/rightNewer">rightNewer</span><span
                     class="symbol">:</span>&nbsp;<a
                     href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html"><span
                     class="identifier">Set</span></a><span class="symbol">&lt;</span><a
                     href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
-                    class="symbol">&gt;</span><span class="symbol">)</span></code>
+                    class="symbol">&gt;</span><span class="symbol">, </span><span class="identifier"
+                                                                                  id="io.github.lostatc.doppel.path.PathDiff$<init>(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((java.nio.file.Path)), kotlin.collections.Set((io.github.lostatc.doppel.path.PathPair)))/pairs">pairs</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html"><span
+                    class="identifier">Set</span></a><span class="symbol">&lt;</span><a href="../-path-pair/index.html"><span
+                    class="identifier">PathPair</span></a><span class="symbol">&gt;</span><span class="symbol">)</span></code>
             <p>An immutable comparison of two path nodes.</p>
         </td>
     </tr>
@@ -154,6 +161,21 @@
     </tr>
     <tr>
         <td>
+            <p><a href="pairs.html">pairs</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">val </span><span class="identifier">pairs</span><span class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html"><span
+                    class="identifier">Set</span></a><span class="symbol">&lt;</span><a href="../-path-pair/index.html"><span
+                    class="identifier">PathPair</span></a><span class="symbol">&gt;</span></code>
+            <p>Pairs of absolute paths of descendants. If a path exists in one node but not the other, the missing
+                path will be <code>null</code>. The left path is associated with the filesystem of <a href="left.html">left</a>,
+                and the right path is associated with
+                the filesystem of <a href="right.html">right</a>.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
             <p><a href="right.html">right</a></p>
         </td>
         <td>
@@ -221,25 +243,25 @@
         <td>
             <code><span class="keyword">fun </span><span class="identifier">fromNodes</span><span
                     class="symbol">(</span><span class="identifier"
-                                                 id="io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)), kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )))/left">left</span><span
+                                                 id="io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.handlers.ErrorHandler, io.github.lostatc.doppel.handlers.PathConverter)/left">left</span><span
                     class="symbol">:</span>&nbsp;<a href="../-path-node/index.html"><span
                     class="identifier">PathNode</span></a><span class="symbol">, </span><span class="identifier"
-                                                                                              id="io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)), kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )))/right">right</span><span
+                                                                                              id="io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.handlers.ErrorHandler, io.github.lostatc.doppel.handlers.PathConverter)/right">right</span><span
                     class="symbol">:</span>&nbsp;<a href="../-path-node/index.html"><span
                     class="identifier">PathNode</span></a><span class="symbol">, </span><span class="identifier"
-                                                                                              id="io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)), kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )))/onError">onError</span><span
+                                                                                              id="io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.handlers.ErrorHandler, io.github.lostatc.doppel.handlers.PathConverter)/errorHandler">errorHandler</span><span
                     class="symbol">:</span>&nbsp;<a
-                    href="../../io.github.lostatc.doppel.handlers/-error-handler.html"><span class="identifier">ErrorHandler</span></a>&nbsp;<span
-                    class="symbol">=</span>&nbsp;::throwOnError<span class="symbol">, </span><span class="identifier"
-                                                                                                   id="io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)), kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )))/pathConverter">pathConverter</span><span
-                    class="symbol">:</span>&nbsp;<a href="../../io.github.lostatc.doppel.handlers/-path-converter.html"><span
-                    class="identifier">PathConverter</span></a>&nbsp;<span
-                    class="symbol">=</span>&nbsp;::neverConvert<span class="symbol">)</span><span
-                    class="symbol">: </span><a href="./index.html"><span class="identifier">PathDiff</span></a></code>
+                    href="../../io.github.lostatc.doppel.handlers/-error-handler/index.html"><span class="identifier">ErrorHandler</span></a>&nbsp;<span
+                    class="symbol">=</span>&nbsp;ThrowHandler()<span class="symbol">, </span><span class="identifier"
+                                                                                                   id="io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.handlers.ErrorHandler, io.github.lostatc.doppel.handlers.PathConverter)/pathConverter">pathConverter</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="../../io.github.lostatc.doppel.handlers/-path-converter/index.html"><span class="identifier">PathConverter</span></a>&nbsp;<span
+                    class="symbol">=</span>&nbsp;SimplePathConverter()<span class="symbol">)</span><span class="symbol">: </span><a
+                    href="./index.html"><span class="identifier">PathDiff</span></a></code>
             <p>Constructs a new <a href="./index.html">PathDiff</a> from a <a
-                    href="from-nodes.html#io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)), kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )))/left">left</a>
+                    href="from-nodes.html#io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.handlers.ErrorHandler, io.github.lostatc.doppel.handlers.PathConverter)/left">left</a>
                 and
-                <a href="from-nodes.html#io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)), kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )))/right">right</a>
+                <a href="from-nodes.html#io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.handlers.ErrorHandler, io.github.lostatc.doppel.handlers.PathConverter)/right">right</a>
                 path node.</p>
         </td>
     </tr>

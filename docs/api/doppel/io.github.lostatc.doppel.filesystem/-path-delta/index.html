@@ -16,9 +16,9 @@
 <p>This class allows for creating a set of changes that can be applied to the file system. Changes are stored in a queue
     and can be applied to the file system all at once. New changes can be queued up by passing instances of
     <a href="../-file-system-action/index.html">FileSystemAction</a> to the <a href="add.html">add</a> method, but the
-    file system is not modified until <a href="apply.html">apply</a> is called. There are actions
-    for moving, copying, creating and deleting files and directories. Custom actions can be created by implementing
-    <a href="../-file-system-action/index.html">FileSystemAction</a>.</p>
+    file system is not modified until <a href="apply.html">apply</a> is called. There are
+    actions for moving, copying, creating and deleting files and directories. Custom actions can be created by
+    implementing <a href="../-file-system-action/index.html">FileSystemAction</a>.</p>
 <p>The <a href="view.html">view</a> method can be used to see what a directory will look like after all changes are
     applied. The <a href="clear.html">clear</a> and
     <a href="undo.html">undo</a> methods can be used to undo changes before they're applied.</p>
@@ -119,6 +119,16 @@
                     href="plus.html#io.github.lostatc.doppel.filesystem.PathDelta$plus(io.github.lostatc.doppel.filesystem.PathDelta)/other">other</a>
                 second.</p>
         </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="to-string.html">toString</a></p>
+        </td>
+        <td>
+            <code><span class="keyword">fun </span><span class="identifier">toString</span><span class="symbol">(</span><span
+                    class="symbol">)</span><span class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span
+                    class="identifier">String</span></a></code></td>
     </tr>
     <tr>
         <td>

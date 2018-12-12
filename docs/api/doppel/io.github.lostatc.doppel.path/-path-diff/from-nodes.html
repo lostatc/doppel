@@ -9,49 +9,47 @@
         href="index.html">PathDiff</a>&nbsp;/&nbsp;<a href="./from-nodes.html">fromNodes</a><br/>
 <br/>
 <h1>fromNodes</h1>
-<a name="io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)), kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )))"></a>
+<a name="io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.handlers.ErrorHandler, io.github.lostatc.doppel.handlers.PathConverter)"></a>
 <code><span class="keyword">fun </span><span class="identifier">fromNodes</span><span class="symbol">(</span><span
         class="identifier"
-        id="io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)), kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )))/left">left</span><span
+        id="io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.handlers.ErrorHandler, io.github.lostatc.doppel.handlers.PathConverter)/left">left</span><span
         class="symbol">:</span>&nbsp;<a href="../-path-node/index.html"><span
         class="identifier">PathNode</span></a><span class="symbol">, </span><span class="identifier"
-                                                                                  id="io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)), kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )))/right">right</span><span
+                                                                                  id="io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.handlers.ErrorHandler, io.github.lostatc.doppel.handlers.PathConverter)/right">right</span><span
         class="symbol">:</span>&nbsp;<a href="../-path-node/index.html"><span
         class="identifier">PathNode</span></a><span class="symbol">, </span><span class="identifier"
-                                                                                  id="io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)), kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )))/onError">onError</span><span
-        class="symbol">:</span>&nbsp;<a href="../../io.github.lostatc.doppel.handlers/-error-handler.html"><span
-        class="identifier">ErrorHandler</span></a>&nbsp;<span class="symbol">=</span>&nbsp;::throwOnError<span
+                                                                                  id="io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.handlers.ErrorHandler, io.github.lostatc.doppel.handlers.PathConverter)/errorHandler">errorHandler</span><span
+        class="symbol">:</span>&nbsp;<a href="../../io.github.lostatc.doppel.handlers/-error-handler/index.html"><span
+        class="identifier">ErrorHandler</span></a>&nbsp;<span class="symbol">=</span>&nbsp;ThrowHandler()<span
         class="symbol">, </span><span class="identifier"
-                                      id="io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)), kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )))/pathConverter">pathConverter</span><span
-        class="symbol">:</span>&nbsp;<a href="../../io.github.lostatc.doppel.handlers/-path-converter.html"><span
-        class="identifier">PathConverter</span></a>&nbsp;<span class="symbol">=</span>&nbsp;::neverConvert<span
+                                      id="io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.handlers.ErrorHandler, io.github.lostatc.doppel.handlers.PathConverter)/pathConverter">pathConverter</span><span
+        class="symbol">:</span>&nbsp;<a href="../../io.github.lostatc.doppel.handlers/-path-converter/index.html"><span
+        class="identifier">PathConverter</span></a>&nbsp;<span class="symbol">=</span>&nbsp;SimplePathConverter()<span
         class="symbol">)</span><span class="symbol">: </span><a href="index.html"><span
         class="identifier">PathDiff</span></a></code> <a
-        href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/path/PathDiff.kt#L71">(source)</a>
+        href="https://github.com/lostatc/doppel/blob/master/src/main/kotlin/io/github/lostatc/doppel/path/PathDiff.kt#L94">(source)</a>
 <p><strong>Platform and version requirements:</strong> JVM</p>
 <p>Constructs a new <a href="index.html">PathDiff</a> from a <a
-        href="from-nodes.html#io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)), kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )))/left">left</a>
+        href="from-nodes.html#io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.handlers.ErrorHandler, io.github.lostatc.doppel.handlers.PathConverter)/left">left</a>
     and
-    <a href="from-nodes.html#io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)), kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )))/right">right</a>
+    <a href="from-nodes.html#io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.handlers.ErrorHandler, io.github.lostatc.doppel.handlers.PathConverter)/right">right</a>
     path node.</p>
-<p>All the paths in this diff will be associated with the file system of <a
-        href="from-nodes.html#io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)), kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )))/left">left</a>.
-    If
-    <a href="from-nodes.html#io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)), kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )))/left">left</a>
+<p>If <a
+        href="from-nodes.html#io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.handlers.ErrorHandler, io.github.lostatc.doppel.handlers.PathConverter)/left">left</a>
     and
-    <a href="from-nodes.html#io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)), kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )))/right">right</a>
-    are
-    associated with different file systems, <a
-            href="from-nodes.html#io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)), kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )))/pathConverter">pathConverter</a>
-    will be invoked to convert them.</p>
+    <a href="from-nodes.html#io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.handlers.ErrorHandler, io.github.lostatc.doppel.handlers.PathConverter)/right">right</a>
+    are associated with different file systems, <a
+            href="from-nodes.html#io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.handlers.ErrorHandler, io.github.lostatc.doppel.handlers.PathConverter)/pathConverter">pathConverter</a>
+    will be invoked to convert
+    them.</p>
 <p>The following exceptions can be passed to <a
-        href="from-nodes.html#io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)), kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )))/onError">onError</a>:
+        href="from-nodes.html#io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.handlers.ErrorHandler, io.github.lostatc.doppel.handlers.PathConverter)/errorHandler">errorHandler</a>:
 </p>
 <ul>
     <li>
         <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/InvalidPathException.html">InvalidPathException</a>:
         A path could not be converted by <a
-            href="from-nodes.html#io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, kotlin.Function2((java.nio.file.Path, java.lang.Exception, io.github.lostatc.doppel.handlers.ErrorHandlerAction)), kotlin.Function2((java.nio.file.Path, java.nio.file.FileSystem, )))/pathConverter">pathConverter</a>.
+            href="from-nodes.html#io.github.lostatc.doppel.path.PathDiff.Companion$fromNodes(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.handlers.ErrorHandler, io.github.lostatc.doppel.handlers.PathConverter)/pathConverter">pathConverter</a>.
     </li>
     <li><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.io/-no-such-file-exception/index.html">NoSuchFileException</a>
         A descendant of one of the path nodes was not found in the file system.
@@ -61,7 +59,8 @@
     </li>
 </ul>
 <h3>Parameters</h3>
-<p><a name="onError"></a>
-    <code>onError</code> - A function that is called for each error that occurs and determines how to handle them.</p>
+<p><a name="errorHandler"></a>
+    <code>errorHandler</code> - A function that is called for each error that occurs and determines how to handle them.
+</p>
 </BODY>
 </HTML>

@@ -10,17 +10,27 @@
 <h2>Package io.github.lostatc.doppel.handlers</h2>
 <p><strong>Platform and version requirements:</strong> JVM</p>
 <p>Functions for handling different kinds of events.</p>
-<p>Many functions, methods and classes that access or modify the filesystem accept an <a href="-error-handler.html">ErrorHandler</a>
-    to determine how
+<p>Many functions, methods and classes that access or modify the filesystem accept an <a
+        href="-error-handler/index.html">ErrorHandler</a> to determine how
     errors are handled on a file-by-file basis. This package provides the default error handlers <a
-            href="skip-on-error.html">skipOnError</a>,
-    <a href="terminate-on-error.html">terminateOnError</a> and <a href="throw-on-error.html">throwOnError</a>.</p>
+            href="#">skipOnError</a>,
+    <a href="#">terminateOnError</a> and <a href="#">throwOnError</a>.</p>
 <p>Some functions, methods and classes that access or modify the filesystem can work between filesystems if a
-    <a href="-path-converter.html">PathConverter</a> is provided. This package provides the default path converter <a
-            href="never-convert.html">neverConvert</a>.</p>
+    <a href="-path-converter/index.html">PathConverter</a> is provided. This package provides the default path converter
+    <a href="#">neverConvert</a>.</p>
 <h3>Types</h3>
 <table>
     <tbody>
+    <tr>
+        <td>
+            <p><a href="-error-handler/index.html">ErrorHandler</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">interface </span><span class="identifier">ErrorHandler</span></code>
+            <p>A class which determines how errors that occur during a file system operation are handled.</p>
+        </td>
+    </tr>
     <tr>
         <td>
             <p><a href="-error-handler-action/index.html">ErrorHandlerAction</a><br/>
@@ -31,134 +41,63 @@
             <p>A value which determines how an error that occurs during a file system operation is handled.</p>
         </td>
     </tr>
-    </tbody>
-</table>
-<h3>Type Aliases</h3>
-<table>
-    <tbody>
     <tr>
         <td>
-            <p><a href="-error-handler.html">ErrorHandler</a><br/>
+            <p><a href="-path-converter/index.html">PathConverter</a><br/>
                 (JVM)</p>
         </td>
         <td>
-            <code><span class="keyword">typealias </span><span class="identifier">ErrorHandler</span>&nbsp;<span
-                    class="symbol">=</span>&nbsp;<span class="symbol">(</span><a
-                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
-                    class="symbol">,</span>&nbsp;<a
-                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-exception/index.html"><span
-                    class="identifier">Exception</span></a><span class="symbol">)</span>&nbsp;<span
-                    class="symbol">-&gt;</span>&nbsp;<a href="-error-handler-action/index.html"><span
-                    class="identifier">ErrorHandlerAction</span></a></code>
-            <p>A function that is called for each error that occurs during a file system operation.</p>
+            <code><span class="keyword">interface </span><span class="identifier">PathConverter</span></code>
+            <p>A class which converts <a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html">Path</a> objects between
+                different <a
+                        href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/FileSystem.html">FileSystem</a>
+                implementations.</p>
         </td>
     </tr>
     <tr>
         <td>
-            <p><a href="-path-converter.html">PathConverter</a><br/>
+            <p><a href="-simple-path-converter/index.html">SimplePathConverter</a><br/>
                 (JVM)</p>
         </td>
         <td>
-            <code><span class="keyword">typealias </span><span class="identifier">PathConverter</span>&nbsp;<span
-                    class="symbol">=</span>&nbsp;<span class="symbol">(</span><a
-                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
-                    class="symbol">,</span>&nbsp;<a
-                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/FileSystem.html"><span
-                    class="identifier">FileSystem</span></a><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a
-                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a></code>
-            <p>A function which converts a <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html">Path</a>
-                object to a <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html">Path</a> of the
-                given <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/FileSystem.html">FileSystem</a>.
-            </p>
-        </td>
-    </tr>
-    </tbody>
-</table>
-<h3>Functions</h3>
-<table>
-    <tbody>
-    <tr>
-        <td>
-            <p><a href="never-convert.html">neverConvert</a><br/>
-                (JVM)</p>
-        </td>
-        <td>
-            <code><span class="keyword">fun </span><span class="identifier">neverConvert</span><span
-                    class="symbol">(</span><span class="identifier"
-                                                 id="io.github.lostatc.doppel.handlers$neverConvert(java.nio.file.Path, java.nio.file.FileSystem)/path">path</span><span
-                    class="symbol">:</span>&nbsp;<a
-                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
-                    class="symbol">, </span><span class="identifier"
-                                                  id="io.github.lostatc.doppel.handlers$neverConvert(java.nio.file.Path, java.nio.file.FileSystem)/fileSystem">fileSystem</span><span
-                    class="symbol">:</span>&nbsp;<a
-                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/FileSystem.html"><span
-                    class="identifier">FileSystem</span></a><span class="symbol">)</span><span
-                    class="symbol">: </span><a
-                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a></code>
-            <p>A <a href="-path-converter.html">PathConverter</a> that doesn't convert paths between file systems.</p>
+            <code><span class="keyword">class </span><span class="identifier">SimplePathConverter</span>&nbsp;<span
+                    class="symbol">:</span>&nbsp;<a href="-path-converter/index.html"><span class="identifier">PathConverter</span></a></code>
+            <p>A <a href="-path-converter/index.html">PathConverter</a> that doesn't attempt to convert paths between
+                file systems.</p>
         </td>
     </tr>
     <tr>
         <td>
-            <p><a href="skip-on-error.html">skipOnError</a><br/>
+            <p><a href="-skip-handler/index.html">SkipHandler</a><br/>
                 (JVM)</p>
         </td>
         <td>
-            <code><span class="keyword">fun </span><span class="identifier">skipOnError</span><span
-                    class="symbol">(</span><span class="identifier"
-                                                 id="io.github.lostatc.doppel.handlers$skipOnError(java.nio.file.Path, java.lang.Exception)/file">file</span><span
-                    class="symbol">:</span>&nbsp;<a
-                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
-                    class="symbol">, </span><span class="identifier"
-                                                  id="io.github.lostatc.doppel.handlers$skipOnError(java.nio.file.Path, java.lang.Exception)/exception">exception</span><span
-                    class="symbol">:</span>&nbsp;<a
-                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-exception/index.html"><span
-                    class="identifier">Exception</span></a><span class="symbol">)</span><span class="symbol">: </span><a
-                    href="-error-handler-action/index.html"><span
-                    class="identifier">ErrorHandlerAction</span></a></code>
-            <p>Handles file system errors by always skipping the file that caused the error.</p>
+            <code><span class="keyword">class </span><span class="identifier">SkipHandler</span>&nbsp;<span
+                    class="symbol">:</span>&nbsp;<a href="-error-handler/index.html"><span class="identifier">ErrorHandler</span></a></code>
+            <p>An error handler that handles file system errors by always skipping the file that caused the error.</p>
         </td>
     </tr>
     <tr>
         <td>
-            <p><a href="terminate-on-error.html">terminateOnError</a><br/>
+            <p><a href="-terminate-handler/index.html">TerminateHandler</a><br/>
                 (JVM)</p>
         </td>
         <td>
-            <code><span class="keyword">fun </span><span class="identifier">terminateOnError</span><span class="symbol">(</span><span
-                    class="identifier"
-                    id="io.github.lostatc.doppel.handlers$terminateOnError(java.nio.file.Path, java.lang.Exception)/file">file</span><span
-                    class="symbol">:</span>&nbsp;<a
-                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
-                    class="symbol">, </span><span class="identifier"
-                                                  id="io.github.lostatc.doppel.handlers$terminateOnError(java.nio.file.Path, java.lang.Exception)/exception">exception</span><span
-                    class="symbol">:</span>&nbsp;<a
-                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-exception/index.html"><span
-                    class="identifier">Exception</span></a><span class="symbol">)</span><span class="symbol">: </span><a
-                    href="-error-handler-action/index.html"><span
-                    class="identifier">ErrorHandlerAction</span></a></code>
-            <p>Handles file system errors by always terminating the operation when there is an error.</p>
+            <code><span class="keyword">class </span><span class="identifier">TerminateHandler</span>&nbsp;<span
+                    class="symbol">:</span>&nbsp;<a href="-error-handler/index.html"><span class="identifier">ErrorHandler</span></a></code>
+            <p>An error handler that handles file system errors by always terminating the operation.</p>
         </td>
     </tr>
     <tr>
         <td>
-            <p><a href="throw-on-error.html">throwOnError</a><br/>
+            <p><a href="-throw-handler/index.html">ThrowHandler</a><br/>
                 (JVM)</p>
         </td>
         <td>
-            <code><span class="keyword">fun </span><span class="identifier">throwOnError</span><span
-                    class="symbol">(</span><span class="identifier"
-                                                 id="io.github.lostatc.doppel.handlers$throwOnError(java.nio.file.Path, java.lang.Exception)/file">file</span><span
-                    class="symbol">:</span>&nbsp;<a
-                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
-                    class="symbol">, </span><span class="identifier"
-                                                  id="io.github.lostatc.doppel.handlers$throwOnError(java.nio.file.Path, java.lang.Exception)/exception">exception</span><span
-                    class="symbol">:</span>&nbsp;<a
-                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-exception/index.html"><span
-                    class="identifier">Exception</span></a><span class="symbol">)</span><span class="symbol">: </span><a
-                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-nothing/index.html"><span
-                    class="identifier">Nothing</span></a></code>
-            <p>Handles file system errors by always throwing the exception.</p>
+            <code><span class="keyword">class </span><span class="identifier">ThrowHandler</span>&nbsp;<span
+                    class="symbol">:</span>&nbsp;<a href="-error-handler/index.html"><span class="identifier">ErrorHandler</span></a></code>
+            <p>An error handler that handles file system errors by always throwing the exception.</p>
         </td>
     </tr>
     </tbody>

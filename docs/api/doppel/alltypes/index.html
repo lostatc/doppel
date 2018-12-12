@@ -56,10 +56,10 @@
     </tr>
     <tr>
         <td>
-            <a href="../io.github.lostatc.doppel.handlers/-error-handler.html">io.github.lostatc.doppel.handlers.ErrorHandler</a>
+            <a href="../io.github.lostatc.doppel.handlers/-error-handler/index.html">io.github.lostatc.doppel.handlers.ErrorHandler</a>
         </td>
         <td>
-            <p>A function that is called for each error that occurs during a file system operation.</p>
+            <p>A class which determines how errors that occur during a file system operation are handled.</p>
         </td>
     </tr>
     <tr>
@@ -106,13 +106,14 @@
     </tr>
     <tr>
         <td>
-            <a href="../io.github.lostatc.doppel.handlers/-path-converter.html">io.github.lostatc.doppel.handlers.PathConverter</a>
+            <a href="../io.github.lostatc.doppel.handlers/-path-converter/index.html">io.github.lostatc.doppel.handlers.PathConverter</a>
         </td>
         <td>
-            <p>A function which converts a <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html">Path</a>
-                object to a <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html">Path</a> of the
-                given <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/FileSystem.html">FileSystem</a>.
-            </p>
+            <p>A class which converts <a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html">Path</a> objects between
+                different <a
+                        href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/FileSystem.html">FileSystem</a>
+                implementations.</p>
         </td>
     </tr>
     <tr>
@@ -141,6 +142,14 @@
     </tr>
     <tr>
         <td>
+            <a href="../io.github.lostatc.doppel.path/-path-pair/index.html">io.github.lostatc.doppel.path.PathPair</a>
+        </td>
+        <td>
+            <p>A pair of file paths.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
             <a href="../io.github.lostatc.doppel.path/-regular-file-type/index.html">io.github.lostatc.doppel.path.RegularFileType</a>
         </td>
         <td>
@@ -149,10 +158,43 @@
     </tr>
     <tr>
         <td>
+            <a href="../io.github.lostatc.doppel.handlers/-simple-path-converter/index.html">io.github.lostatc.doppel.handlers.SimplePathConverter</a>
+        </td>
+        <td>
+            <p>A <a href="../io.github.lostatc.doppel.handlers/-path-converter/index.html">PathConverter</a> that
+                doesn't attempt to convert paths between file systems.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <a href="../io.github.lostatc.doppel.handlers/-skip-handler/index.html">io.github.lostatc.doppel.handlers.SkipHandler</a>
+        </td>
+        <td>
+            <p>An error handler that handles file system errors by always skipping the file that caused the error.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
             <a href="../io.github.lostatc.doppel.path/-symbolic-link-type/index.html">io.github.lostatc.doppel.path.SymbolicLinkType</a>
         </td>
         <td>
             <p>A type representing a symbolic link.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <a href="../io.github.lostatc.doppel.handlers/-terminate-handler/index.html">io.github.lostatc.doppel.handlers.TerminateHandler</a>
+        </td>
+        <td>
+            <p>An error handler that handles file system errors by always terminating the operation.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <a href="../io.github.lostatc.doppel.handlers/-throw-handler/index.html">io.github.lostatc.doppel.handlers.ThrowHandler</a>
+        </td>
+        <td>
+            <p>An error handler that handles file system errors by always throwing the exception.</p>
         </td>
     </tr>
     <tr>
