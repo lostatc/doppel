@@ -54,6 +54,16 @@
     </tr>
     <tr>
         <td>
+            <p><a href="-digest-algorithm/index.html">DigestAlgorithm</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">enum</span> <span class="keyword">class </span><span class="identifier">DigestAlgorithm</span></code>
+            <p>An algorithm used to create a message digest.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
             <p><a href="-duplicate-file-finder/index.html">DuplicateFileFinder</a><br/>
                 (JVM)</p>
         </td>
@@ -124,6 +134,35 @@
                 <a href="add-node-to-view.html#io.github.lostatc.doppel.filesystem$addNodeToView(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.MutablePathNode)/pathNode">pathNode</a>
                 starts with <a
                         href="add-node-to-view.html#io.github.lostatc.doppel.filesystem$addNodeToView(io.github.lostatc.doppel.path.PathNode, io.github.lostatc.doppel.path.MutablePathNode)/viewNode">viewNode</a>.
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="get-file-checksum.html">getFileChecksum</a><br/>
+                (JVM)</p>
+        </td>
+        <td>
+            <code><span class="keyword">fun </span><span class="identifier">getFileChecksum</span><span
+                    class="symbol">(</span><span class="identifier"
+                                                 id="io.github.lostatc.doppel.filesystem$getFileChecksum(java.nio.file.Path, io.github.lostatc.doppel.filesystem.DigestAlgorithm, kotlin.Int)/file">file</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="http://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html"><span class="identifier">Path</span></a><span
+                    class="symbol">, </span><span class="identifier"
+                                                  id="io.github.lostatc.doppel.filesystem$getFileChecksum(java.nio.file.Path, io.github.lostatc.doppel.filesystem.DigestAlgorithm, kotlin.Int)/algorithm">algorithm</span><span
+                    class="symbol">:</span>&nbsp;<a href="-digest-algorithm/index.html"><span class="identifier">DigestAlgorithm</span></a>&nbsp;<span
+                    class="symbol">=</span>&nbsp;DigestAlgorithm.SHA1<span class="symbol">, </span><span
+                    class="identifier"
+                    id="io.github.lostatc.doppel.filesystem$getFileChecksum(java.nio.file.Path, io.github.lostatc.doppel.filesystem.DigestAlgorithm, kotlin.Int)/bufferSize">bufferSize</span><span
+                    class="symbol">:</span>&nbsp;<a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a>&nbsp;<span
+                    class="symbol">=</span>&nbsp;4096<span class="symbol">)</span><span class="symbol">: </span><a
+                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-byte-array/index.html"><span
+                    class="identifier">ByteArray</span></a></code>
+            <p>This function computes and returns a checksum of the given <a
+                    href="get-file-checksum.html#io.github.lostatc.doppel.filesystem$getFileChecksum(java.nio.file.Path, io.github.lostatc.doppel.filesystem.DigestAlgorithm, kotlin.Int)/file">file</a>
+                using the given <a
+                        href="get-file-checksum.html#io.github.lostatc.doppel.filesystem$getFileChecksum(java.nio.file.Path, io.github.lostatc.doppel.filesystem.DigestAlgorithm, kotlin.Int)/algorithm">algorithm</a>.
             </p>
         </td>
     </tr>
