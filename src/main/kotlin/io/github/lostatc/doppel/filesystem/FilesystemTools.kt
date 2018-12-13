@@ -40,7 +40,7 @@ import java.security.MessageDigest
  *
  * @property [algorithmName] The name of the algorithm.
  */
-internal enum class DigestAlgorithm(val algorithmName: String) {
+enum class DigestAlgorithm(val algorithmName: String) {
     /**
      * The MD5 message digest algorithm.
      */
@@ -58,19 +58,20 @@ internal enum class DigestAlgorithm(val algorithmName: String) {
 }
 
 /**
- * This is the size of the buffer used when computing the checksum of a file.
- */
-private const val CHECKSUM_BUFFER_SIZE: Int = 4096
-
-/**
  * This function computes and returns a checksum of the given [file] using the given [algorithm].
+ *
+ * @param [bufferSize] The file is read this many bytes at a time.
  *
  * @throws [IOException] An I/O error occurred.
  */
-internal fun getFileChecksum(file: Path, algorithm: DigestAlgorithm = DigestAlgorithm.SHA1): ByteArray {
+fun getFileChecksum(
+    file: Path,
+    algorithm: DigestAlgorithm = DigestAlgorithm.SHA1,
+    bufferSize: Int = 4096
+): ByteArray {
     val messageDigest = MessageDigest.getInstance(algorithm.algorithmName)
     val inputStream = Files.newInputStream(file)
-    val buffer = ByteArray(CHECKSUM_BUFFER_SIZE)
+    val buffer = ByteArray(bufferSize)
 
     DigestInputStream(inputStream, messageDigest).use {
         do {
